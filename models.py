@@ -24,3 +24,29 @@ class BaseModel(db.Model):
             column: value if not isinstance(value, datetime.date) else value.strftime('%Y-%m-%d')
             for column, value in self._to_dict().items()
         }
+
+class Documents(BaseModel, db.Model):
+    __tablename__ = 'documents'
+    id = db.Column(db.Integer, primary_key=True)
+    data = db.Column(db.String(120))
+
+    # def __init__(self, id=None, data=None):
+    #     self.id = id
+    #     self.data = data
+
+    def __repr__(self):
+        return '<Documents %r>' % (self.id)
+
+class SharePrices(BaseModel, db.Model):
+    __tablename__ = 'share_prices'
+    timestamp = db.Column(db.Integer, primary_key=True)
+    open = db.Column(db.Integer)
+    close = db.Column(db.Integer)
+    volume = db.Column(db.Integer)
+
+    # def __init__(self, id=None, data=None):
+    #     self.id = id
+    #     self.data = data
+
+    def __repr__(self):
+        return '<SharePrices %r>' % (self.timestamp)

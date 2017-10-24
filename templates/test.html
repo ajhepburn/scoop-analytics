@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Documents</title>
+</head>
+<body>
+	<!-- {%for document in myDocuments%}
+	<li>{{document.data}}</li>
+	{% endfor %} -->
+
+	{%for share_price in share_prices%}
+	<li>{{share_price.open}}, {{share_price.close}}, {{share_price.volume}}</li>
+	{% endfor %} 
+</body>
+</html>
