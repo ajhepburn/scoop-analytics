@@ -18,12 +18,5 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:\
 %(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
 db.init_app(app)
 
-@app.route("/")
-def main():
-    myDocuments = Documents.query.all()
-    share_prices = SharePrices.query.all()
-    # print(share_prices)
-    return render_template('test.html', myDocuments=myDocuments, share_prices=share_prices)
-
 if __name__ == '__main__':
     app.run()
