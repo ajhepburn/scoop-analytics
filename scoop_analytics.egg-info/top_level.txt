@@ -1,1 +1,1 @@
-scoop-analytics
+scoop_analytics
