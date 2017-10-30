@@ -1,9 +1,11 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask import render_template
-from models import db, BaseModel, Documents, SharePrices
+from scoop_analytics.models import db, BaseModel, Documents, SharePrices
 
 app = Flask(__name__)
+
+import scoop_analytics.views
 
 POSTGRES = {
     'user': 'postgres',

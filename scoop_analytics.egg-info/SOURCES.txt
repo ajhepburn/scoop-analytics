@@ -1,7 +1,7 @@
-scoop-analytics/__init__.py
-scoop-analytics/manage.py
-scoop-analytics/models.py
-scoop-analytics/views.py
+scoop_analytics/__init__.py
+scoop_analytics/manage.py
+scoop_analytics/models.py
+scoop_analytics/views.py
 scoop_analytics.egg-info/PKG-INFO
 scoop_analytics.egg-info/SOURCES.txt
 scoop_analytics.egg-info/dependency_links.txt
