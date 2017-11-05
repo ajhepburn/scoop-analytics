@@ -39,9 +39,12 @@ class Documents(BaseModel, db.Model):
 
 class SharePrices(BaseModel, db.Model):
     __tablename__ = 'share_prices'
+    symbol = db.Column(db.String)
     timestamp = db.Column(db.Integer, primary_key=True)
     open = db.Column(db.Integer)
     close = db.Column(db.Integer)
+    high = db.Column(db.Integer)
+    low = db.Column(db.Integer)
     volume = db.Column(db.Integer)
 
     # def __init__(self, id=None, data=None):
@@ -49,4 +52,4 @@ class SharePrices(BaseModel, db.Model):
     #     self.data = data
 
     def __repr__(self):
-        return '<SharePrices %r>' % (self.timestamp)
+        return '<SharePrices %r>' % (self.symbol)
