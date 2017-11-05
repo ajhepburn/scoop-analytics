@@ -1,16 +1,16 @@
 <!-- <!DOCTYPE html>
 <html>
 <head>
-	<title>Documents</title>
+    <title>Documents</title>
 </head>
 <body>
-	{%for document in myDocuments%}
-	<li>{{document.data}}</li>
-	{% endfor %}
+    {%for document in myDocuments%}
+    <li>{{document.data}}</li>
+    {% endfor %}
 
-	{% for share_price in share_prices %}
-	<li>{{share_price.timestamp}}, {{share_price.open}}, {{share_price.close}}, {{share_price.volume}}</li>
-	{% endfor %}
+    {% for share_price in share_prices %}
+    <li>{{share_price.timestamp}}, {{share_price.open}}, {{share_price.close}}, {{share_price.volume}}</li>
+    {% endfor %}
 </body>
 </html> -->
 
@@ -46,55 +46,42 @@ var myLineChart = new Chart(ctx, {
     datasets: [{
         label: 'Open',
         data: open_data,
-        backgroundColor: [
-            'rgba(255, 99, 132, 0.2)',
-            'rgba(54, 162, 235, 0.2)',
-            'rgba(255, 206, 86, 0.2)',
-            'rgba(75, 192, 192, 0.2)',
-            'rgba(153, 102, 255, 0.2)',
-            'rgba(255, 159, 64, 0.2)'
-        ],
-        borderColor: [
-            'rgba(255,99,132,1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)',
-            'rgba(255, 159, 64, 1)'
-        ],
+        backgroundColor: 'rgba(192,192,192,0.2)',
+        borderColor: 'rgba(168,168,168,1)',
         borderWidth: 1
     }, {
         label: 'High',
         data: high_data,
         fill: false,
-        borderColor: [
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)',
-            'rgba(255, 159, 64, 1)'
-        ],
+        borderColor: '#3cba9f',
         borderWidth: 1
     }, {
         label: 'Low',
         data: low_data,
         fill: false,
-        borderColor: [
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)',
-            'rgba(255, 159, 64, 1)'
-        ],
+        borderColor: '#c45850',
         borderWidth: 1
     }],
     },
     options: {
         scales: {
             yAxes: [{
+                display: true,
+                scaleLabel: {
+                            display: true,
+                            labelString: 'Share Prices'
+                        },
                 ticks: {
                     beginAtZero:false
                 }
-            }]
+            }],
+            xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Time'
+                        }
+                    }]
         }
     }
 });
