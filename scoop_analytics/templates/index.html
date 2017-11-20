@@ -206,6 +206,8 @@ $(document).ready(function() {
         r3 = Math.random(),
         r4 = Math.random();
 
+    var open_data = [], high_data = [], low_data = [], timestamp_data = []
+
     for (var i = 0; i < 100; i++) {
       sin.push([ i, r1 * Math.sin( r2 +  i / (10 * (r4 + .5) ))]);
       cos.push([ i, r2 * Math.cos( r3 + i / (10 * (r3 + .5) ))]);
@@ -213,22 +215,29 @@ $(document).ready(function() {
       cos2.push([ i, r4 * Math.cos( r4 + i / (10 * (r1 + .5) ))]);
     }
 
+    {% for share_price in share_prices %}
+				open_data.push([Number({{ loop.index-1 }}), Number({{ share_price.open }})]);
+				high_data.push([Number({{ loop.index-1 }}), Number({{ share_price.high }})]);
+				low_data.push([Number({{ loop.index-1 }}), Number({{ share_price.low }})]);
+				timestamp_data.push("{{ share_price.timestamp }}");
+		{% endfor %}
+
+		console.log("Open: ", open_data);
+		console.log("High: ", high_data);
+		console.log("Low: ", low_data);
+
     return [
       {
-        data: sin,
-        label: "Sine Wave"
+        data: open_data,
+        label: "Open"
       },
       {
-        data: cos,
-        label: "Cosine Wave"
+        data: high_data,
+        label: "High"
       },
       {
-        data: sin2,
-        label: "Sine2 Wave"
-      },
-      {
-        data: cos2,
-        label: "Cosine2 Wave"
+        data: low_data,
+        label: "Low"
       }
     ];
   }
