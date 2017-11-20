@@ -6,7 +6,7 @@ import time
 
 @app.route("/")
 def main():
-	myDocuments = Documents.query.limit(10).all()
+	myDocuments = Documents.query.limit(100).all()
 	share_prices = SharePrices.query.limit(10).all()
 
 	for el in share_prices:
