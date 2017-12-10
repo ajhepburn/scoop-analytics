@@ -9,6 +9,7 @@
   <title>Scoop Analytics</title>
   <link rel="stylesheet" href="{{ url_for('static', filename = 'styles/main.css') }}">
   <script src="{{ url_for('static', filename = 'js/d3.min.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'js/jquery-3.2.1.min.js') }}"></script>
 </head>
 <body>
 <script>
@@ -146,10 +147,20 @@ function plot(params){
 		.on("mouseover", function(d,i){
 			d3.select(this)
 				.style("opacity", 1);
+				if($(this).attr("class")=="open price") {
+					self.selectAll(".area")
+						.style("opacity", function(d){
+							return 0.5;
+						});
+				}
 		})
 		.on("mouseout", function(d,i){
 			d3.select(this)
-				.style("opacity", 0.5);
+				.style("opacity", 0.1);
+				self.selectAll(".area")
+					.style("opacity", function(d){
+						return 0.15;
+					});
 		});
 
 	prices.forEach(function(price){
@@ -176,11 +187,6 @@ function plot(params){
 				.attr("r", 2);
 
 		//update
-		g.selectAll(".trendline")
-			.attr("d", function(d){
-				return line(d);
-			});
-
 		g.selectAll(".point")
 			.style("stroke", function(d,i){
 				return "black";
@@ -196,11 +202,12 @@ function plot(params){
 				return y(d.value);
 			});
 
-		//exit()
 		g.selectAll(".trendline")
-			.data([arr])
-			.exit()
-			.remove();
+			.attr("d", function(d){
+				return line(d);
+			});
+
+		//exit()
 		g.selectAll(".point")
 			.data(arr)
 			.exit()
