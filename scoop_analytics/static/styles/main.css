@@ -1,5 +1,5 @@
 body,html{
-	margin: 0;
+    margin: 0;
 	padding: 0;
 	font-family: "Arial", sans-serif;
 	font-size: 0.95em;
@@ -23,6 +23,11 @@ body,html{
 	fill: none;
 	stroke: #000;
 	shape-rendering: crispEdges;
+}
+.axis-label{
+	text-anchor:middle;
+	fill: black;
+	font-size:125%;
 }
 .gridline path,
 .gridline line{

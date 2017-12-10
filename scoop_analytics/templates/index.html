@@ -29,7 +29,7 @@ var width = w - margin.left - margin.right;
 var height = h - margin.top - margin.bottom;
 
 var svg = d3.select("body").append("svg")
-			.attr("id", "chart")
+    		.attr("id", "chart")
 			.attr("width", w)
 			.attr("height", h);
 var chart = svg.append("g")
@@ -37,6 +37,7 @@ var chart = svg.append("g")
 			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var timeParser = d3.timeParse("%s");
+
 var x = d3.scaleTime()
 		.domain(d3.extent(data, function(d){
 			var time = timeParser(d.timestamp);
@@ -51,6 +52,13 @@ var y = d3.scaleLinear()
 var xAxis = d3.axisBottom(x)
 			.tickFormat(d3.timeFormat("%H:%M"));
 var yAxis = d3.axisLeft(y);
+var xGridlines = d3.axisBottom(x)
+				.tickSize(-height,-height)
+				.tickFormat("");
+var yGridlines = d3.axisLeft(y)
+				.tickSize(-width,0,0)
+				.tickFormat("");
+
 var line = d3.line()
 			.x(function(d){
 				var time = timeParser(d.timestamp);
@@ -69,15 +77,42 @@ var area = d3.area()
 				return y(d.open);
 			});
 
+function drawAxes(params){
+	if(params.initialise){
+		this.append("g")
+			.classed("gridline x", true)
+			.attr("transform", "translate(0,"+height+")")
+			.call(params.gridlines.x);
+		this.append("g")
+			.classed("gridline y", true)
+			.attr("transform", "translate(0,0)")
+			.call(params.gridlines.y);
+
+		this.append("g")
+			.classed("axis x", true)
+			.attr("transform", "translate(" + 0 + "," + height + ")")
+			.call(params.axis.x);
+
+		this.append("g")
+			.classed("axis y", true)
+			.attr("transform", "translate(0,0)")
+			.call(params.axis.y);
+
+		this.select(".y.axis")
+			.append("text")
+			.classed("y axis-label",true)
+			.attr("transform", "translate(-56,"+height/2+") rotate(-90)")
+			.text("Share Price ($)");
+		this.select(".x.axis")
+			.append("text")
+			.classed("x axis-label",true)
+			.attr("transform", "translate("+width/2+",48)")
+			.text("Time (Hours, Minutes)");
+	}
+}
+
 function plot(params){
-	this.append("g")
-		.classed("x axis", true)
-		.attr("transform", "translate(0," + height + ")")
-		.call(params.axis.x);
-	this.append("g")
-		.classed("y axis", true)
-		.attr("transform", "translate(0,0)")
-		.call(params.axis.y);
+	drawAxes.call(this, params);
 	// enter()
 	this.selectAll(".area")
 		.data([params.data])
@@ -131,7 +166,12 @@ plot.call(chart, {
 	axis: {
 		x: xAxis,
 		y: yAxis
-	}
+	},
+	gridlines: {
+		x: xGridlines,
+		y: yGridlines,
+	},
+	initialise: true
 })
 </script>
 </body>
