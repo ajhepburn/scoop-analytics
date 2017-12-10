@@ -44,10 +44,9 @@ var x = d3.scaleTime()
 			return time;
 		}))
 		.range([0,width]);
+var yRange = d3.max(data, function(d){return d.open;}) - d3.min(data, function(d){return d.open;});
 var y = d3.scaleLinear()
-		.domain([0,d3.max(data, function(d){
-			return d.open;
-		})])
+		.domain([d3.min(data, function(d){return d.open;})-yRange,d3.max(data, function(d){return d.open;})])
 		.range([height, 0]);
 var xAxis = d3.axisBottom(x)
 			.tickFormat(d3.timeFormat("%H:%M"));
