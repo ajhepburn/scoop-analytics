@@ -1,248 +1,137 @@
-<!-- <!DOCTYPE html>
-<html>
-<head>
-    <title>Documents</title>
-</head>
-<body>
-    {%for document in myDocuments%}
-    <li>{{document.data}}</li>
-    {% endfor %}
-
-    {% for share_price in share_prices %}
-    <li>{{share_price.timestamp}}, {{share_price.open}}, {{share_price.close}}, {{share_price.volume}}</li>
-    {% endfor %}
-</body>
-</html>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
-</head>
-<body>
-
-{% for share_price in share_prices %}
+<!-- {% for share_price in share_prices %}
 <li>{{share_price.symbol}}, {{share_price.timestamp}}, {{share_price.open}}, {{share_price.close}}, {{share_price.high}}, {{share_price.low}}, {{share_price.volume}}</li>
-{% endfor %}
-
-<canvas id="myChart"></canvas>
-<script>
-var open_data = [], high_data = [], low_data = [], timestamp_data = [];
-
-{% for share_price in share_prices %}
-    open_data.push({{ share_price.open }});
-    high_data.push({{ share_price.high }});
-    low_data.push({{ share_price.low }});
-    timestamp_data.push("{{ share_price.timestamp }}");
-{% endfor %}
-
-var ctx = document.getElementById("myChart").getContext('2d');
-var myLineChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-    labels: timestamp_data,
-    datasets: [{
-        label: 'Open',
-        data: open_data,
-        backgroundColor: 'rgba(192,192,192,0.2)',
-        borderColor: 'rgba(168,168,168,1)',
-        borderWidth: 1
-    }, {
-        label: 'High',
-        data: high_data,
-        fill: false,
-        borderColor: '#3cba9f',
-        borderWidth: 1
-    }, {
-        label: 'Low',
-        data: low_data,
-        fill: false,
-        borderColor: '#c45850',
-        borderWidth: 1
-    }],
-    },
-    options: {
-        scales: {
-            yAxes: [{
-                display: true,
-                scaleLabel: {
-                            display: true,
-                            labelString: 'Share Prices'
-                        },
-                ticks: {
-                    beginAtZero:false
-                }
-            }],
-            xAxes: [{
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Time'
-                        }
-                    }]
-        }
-    }
-});
-</script>
-
-</body>
-</html> -->
+{% endfor %} -->
 
 <!DOCTYPE html>
-<meta charset="utf-8">
-
-<link href="{{ url_for('static', filename = 'styles/d3.css') }}" rel="stylesheet" type="text/css">
-
-<style>
-#test1 {
-  margin: 0;
-  padding: 0;
-  overflow: none;
-}
-</style>
-
-
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scoop Analytics</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename = 'styles/main.css') }}">
+  <script src="{{ url_for('static', filename = 'js/d3.min.js') }}"></script>
+</head>
 <body>
-
-<div id="test1">
-  <svg></svg>
-</div>
-
-<script src="http://mbostock.github.com/d3/d3.v2.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-<script src="{{ url_for('static', filename = 'js/nvtooltip.js') }}"></script>
-<script src="{{ url_for('static', filename = 'js/d3legend.js') }}"></script> 
-<script src="{{ url_for('static', filename = 'js/d3line.js') }}"></script> 
-<script src="{{ url_for('static', filename = 'js/d3linewithlegend.js') }}"></script> 
 <script>
+var data = [];
+{% for share_price in share_prices %}
+data.push({symbol: "{{share_price.symbol}}", timestamp: "{{share_price.timestamp}}", open: "{{share_price.open}}", close: "{{share_price.close}}", high: "{{share_price.high}}", low: "{{share_price.low}}", volume: "{{share_price.volume}}"});
+{% endfor %}
 
-function log(text) {
-  if (console && console.log) console.log(text);
-  return text;
+var w = 800;
+var h = 450;
+var margin = {
+  top: 58,
+  bottom: 100,
+  left: 80,
+  right: 40
 }
+var width = w - margin.left - margin.right;
+var height = h - margin.top - margin.bottom;
 
+var svg = d3.select("body").append("svg")
+			.attr("id", "chart")
+			.attr("width", w)
+			.attr("height", h);
+var chart = svg.append("g")
+			.classed("display", true)
+			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+var timeParser = d3.timeParse("%s");
+var x = d3.scaleTime()
+		.domain(d3.extent(data, function(d){
+			var time = timeParser(d.timestamp);
+			return time;
+		}))
+		.range([0,width]);
+var y = d3.scaleLinear()
+		.domain([0,d3.max(data, function(d){
+			return d.open;
+		})])
+		.range([height, 0]);
+var xAxis = d3.axisBottom(x)
+			.tickFormat(d3.timeFormat("%H:%M"));
+var yAxis = d3.axisLeft(y);
+var line = d3.line()
+			.x(function(d){
+				var time = timeParser(d.timestamp);
+				return x(time);
+			})
+			.y(function(d){
+				return y(d.open);
+			});
+var area = d3.area()
+			.x(function(d) {
+				var time = timeParser(d.timestamp);
+				return x(time);
+			})
+			.y0(height)
+			.y1(function(d){
+				return y(d.open);
+			});
 
-$(document).ready(function() {
-  var margin = {top: 30, right: 10, bottom: 50, left: 60},
-      chart = d3LineWithLegend()
-                .xAxis.label('Time (ms)')
-                .width(width(margin))
-                .height(height(margin))
-                .yAxis.label('Voltage (v)');
-
-
-  var svg = d3.select('#test1 svg')
-      .datum(generateData())
-
-  svg.transition().duration(500)
-      .attr('width', width(margin))
-      .attr('height', height(margin))
-      .call(chart);
-
-
-  chart.dispatch.on('showTooltip', function(e) {
-  var offset = $('#test1').offset(), // { left: 0, top: 0 }
-        left = e.pos[0] + offset.left,
-        top = e.pos[1] + offset.top,
-        formatter = d3.format(".04f");
-
-    var content = '<h3>' + e.series.label + '</h3>' +
-                  '<p>' +
-                  '<span class="value">[' + e.point[0] + ', ' + formatter(e.point[1]) + ']</span>' +
-                  '</p>';
-
-    nvtooltip.show([left, top], content);
-  });
-
-  chart.dispatch.on('hideTooltip', function(e) {
-    nvtooltip.cleanup();
-  });
-
-
-
-
-  $(window).resize(function() {
-    var margin = chart.margin();
-
-    chart
-      .width(width(margin))
-      .height(height(margin));
-
-    d3.select('#test1 svg')
-      .attr('width', width(margin))
-      .attr('height', height(margin))
-      .call(chart);
-
-    });
-
-
-
-
-  function width(margin) {
-    var w = $(window).width() - 20;
-
-    return ( (w - margin.left - margin.right - 20) < 0 ) ? margin.left + margin.right + 2 : w;
-  }
-
-  function height(margin) {
-    var h = $(window).height() - 20;
-
-    return ( h - margin.top - margin.bottom - 20 < 0 ) ? 
-              margin.top + margin.bottom + 2 : h;
-  }
-
-
-  //data
-  function generateData() {
-    var sin = [],
-        sin2 = [],
-        cos = [],
-        cos2 = [],
-        r1 = Math.random(),
-        r2 = Math.random(),
-        r3 = Math.random(),
-        r4 = Math.random();
-
-    var open_data = [], high_data = [], low_data = [], timestamp_data = []
-
-    for (var i = 0; i < 100; i++) {
-      sin.push([ i, r1 * Math.sin( r2 +  i / (10 * (r4 + .5) ))]);
-      cos.push([ i, r2 * Math.cos( r3 + i / (10 * (r3 + .5) ))]);
-      sin2.push([ i, r3 * Math.sin( r1 + i / (10 * (r2 + .5) ))]);
-      cos2.push([ i, r4 * Math.cos( r4 + i / (10 * (r1 + .5) ))]);
-    }
-
-    {% for share_price in share_prices %}
-				open_data.push([Number({{ loop.index-1 }}), Number({{ share_price.open }})]);
-				high_data.push([Number({{ loop.index-1 }}), Number({{ share_price.high }})]);
-				low_data.push([Number({{ loop.index-1 }}), Number({{ share_price.low }})]);
-				timestamp_data.push("{{ share_price.timestamp }}");
-		{% endfor %}
-
-		console.log("Open: ", open_data);
-		console.log("High: ", high_data);
-		console.log("Low: ", low_data);
-
-    return [
-      {
-        data: open_data,
-        label: "Open"
-      },
-      {
-        data: high_data,
-        label: "High"
-      },
-      {
-        data: low_data,
-        label: "Low"
-      }
-    ];
-  }
-
-});
-
-
+function plot(params){
+	this.append("g")
+		.classed("x axis", true)
+		.attr("transform", "translate(0," + height + ")")
+		.call(params.axis.x);
+	this.append("g")
+		.classed("y axis", true)
+		.attr("transform", "translate(0,0)")
+		.call(params.axis.y);
+	// enter()
+	this.selectAll(".area")
+		.data([params.data])
+		.enter()
+			.append("path")
+			.classed("area",true)
+	this.selectAll(".trendline")
+			.data([params.data])
+			.enter()
+				.append("path")
+				.classed("trendline", true);
+	this.selectAll(".point")
+		.data(params.data)
+		.enter()
+			.append("circle")
+			.classed("point", true)
+			.attr("r", 2);
+	// update
+	this.selectAll(".area")
+		.attr("d", function(d){
+			return area(d);
+		});
+	this.selectAll(".trendline")
+		.attr("d", function(d){
+			return line(d);
+		});
+	this.selectAll(".point")
+		.attr("cx", function(d){
+			var time = timeParser(d.timestamp);
+			return x(time);
+		})
+		.attr("cy", function(d){
+			return y(d.open);
+		});
+	// exit
+	this.selectAll(".area")
+		.data([params.data])
+		.exit()
+		.remove();
+	this.selectAll(".trendline")
+		.data([params.data])
+		.exit()
+		.remove();
+	this.selectAll(".point")
+		.data(params.data)
+		.exit()
+		.remove();
+}
+plot.call(chart, {
+	data: data,
+	axis: {
+		x: xAxis,
+		y: yAxis
+	}
+})
 </script>
+</body>
