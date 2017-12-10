@@ -1,12 +1,12 @@
 body,html{
     margin: 0;
-	padding: 0;
+    padding: 0;
 	font-family: "Arial", sans-serif;
 	font-size: 0.95em;
 	text-align: center;
 }
 #chart{
-	background-color: #F5F2EB;
+	background-color: #FFFFFF;
 	border: 1px solid #CCC;
 }
 .bar{
@@ -35,14 +35,21 @@ body,html{
 	stroke: #ccc;
 	shape-rendering: crispEdges;
 }
-.trendline{
+.trendline {
 	fill: none;
-	stroke: #ccc;
 	stroke-width: 4px;
+	shape-rendering: geometricPrecision;
 }
 .area{
-	opacity: 0.25;
-	fill: #ccc;
+	opacity: 0.15;
+	fill: #e6e6e6;
 	stroke: #ccc;
 	stroke-width: 1px;
+}
+.chart-header{
+	text-transform: capitalize;
+	font-size: 125%;
+}
+.price{
+	opacity:0.5;
 }
