@@ -177,12 +177,8 @@ function plot(params){
 				.append("circle")
 				.classed("point", true)
 				.attr("r", 4)
-				.style("fill", function(d,i){
-					return "#fff";
-				})
-				.style("opacity", function(d,i){
-					return 0.25;
-				});
+				.style("fill", "#fff")
+				.style("opacity", 0.25);
 
 		//update
 		g.selectAll(".point")
@@ -197,7 +193,8 @@ function plot(params){
 				d3.select(this)
 					.transition()
 					.attr("r", 6)
-					.style("opacity", 1);
+					.style("opacity", 1)
+					.style("stroke-width", 2);
 				g.selectAll(".trendline")
 					.transition()
 					.style("opacity", 1);
@@ -212,10 +209,11 @@ function plot(params){
 				d3.select(this)
 					.transition()
 					.attr("r", 4)
-					.style("opacity", 0.25);
+					.style("opacity", 0.25)
+					.style("stroke-width", 1);
 				g.selectAll(".trendline")
 					.transition()
-					.style("opacity", 0.25);
+					.style("opacity", 0.1);
 				d3.select(".chart-header").text("");
 			});
 
@@ -235,7 +233,8 @@ function plot(params){
 				g.selectAll(".point")
 					.transition()
 					.attr("r", 4)
-					.style("opacity", 1);
+					.style("opacity", 1)
+					.style("stroke-width", 1);
 			})
 			.on("mouseout", function(d,i){
 				d3.select(this)
@@ -245,7 +244,8 @@ function plot(params){
 						.style("opacity", 0.15);
 				g.selectAll(".point")
 					.transition()
-					.style("opacity", 0.25);
+					.style("opacity", 0.25)
+					.style("stroke-width", 1);
 			});
 
 
