@@ -179,13 +179,13 @@ function plot(params){
 				.attr("r", 4)
 				.style("fill", function(d,i){
 					return "#fff";
+				})
+				.style("opacity", function(d,i){
+					return 0.25;
 				});
 
 		//update
 		g.selectAll(".point")
-			.style("opacity", function(d,i){
-				return 0.25;
-			})
 			.attr("cx", function(d){
 				var time = timeParser(d.timestamp);
 				return x(time);
@@ -196,16 +196,11 @@ function plot(params){
 			.on("mouseover", function(d,i){
 				d3.select(this)
 					.transition()
-					.attr("r", function(d){
-						return 6;
-					})
-					.style("opacity", function(d,i){
-						return 1;
-					});
+					.attr("r", 6)
+					.style("opacity", 1);
 				g.selectAll(".trendline")
-					.style("opacity", function(d,i){
-						return 1;
-					});
+					.transition()
+					.style("opacity", 1);
 
 				var str = d.key.charAt(0).toUpperCase() + d.key.slice(1);
 				if (d.key=="high"||d.key=="low") str += " Average Market Price: ";
@@ -216,16 +211,11 @@ function plot(params){
 			.on("mouseout", function(d,i){
 				d3.select(this)
 					.transition()
-					.attr("r", function(d){
-						return 4;
-					})
-					.style("opacity", function(d,i){
-						return 0.25;
-					});
+					.attr("r", 4)
+					.style("opacity", 0.25);
 				g.selectAll(".trendline")
-					.style("opacity", function(d,i){
-						return 0.25;
-					});
+					.transition()
+					.style("opacity", 0.25);
 				d3.select(".chart-header").text("");
 			});
 
@@ -240,27 +230,22 @@ function plot(params){
 					var groupDOM = $(g).get(0)["_groups"][0][0];
 					if($(groupDOM).attr("class")=="open price") {
 						self.selectAll(".area")
-							.style("opacity", function(d){
-								return 0.5;
-							});
+							.style("opacity", 0.5);
 					}
-					g.selectAll(".point")
-						.style("opacity", function(d,i){
-							return 1;
-					});
+				g.selectAll(".point")
+					.transition()
+					.attr("r", 4)
+					.style("opacity", 1);
 			})
 			.on("mouseout", function(d,i){
 				d3.select(this)
 					.transition()
 					.style("opacity", 0.1);
 					self.selectAll(".area")
-						.style("opacity", function(d){
-							return 0.15;
-						});
-					g.selectAll(".point")
-						.style("opacity", function(d,i){
-							return 0.25;
-					});
+						.style("opacity", 0.15);
+				g.selectAll(".point")
+					.transition()
+					.style("opacity", 0.25);
 			});
 
 
