@@ -18,13 +18,13 @@ var data = [];
 data.push({symbol: "{{share_price.symbol}}", timestamp: "{{share_price.timestamp}}", open: "{{share_price.open}}", close: "{{share_price.close}}", high: "{{share_price.high}}", low: "{{share_price.low}}", volume: "{{share_price.volume}}"});
 {% endfor %}
 
-var w = 800;
-var h = 450;
+var w = 900;
+var h = 550;
 var margin = {
   top: 58,
   bottom: 100,
   left: 80,
-  right: 40
+  right: 100
 }
 var width = w - margin.left - margin.right;
 var height = h - margin.top - margin.bottom;
@@ -148,6 +148,34 @@ function plot(params){
 					return d;
 				})
 				.classed("price", true);
+
+	this.selectAll(".legend")
+		.data(prices)
+		.enter()
+		.append("g")
+		.attr("class", "legend")
+		.classed("legend", true)
+	this.selectAll(".legend")
+		.append("rect")
+		.attr("x", width+20)
+		.attr("y", function(d,i){
+			return i*20;
+		})
+		.attr("width", 10)
+		.attr("height", 10)
+		.style('fill', function(d,i) {
+			return colorScale(i);
+		});
+  	this.selectAll(".legend")
+  		.append("text")
+		.attr("x", width+38)
+		.attr("y", function(d,i){
+			return (i*20)+9;
+		})
+		.text(function(d){
+			return d.charAt(0).toUpperCase() + d.slice(1);
+		})
+		.style("fill", "#000");
 
 	// update
 	this.selectAll(".price")
