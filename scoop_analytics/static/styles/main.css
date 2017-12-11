@@ -52,3 +52,6 @@ body,html{
 	fill: black;
 	font-size:90%;
 }
+.legend text{
+	font-size:75%;
+}
