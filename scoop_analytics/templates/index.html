@@ -85,7 +85,8 @@ var area = d3.area()
 			.y0(height)
 			.y1(function(d){
 				return y(d.open);
-			});
+			})
+			.curve(d3.curveCardinal);
 
 function drawAxes(params){
 	if(params.initialise){
@@ -133,6 +134,7 @@ function plot(params){
 		.enter()
 			.append("path")
 			.classed("area",true)
+	
 	this.selectAll(".price")
 			.data(prices)
 			.enter()
@@ -142,27 +144,10 @@ function plot(params){
 				})
 				.classed("price", true);
 
+	// update
 	this.selectAll(".price")
 		.style("stroke", function(d,i){
 			return colorScale(i);
-		})
-		.on("mouseover", function(d,i){
-			d3.select(this)
-				.style("opacity", 1);
-				if($(this).attr("class")=="open price") {
-					self.selectAll(".area")
-						.style("opacity", function(d){
-							return 0.5;
-						});
-				}
-		})
-		.on("mouseout", function(d,i){
-			d3.select(this)
-				.style("opacity", 0.1);
-				self.selectAll(".area")
-					.style("opacity", function(d){
-						return 0.15;
-					});
 		});
 
 	prices.forEach(function(price){
@@ -194,7 +179,7 @@ function plot(params){
 				return "black";
 			})
 			.style("opacity", function(d,i){
-				return 1;
+				return 0.25;
 			})
 			.attr("cx", function(d){
 				var time = timeParser(d.timestamp);
@@ -207,6 +192,33 @@ function plot(params){
 		g.selectAll(".trendline")
 			.attr("d", function(d){
 				return line(d);
+			})
+			.on("mouseover", function(d,i){
+				d3.select(this)
+					.style("opacity", 1);
+					var groupDOM = $(g).get(0)["_groups"][0][0];
+					if($(groupDOM).attr("class")=="open price") {
+						self.selectAll(".area")
+							.style("opacity", function(d){
+								return 0.5;
+							});
+					}
+					g.selectAll(".point")
+						.style("opacity", function(d,i){
+							return 1;
+					})
+			})
+			.on("mouseout", function(d,i){
+				d3.select(this)
+					.style("opacity", 0.1);
+					self.selectAll(".area")
+						.style("opacity", function(d){
+							return 0.15;
+						});
+					g.selectAll(".point")
+						.style("opacity", function(d,i){
+							return 0.25;
+					})
 			});
 
 		//exit()

@@ -39,6 +39,7 @@ body,html{
 	fill: none;
 	stroke-width: 4px;
 	shape-rendering: geometricPrecision;
+	opacity: 0.1;
 }
 .area{
 	opacity: 0.15;
@@ -49,7 +50,4 @@ body,html{
 .chart-header{
 	text-transform: capitalize;
 	font-size: 125%;
-}
-.price{
-	opacity:0.1;
 }
