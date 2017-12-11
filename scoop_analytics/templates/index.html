@@ -45,6 +45,7 @@ var x = d3.scaleTime()
 			return time;
 		}))
 		.range([0,width]);
+
 var maxVal = d3.max([d3.max([
     d3.max(data, function(d) { return d.open; }),
     d3.max(data, function(d) { return d.high; })
@@ -74,7 +75,8 @@ var line = d3.line()
 			})
 			.y(function(d){
 				return y(d.value);
-			});
+			})
+			.curve(d3.curveCardinal);
 var area = d3.area()
 			.x(function(d) {
 				var time = timeParser(d.timestamp);
