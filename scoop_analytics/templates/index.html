@@ -88,6 +88,7 @@ var area = d3.area()
 			})
 			.curve(d3.curveCardinal);
 
+
 function drawAxes(params){
 	if(params.initialise){
 		this.append("g")
@@ -153,7 +154,9 @@ function plot(params){
 		.data(prices)
 		.enter()
 		.append("g")
-		.attr("class", "legend")
+		.attr("class", function(d){
+			return "_"+d;
+		})
 		.classed("legend", true)
 	this.selectAll(".legend")
 		.append("rect")
@@ -226,6 +229,13 @@ function plot(params){
 				g.selectAll(".trendline")
 					.transition()
 					.style("opacity", 1);
+				d3.select(this).attr("fill", "#588C73");
+    			d3.selectAll(".tooltip")
+		            .style("left", d3.event.pageX + "px")
+		            .style("top", d3.event.pageY + "px")
+		            .style("display", "inline-block")
+					.html("[TOOLTIP DATA]");
+
 
 				var str = d.key.charAt(0).toUpperCase() + d.key.slice(1);
 				if (d.key=="high"||d.key=="low") str += " Average Market Price: ";
@@ -243,6 +253,8 @@ function plot(params){
 					.transition()
 					.style("opacity", 0.1);
 				d3.select(".chart-header").text("");
+				d3.selectAll(".tooltip")
+					.style("display", "none");
 			});
 
 		g.selectAll(".trendline")
@@ -289,6 +301,11 @@ function plot(params){
 			.remove();
 	});
 
+	this.selectAll(".legend rect")
+		.on("mouseover", function(d,i){
+			// Update legend colouring
+		})
+
 	this.selectAll(".area")
 		.attr("d", function(d){
 			return area(d);
@@ -299,6 +316,10 @@ function plot(params){
 		.data([params.data])
 		.exit()
 		.remove();
+	d3.select("body")
+		.append("div")
+		.attr("class", "tooltip")
+		.classed("tooltip", true);
 }
 plot.call(chart, {
 	data: data,
