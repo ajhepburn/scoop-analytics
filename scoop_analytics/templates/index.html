@@ -231,11 +231,11 @@ function plot(params){
 					.style("opacity", 1);
 				d3.select(this).attr("fill", "#588C73");
     			d3.selectAll(".tooltip")
-		            .style("left", d3.event.pageX+5+"px")
-		            .style("top", d3.event.pageY+5+"px")
-		            .style("display", "inline-block")
-					.html("[TOOLTIP DATA]")
-					.transition();
+            .style("left", d3.event.pageX+5+"px")
+            .style("top", d3.event.pageY+5+"px")
+            .style("display", "inline-block")
+            .html("[TOOLTIP DATA]")
+            .transition();
 
 
 				var str = d.key.charAt(0).toUpperCase() + d.key.slice(1);
