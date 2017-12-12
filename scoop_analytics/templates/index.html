@@ -231,10 +231,11 @@ function plot(params){
 					.style("opacity", 1);
 				d3.select(this).attr("fill", "#588C73");
     			d3.selectAll(".tooltip")
-		            .style("left", d3.event.pageX + "px")
-		            .style("top", d3.event.pageY + "px")
-		            .style("display", "inline-block")
-					.html("[TOOLTIP DATA]");
+            .style("left", d3.event.pageX+5+"px")
+            .style("top", d3.event.pageY+5+"px")
+            .style("display", "inline-block")
+            .html("[TOOLTIP DATA]")
+            .transition();
 
 
 				var str = d.key.charAt(0).toUpperCase() + d.key.slice(1);
@@ -254,7 +255,8 @@ function plot(params){
 					.style("opacity", 0.1);
 				d3.select(".chart-header").text("");
 				d3.selectAll(".tooltip")
-					.style("display", "none");
+					.style("display", "none")
+					.transition();
 			});
 
 		g.selectAll(".trendline")
