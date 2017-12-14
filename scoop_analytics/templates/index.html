@@ -142,22 +142,22 @@ function plot(params){
 			.classed("area",true)
 	
 	this.selectAll(".price")
-			.data(prices)
-			.enter()
-				.append("g")
-				.attr("class", function(d){
-					return d;
-				})
-				.classed("price", true);
+		.data(prices)
+		.enter()
+			.append("g")
+			.attr("class", function(d){
+				return d;
+			})
+			.classed("price", true);
 
 	this.selectAll(".legend")
-		.data(prices)
+		.data(prices.filter(function(d){return d!="open";}))
 		.enter()
 		.append("g")
 		.attr("class", function(d){
 			return "_"+d;
 		})
-		.classed("legend", true)
+		.classed("legend", true);
 	this.selectAll(".legend")
 		.append("rect")
 		.attr("x", width+20)
@@ -197,23 +197,20 @@ function plot(params){
 			};
 		});
 		// enter()
-		if($(groupDOM).attr("class")=="open price")
-		{
-			g.selectAll(".trendline")
-				.data([arr])
-				.enter()
-					.append("path")
-					.classed("trendline", true);
-	
-			g.selectAll(".point")
-				.data(arr)
-				.enter()
-					.append("circle")
-					.classed("point", true)
-					.attr("r", 4)
-					.style("fill", "#fff")
-					.style("opacity", 0.25);
-		}
+		g.selectAll(".trendline")
+			.data([arr].filter(function(d,i){return d[i].key=="open"}))
+			.enter()
+				.append("path")
+				.classed("trendline", true);
+
+		g.selectAll(".point")
+			.data(arr.filter(function(d){return d.key=="open"}))
+			.enter()
+				.append("circle")
+				.classed("point", true)
+				.attr("r", 4)
+				.style("fill", "#fff")
+				.style("opacity", 0.25);
 
 		//update
 		g.selectAll(".point")
