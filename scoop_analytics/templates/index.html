@@ -188,6 +188,7 @@ function plot(params){
 
 	prices.forEach(function(price){
 		var g = self.selectAll("g."+price);
+		var groupDOM = $(g).get(0)["_groups"][0][0];
 		var arr = params.data.map(function(d){
 			return {
 				key: price,
@@ -196,20 +197,23 @@ function plot(params){
 			};
 		});
 		// enter()
-		g.selectAll(".trendline")
-			.data([arr])
-			.enter()
-				.append("path")
-				.classed("trendline", true);
-
-		g.selectAll(".point")
-			.data(arr)
-			.enter()
-				.append("circle")
-				.classed("point", true)
-				.attr("r", 4)
-				.style("fill", "#fff")
-				.style("opacity", 0.25);
+		if($(groupDOM).attr("class")=="open price")
+		{
+			g.selectAll(".trendline")
+				.data([arr])
+				.enter()
+					.append("path")
+					.classed("trendline", true);
+	
+			g.selectAll(".point")
+				.data(arr)
+				.enter()
+					.append("circle")
+					.classed("point", true)
+					.attr("r", 4)
+					.style("fill", "#fff")
+					.style("opacity", 0.25);
+		}
 
 		//update
 		g.selectAll(".point")
@@ -231,11 +235,11 @@ function plot(params){
 					.style("opacity", 1);
 				d3.select(this).attr("fill", "#588C73");
     			d3.selectAll(".tooltip")
-            .style("left", d3.event.pageX+5+"px")
-            .style("top", d3.event.pageY+5+"px")
-            .style("display", "inline-block")
-            .html("[TOOLTIP DATA]")
-            .transition();
+					.style("left", d3.event.pageX+5+"px")
+					.style("top", d3.event.pageY+5+"px")
+					.style("display", "inline-block")
+					.html("[TOOLTIP DATA]")
+					.transition();
 
 
 				var str = d.key.charAt(0).toUpperCase() + d.key.slice(1);
@@ -267,9 +271,9 @@ function plot(params){
 				d3.select(this)
 					.transition()
 					.style("opacity", 1);
-					var groupDOM = $(g).get(0)["_groups"][0][0];
 					if($(groupDOM).attr("class")=="open price") {
 						self.selectAll(".area")
+							.transition()
 							.style("opacity", 0.5);
 					}
 				g.selectAll(".point")
@@ -283,6 +287,7 @@ function plot(params){
 					.transition()
 					.style("opacity", 0.1);
 					self.selectAll(".area")
+						.transition()
 						.style("opacity", 0.15);
 				g.selectAll(".point")
 					.transition()
