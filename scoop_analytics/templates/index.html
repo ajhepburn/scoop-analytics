@@ -151,7 +151,7 @@ function plot(params){
 			.classed("price", true);
 
 	this.selectAll(".legend")
-		.data(prices.filter(function(d){return d!="open";}))
+		.data(prices.filter(function(d){return d=="open";}))
 		.enter()
 		.append("g")
 		.attr("class", function(d){
@@ -186,8 +186,8 @@ function plot(params){
 			return colorScale(i);
 		});
 
-	prices.forEach(function(price){
-		var g = self.selectAll("g."+price);
+	prices.forEach(function(price)
+{		var g = self.selectAll("g."+price);
 		var groupDOM = $(g).get(0)["_groups"][0][0];
 		var arr = params.data.map(function(d){
 			return {
@@ -235,7 +235,13 @@ function plot(params){
 					.style("left", d3.event.pageX+5+"px")
 					.style("top", d3.event.pageY+5+"px")
 					.style("display", "inline-block")
-					.html("[TOOLTIP DATA]")
+					.html(function(){
+						var type = d.key.charAt(0).toUpperCase() + d.key.slice(1);
+						var time = d3.timeFormat("%H:%M")(timeParser(d.timestamp));
+						var price = parseFloat(d.value).toFixed(2);
+
+						return "<i>"+type+"</i>" + "<br/><b>"+price+"</b>&nbsp;&nbsp;(" + time+")";
+					 })
 					.transition();
 
 
@@ -305,11 +311,6 @@ function plot(params){
 			.remove();
 	});
 
-	this.selectAll(".legend rect")
-		.on("mouseover", function(d,i){
-			// Update legend colouring
-		})
-
 	this.selectAll(".area")
 		.attr("d", function(d){
 			return area(d);
@@ -320,6 +321,7 @@ function plot(params){
 		.data([params.data])
 		.exit()
 		.remove();
+
 	d3.select("body")
 		.append("div")
 		.attr("class", "tooltip")
