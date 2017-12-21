@@ -21,8 +21,29 @@ var data_tweets = [];
 data_prices.push({symbol: "{{share_price.symbol}}", timestamp: "{{share_price.timestamp}}", open: "{{share_price.open}}", close: "{{share_price.close}}", high: "{{share_price.high}}", low: "{{share_price.low}}", volume: "{{share_price.volume}}"});
 {% endfor %}
 
-var docs = JSON.parse({{ documents | tojson | safe}});
-console.log(docs);
+function parseDocs() {
+	var docs = JSON.parse({{ documents | tojson | safe}});
+	var dateParser = d3.timeParse("%a %b %d %H:%M:%S %Y");
+
+	for(var i in docs) {
+		var obj = docs[i];
+		obj['tweet_text'] = obj['tweet_text'].replace(/\n/g, " ");
+		var str = obj['tweet_created'].slice(0,-10).concat(obj['tweet_created'].slice(-4));
+		var time = d3.timeFormat("%d-%m-%y, %H:%M")(dateParser(str));
+		obj['tweet_created'] = time;
+	}
+	return docs;
+}
+
+var docs = parseDocs();
+
+function testTimestamp() {
+	for(var i in data_prices) {
+		var timeParser = d3.timeParse("%s");
+		var time = d3.timeFormat("%d-%m-%y, %H:%M")(timeParser(data_prices[i].timestamp));
+		console.log(time);
+	}
+}
 
 var w = 900;
 var h = 550;
