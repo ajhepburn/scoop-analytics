@@ -13,10 +13,16 @@
 </head>
 <body>
 <script>
-var data = [];
+var data_prices = [];
+var data_tweets = [];
+
+// Populate arrays
 {% for share_price in share_prices %}
-data.push({symbol: "{{share_price.symbol}}", timestamp: "{{share_price.timestamp}}", open: "{{share_price.open}}", close: "{{share_price.close}}", high: "{{share_price.high}}", low: "{{share_price.low}}", volume: "{{share_price.volume}}"});
+data_prices.push({symbol: "{{share_price.symbol}}", timestamp: "{{share_price.timestamp}}", open: "{{share_price.open}}", close: "{{share_price.close}}", high: "{{share_price.high}}", low: "{{share_price.low}}", volume: "{{share_price.volume}}"});
 {% endfor %}
+
+var docs = JSON.parse({{ documents | tojson | safe}});
+console.log(docs);
 
 var w = 900;
 var h = 550;
@@ -40,20 +46,20 @@ var chart = svg.append("g")
 var timeParser = d3.timeParse("%s");
 
 var x = d3.scaleTime()
-		.domain(d3.extent(data, function(d){
+		.domain(d3.extent(data_prices, function(d){
 			var time = timeParser(d.timestamp);
 			return time;
 		}))
 		.range([0,width]);
 
 var maxVal = d3.max([d3.max([
-    d3.max(data, function(d) { return d.open; }),
-    d3.max(data, function(d) { return d.high; })
-]),d3.max(data, function(d) { return d.low; })]);
+    d3.max(data_prices, function(d) { return d.open; }),
+    d3.max(data_prices, function(d) { return d.high; })
+]),d3.max(data_prices, function(d) { return d.low; })]);
 var minVal = d3.min([d3.min([
-    d3.min(data, function(d) { return d.open; }),
-    d3.min(data, function(d) { return d.high; })
-]),d3.min(data, function(d) { return d.low; })]);
+    d3.min(data_prices, function(d) { return d.open; }),
+    d3.min(data_prices, function(d) { return d.high; })
+]),d3.min(data_prices, function(d) { return d.low; })]);
 
 var colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 var y = d3.scaleLinear()
@@ -131,12 +137,12 @@ function drawAxes(params){
 function plot(params){
 	drawAxes.call(this, params);
 	var self = this;
-	var prices = d3.keys(params.data[0]).filter(function(d){
+	var prices = d3.keys(params.data_prices[0]).filter(function(d){
 		return d == "open" || d == "high" || d == "low";
 	});
 	// enter()
 	this.selectAll(".area")
-		.data([params.data])
+		.data([params.data_prices])
 		.enter()
 			.append("path")
 			.classed("area",true)
@@ -189,7 +195,7 @@ function plot(params){
 	prices.forEach(function(price)
 {		var g = self.selectAll("g."+price);
 		var groupDOM = $(g).get(0)["_groups"][0][0];
-		var arr = params.data.map(function(d){
+		var arr = params.data_prices.map(function(d){
 			return {
 				key: price,
 				timestamp: d.timestamp,
@@ -238,7 +244,7 @@ function plot(params){
 					.style("display", "inline-block")
 					.html(function(){
 						var curr_time = d.timestamp;
-						var curr_obj = params.data.filter(function(d){return d.timestamp==curr_time;})[0];
+						var curr_obj = params.data_prices.filter(function(d){return d.timestamp==curr_time;})[0];
 						var time_format = d3.timeFormat("%H:%M")(timeParser(d.timestamp));
 						var prices = {
 							high: parseFloat(curr_obj.high).toFixed(2),
@@ -323,7 +329,7 @@ function plot(params){
 
 	// exit
 	this.selectAll(".area")
-		.data([params.data])
+		.data([params.data_prices])
 		.exit()
 		.remove();
 
@@ -333,7 +339,7 @@ function plot(params){
 		.classed("tooltip", true);
 }
 plot.call(chart, {
-	data: data,
+	data_prices: data_prices,
 	axis: {
 		x: xAxis,
 		y: yAxis
