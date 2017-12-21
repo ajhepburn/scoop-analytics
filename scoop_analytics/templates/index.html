@@ -204,9 +204,10 @@ function plot(params){
 				.classed("trendline", true);
 
 		g.selectAll(".point")
-			.data(arr.filter(function(d){return d.key=="open"}))
+			.data(arr)
 			.enter()
 				.append("circle")
+				.filter(function(d){return d.key=="open";})
 				.classed("point", true)
 				.attr("r", 4)
 				.style("fill", "#fff")
@@ -236,11 +237,15 @@ function plot(params){
 					.style("top", d3.event.pageY+5+"px")
 					.style("display", "inline-block")
 					.html(function(){
-						var type = d.key.charAt(0).toUpperCase() + d.key.slice(1);
-						var time = d3.timeFormat("%H:%M")(timeParser(d.timestamp));
-						var price = parseFloat(d.value).toFixed(2);
+						var curr_time = d.timestamp;
+						var curr_obj = params.data.filter(function(d){return d.timestamp==curr_time;})[0];
+						var time_format = d3.timeFormat("%H:%M")(timeParser(d.timestamp));
+						var prices = {
+							high: parseFloat(curr_obj.high).toFixed(2),
+							low: parseFloat(curr_obj.low).toFixed(2)
+						}
 
-						return "<i>"+type+"</i>" + "<br/><b>"+price+"</b>&nbsp;&nbsp;(" + time+")";
+						return "(<b>"+time_format+"</b>)<br/><b>High:</b>" + "&nbsp;"+prices.high+"<br/><b>Low:</b>"+"&nbsp;"+prices.low;
 					 })
 					.transition();
 
