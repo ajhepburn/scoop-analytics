@@ -17,9 +17,20 @@ var data_prices = [];
 var data_tweets = [];
 
 // Populate arrays
-{% for share_price in share_prices %}
+/*{% for share_price in share_prices %}
 data_prices.push({symbol: "{{share_price.symbol}}", timestamp: "{{share_price.timestamp}}", open: "{{share_price.open}}", close: "{{share_price.close}}", high: "{{share_price.high}}", low: "{{share_price.low}}", volume: "{{share_price.volume}}"});
-{% endfor %}
+{% endfor %}*/
+
+function parsePrices() {
+	var prices = JSON.parse({{ share_prices | tojson | safe}});
+
+	for(var i in prices) {
+		console.log(i, prices[i]);
+		data_prices.push(prices[i]);
+	}
+}
+
+parsePrices();
 
 function parseDocs() {
 	var docs = JSON.parse({{ documents | tojson | safe}});
@@ -178,9 +189,10 @@ function plot(params){
 			.classed("price", true);
 
 	this.selectAll(".legend")
-		.data(prices.filter(function(d){return d=="open";}))
+		.data(prices)
 		.enter()
 		.append("g")
+		.filter(function(d){return d=="open";})
 		.attr("class", function(d){
 			return "_"+d;
 		})
@@ -194,6 +206,7 @@ function plot(params){
 		.attr("width", 10)
 		.attr("height", 10)
 		.style('fill', function(d,i) {
+			console.log(d, i);
 			return colorScale(i);
 		});
   	this.selectAll(".legend")
@@ -210,6 +223,7 @@ function plot(params){
 	// update
 	this.selectAll(".price")
 		.style("stroke", function(d,i){
+			console.log(d, i);
 			return colorScale(i);
 		});
 
@@ -266,13 +280,14 @@ function plot(params){
 					.html(function(){
 						var curr_time = d.timestamp;
 						var curr_obj = params.data_prices.filter(function(d){return d.timestamp==curr_time;})[0];
+						var date_format = d3.timeFormat("%d-%m")(timeParser(d.timestamp));
 						var time_format = d3.timeFormat("%H:%M")(timeParser(d.timestamp));
 						var prices = {
 							high: parseFloat(curr_obj.high).toFixed(2),
 							low: parseFloat(curr_obj.low).toFixed(2)
 						}
 
-						return "(<b>"+time_format+"</b>)<br/><b>High:</b>" + "&nbsp;"+prices.high+"<br/><b>Low:</b>"+"&nbsp;"+prices.low;
+						return date_format + " (<b>"+time_format+"</b>)<br/><b>High:</b>" + "&nbsp;"+prices.high+"<br/><b>Low:</b>"+"&nbsp;"+prices.low;
 					 })
 					.transition();
 
