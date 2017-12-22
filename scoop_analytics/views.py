@@ -10,7 +10,7 @@ import sys
 @app.route("/")
 def main():
 	#my_documents = Documents.query.limit(40).all()
-	share_prices = SharePrices.query.limit(40).all()
+	share_prices = SharePrices.query.filter(SharePrices.symbol == 'AAOI').limit(50).all()
 
 	# docs=[]
 	# for el in result:
@@ -18,14 +18,15 @@ def main():
 	# 	d['tweet_text'] = d['tweet_text'].replace("\n", " ")
 	# 	docs.append(d);
 
-	result = db.engine.execute("SELECT DISTINCT data->'id' as tweet_id, data->'text' as tweet_text, data->'created_at' as tweet_created, value as cashtag FROM documents, jsonb_array_elements(data->'entities'->'symbols') where value->>'text' in ('AAAP');")
-	docs = json.dumps([dict(r) for r in result])
-
-	print(docs)
+	prices_result = db.engine.execute("SELECT symbol, timestamp, open, close, high, low, volume FROM share_prices WHERE (close >= 1.10 * open) AND volume <> 0 AND symbol LIKE 'ARDM' ORDER BY timestamp;")
+	docs_result = db.engine.execute("SELECT DISTINCT data->'id' as tweet_id, data->'text' as tweet_text, data->'created_at' as tweet_created, value as cashtag FROM documents, jsonb_array_elements(data->'entities'->'symbols') where value->>'text' in ('AAOI');")
+	
+	docs = json.dumps([dict(r) for r in docs_result])
+	prices = json.dumps([dict(r) for r in prices_result])
 
 	# for el in share_prices:
 	# 	tstamp_conv = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime(el.__dict__['timestamp']))
 	# 	#tstamp_conv = time.strftime("%H:%M", time.localtime(el.__dict__['timestamp']))
 	# 	el.__dict__['timestamp'] = tstamp_conv
 
-	return render_template('index.html', documents=docs, share_prices=share_prices)
+	return render_template('index.html', documents=docs, share_prices=prices)
