@@ -25,7 +25,6 @@ function parsePrices() {
 	var prices = JSON.parse({{ share_prices | tojson | safe}});
 
 	for(var i in prices) {
-		console.log(i, prices[i]);
 		data_prices.push(prices[i]);
 	}
 }
@@ -204,11 +203,7 @@ function plot(params){
 			return i*20;
 		})
 		.attr("width", 10)
-		.attr("height", 10)
-		.style('fill', function(d,i) {
-			console.log(d, i);
-			return colorScale(i);
-		});
+		.attr("height", 10);
   	this.selectAll(".legend")
   		.append("text")
 		.attr("x", width+38)
@@ -223,9 +218,13 @@ function plot(params){
 	// update
 	this.selectAll(".price")
 		.style("stroke", function(d,i){
-			console.log(d, i);
 			return colorScale(i);
 		});
+
+	this.selectAll(".legend")
+		.style("fill", function(d, i){
+			return colorScale(prices.indexOf(d));
+		})
 
 	prices.forEach(function(price)
 {		var g = self.selectAll("g."+price);
