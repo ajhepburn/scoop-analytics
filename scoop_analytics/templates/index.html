@@ -21,7 +21,7 @@ var data_tweets = [];
 data_prices.push({symbol: "{{share_price.symbol}}", timestamp: "{{share_price.timestamp}}", open: "{{share_price.open}}", close: "{{share_price.close}}", high: "{{share_price.high}}", low: "{{share_price.low}}", volume: "{{share_price.volume}}"});
 {% endfor %}*/
 
-function parsePrices() {
+function parsePrices(){
 	var prices = JSON.parse({{ share_prices | tojson | safe}});
 
 	for(var i in prices) {
@@ -31,15 +31,14 @@ function parsePrices() {
 
 parsePrices();
 
-function parseDocs() {
+function parseDocs(){
 	var docs = JSON.parse({{ documents | tojson | safe}});
-	var dateParser = d3.timeParse("%a %b %d %H:%M:%S %Y");
+	var dateParser = d3.timeParse("%a %b %d %H:%M:%S %Z %Y");
 
 	for(var i in docs) {
 		var obj = docs[i];
 		obj['tweet_text'] = obj['tweet_text'].replace(/\n/g, " ");
-		var str = obj['tweet_created'].slice(0,-10).concat(obj['tweet_created'].slice(-4));
-		var time = d3.timeFormat("%d-%m-%y, %H:%M")(dateParser(str));
+		var time = d3.timeFormat("%d-%m-%y, %H:%M")(dateParser(obj['tweet_created']));
 		obj['tweet_created'] = time;
 	}
 	return docs;
@@ -47,19 +46,19 @@ function parseDocs() {
 
 var docs = parseDocs();
 
-function testTimestamp() {
+function testTimestamp(){
 	for(var i in data_prices) {
 		var timeParser = d3.timeParse("%s");
 		var time = d3.timeFormat("%d-%m-%y, %H:%M")(timeParser(data_prices[i].timestamp));
-		console.log(time);
+		//console.log(time);
 	}
 }
 
 var w = 900;
-var h = 550;
+var h = 700;
 var margin = {
   top: 58,
-  bottom: 100,
+  bottom: 250,
   left: 80,
   right: 100
 }
@@ -82,6 +81,8 @@ var x = d3.scaleTime()
 			return time;
 		}))
 		.range([0,width]);
+
+//console.log(time_arr);
 
 var maxVal = d3.max([d3.max([
     d3.max(data_prices, function(d) { return d.open; }),
@@ -157,11 +158,24 @@ function drawAxes(params){
 			.classed("x axis-label",true)
 			.attr("transform", "translate("+width/2+",48)")
 			.text("Time (Hours, Minutes)");
-		this.append("g")
+/*		this.append("g")
 			.append("text")
 			.classed("chart-header",true)
 			.attr("transform", "translate("+width/2+",-24)")
-			.text("");
+			.text("");*/
+		this.append("g")
+			.classed("panel", true)
+			.attr("transform", "translate(0,"+(height+(height/4))+")")
+		this.select(".panel")
+			.append("text")
+			.classed("panel panel-header", true)
+			.attr("transform", "translate(0,0)")
+			.text("Tweet Information");
+		this.select(".panel")
+			.append("text")
+			.classed("panel panel-body", true)
+			.attr("transform", "translate(0,30)")
+			.text("Tweet Information");
 	}
 }
 
@@ -290,6 +304,10 @@ function plot(params){
 					 })
 					.transition();
 
+				self.selectAll(".area")
+							.transition()
+							.style("opacity", 0.5);
+
 
 				var str = d.key.charAt(0).toUpperCase() + d.key.slice(1);
 				if (d.key=="high"||d.key=="low") str += " Average Market Price: ";
@@ -310,6 +328,9 @@ function plot(params){
 				d3.selectAll(".tooltip")
 					.style("display", "none")
 					.transition();
+				self.selectAll(".area")
+					.transition()
+					.style("opacity", 0.15);
 			});
 
 		g.selectAll(".trendline")
