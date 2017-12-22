@@ -87,3 +87,14 @@ body,html{
 	font-weight: 500;
 	color: #081F2C;
  }
+ .panel {
+	text-anchor:middle;
+	fill: black;
+	font-size:90%;
+ }
+ .panel-header {
+ 	font-size:100%;
+ }
+ .panel-body {
+ 	opacity: 0.15;
+ }
