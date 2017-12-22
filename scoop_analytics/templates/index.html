@@ -303,6 +303,11 @@ function plot(params){
 						return date_format + " (<b>"+time_format+"</b>)<br/><b>High:</b>" + "&nbsp;"+prices.high+"<br/><b>Low:</b>"+"&nbsp;"+prices.low;
 					 })
 					.transition();
+				d3.selectAll(".panel-body")
+					.style("opacity", 1)
+					.text(function(){
+						return "Check";
+					});
 
 				self.selectAll(".area")
 							.transition()
@@ -328,6 +333,8 @@ function plot(params){
 				d3.selectAll(".tooltip")
 					.style("display", "none")
 					.transition();
+				d3.selectAll(".panel-body")
+					.style("opacity", 0.15);
 				self.selectAll(".area")
 					.transition()
 					.style("opacity", 0.15);
