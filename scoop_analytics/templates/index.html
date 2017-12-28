@@ -175,7 +175,7 @@ function drawAxes(params){
 			.append("text")
 			.classed("panel panel-body", true)
 			.attr("transform", "translate(0,30)")
-			.text("Tweet Information");
+			.text("");
 	}
 }
 
@@ -277,6 +277,7 @@ function plot(params){
 				return y(d.value);
 			})
 			.on("mouseover", function(d,i){
+				var curr_point = this;
 				d3.select(this)
 					.transition()
 					.attr("r", 6)
@@ -304,9 +305,17 @@ function plot(params){
 					 })
 					.transition();
 				d3.selectAll(".panel-body")
+					.transition()
 					.style("opacity", 1)
-					.text(function(){
-						return "Check";
+					.text(function(d,i){
+						for(tweet in docs){
+							var timeParser = d3.timeParse("%s");
+
+							var tweet_time = d3.timeParse("%d-%m-%y, %H:%M")(docs[tweet].tweet_created);
+							var point_time = d3.timeParse("%s")(d3.select(curr_point).data()[0].timestamp);
+							var diff = point_time.getTime() - tweet_time.getTime();
+							if(diff<=1800000 && diff>=-1800000) return docs[tweet].tweet_text;
+						}
 					});
 
 				self.selectAll(".area")
@@ -334,7 +343,8 @@ function plot(params){
 					.style("display", "none")
 					.transition();
 				d3.selectAll(".panel-body")
-					.style("opacity", 0.15);
+					.transition()
+					.text("");
 				self.selectAll(".area")
 					.transition()
 					.style("opacity", 0.15);

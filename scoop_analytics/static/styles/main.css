@@ -96,5 +96,6 @@ body,html{
  	font-size:100%;
  }
  .panel-body {
+ 	text-anchor: start;
  	opacity: 0.15;
  }
