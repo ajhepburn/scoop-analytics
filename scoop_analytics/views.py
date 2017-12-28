@@ -19,7 +19,7 @@ def main():
 	# 	docs.append(d);
 
 	prices_result = db.engine.execute("SELECT symbol, timestamp, open, close, high, low, volume FROM share_prices WHERE (close >= 1.05 * open) AND volume <> 0 AND symbol LIKE 'ITUS' ORDER BY timestamp LIMIT 8;")
-	docs_result = db.engine.execute("SELECT DISTINCT data->'id' as tweet_id, data->'text' as tweet_text, data->'created_at' as tweet_created, value as cashtag FROM documents, jsonb_array_elements(data->'entities'->'symbols') where value->>'text' in ('ITUS');")
+	docs_result = db.engine.execute("SELECT DISTINCT data->'id' as tweet_id, data->'text' as tweet_text, data->'created_at' as tweet_created, value as cashtag FROM documents, jsonb_array_elements(data->'entities'->'symbols') where value->>'text' in ('ITUS') ORDER BY tweet_created LIMIT 1;")
 	
 	docs = json.dumps([dict(r) for r in docs_result])
 	prices = json.dumps([dict(r) for r in prices_result])
