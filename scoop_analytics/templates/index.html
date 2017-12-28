@@ -21,38 +21,35 @@ var data_tweets = [];
 data_prices.push({symbol: "{{share_price.symbol}}", timestamp: "{{share_price.timestamp}}", open: "{{share_price.open}}", close: "{{share_price.close}}", high: "{{share_price.high}}", low: "{{share_price.low}}", volume: "{{share_price.volume}}"});
 {% endfor %}*/
 
-function parsePrices(){
-	var prices = JSON.parse({{ share_prices | tojson | safe}});
+function parseData(){
+	function parsePrices(){
+		var prices = JSON.parse({{ share_prices | tojson | safe}});
 
-	for(var i in prices) {
-		data_prices.push(prices[i]);
+		for(var i in prices) {
+			data_prices.push(prices[i]);
+		}
 	}
+
+	function parseDocs(){
+		var docs = JSON.parse({{ documents | tojson | safe}});
+		var dateParser = d3.timeParse("%a %b %d %H:%M:%S %Z %Y");
+
+		for(var i in docs) {
+			var obj = docs[i];
+			obj['tweet_text'] = obj['tweet_text'].replace(/\n/g, " ");
+			var time = d3.timeFormat("%d-%m-%y, %H:%M")(dateParser(obj['tweet_created']));
+			obj['tweet_created'] = time;
+		}
+		return docs;
+	}
+	return {
+        parsePrices: parsePrices,
+        parseDocs: parseDocs
+    };
 }
 
-parsePrices();
-
-function parseDocs(){
-	var docs = JSON.parse({{ documents | tojson | safe}});
-	var dateParser = d3.timeParse("%a %b %d %H:%M:%S %Z %Y");
-
-	for(var i in docs) {
-		var obj = docs[i];
-		obj['tweet_text'] = obj['tweet_text'].replace(/\n/g, " ");
-		var time = d3.timeFormat("%d-%m-%y, %H:%M")(dateParser(obj['tweet_created']));
-		obj['tweet_created'] = time;
-	}
-	return docs;
-}
-
-var docs = parseDocs();
-
-function testTimestamp(){
-	for(var i in data_prices) {
-		var timeParser = d3.timeParse("%s");
-		var time = d3.timeFormat("%d-%m-%y, %H:%M")(timeParser(data_prices[i].timestamp));
-		//console.log(time);
-	}
-}
+parseData().parsePrices();
+var docs = parseData().parseDocs();
 
 var w = 900;
 var h = 700;
@@ -81,8 +78,6 @@ var x = d3.scaleTime()
 			return time;
 		}))
 		.range([0,width]);
-
-//console.log(time_arr);
 
 var maxVal = d3.max([d3.max([
     d3.max(data_prices, function(d) { return d.open; }),
@@ -158,11 +153,6 @@ function drawAxes(params){
 			.classed("x axis-label",true)
 			.attr("transform", "translate("+width/2+",48)")
 			.text("Time (Hours, Minutes)");
-/*		this.append("g")
-			.append("text")
-			.classed("chart-header",true)
-			.attr("transform", "translate("+width/2+",-24)")
-			.text("");*/
 		this.append("g")
 			.classed("panel", true)
 			.attr("transform", "translate(0,"+(height+(height/4))+")")

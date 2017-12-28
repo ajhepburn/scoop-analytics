@@ -37,7 +37,7 @@ body,html{
 }
 .trendline {
 	fill: none;
-	stroke-width: 4px;
+	stroke-width: 2px;
 	shape-rendering: geometricPrecision;
 	opacity: 0.1;
 }
