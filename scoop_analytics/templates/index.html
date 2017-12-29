@@ -16,11 +16,6 @@
 var data_prices = [];
 var data_tweets = [];
 
-// Populate arrays
-/*{% for share_price in share_prices %}
-data_prices.push({symbol: "{{share_price.symbol}}", timestamp: "{{share_price.timestamp}}", open: "{{share_price.open}}", close: "{{share_price.close}}", high: "{{share_price.high}}", low: "{{share_price.low}}", volume: "{{share_price.volume}}"});
-{% endfor %}*/
-
 function parseData(){
 	function parsePrices(){
 		var prices = JSON.parse({{ share_prices | tojson | safe}});
@@ -51,50 +46,74 @@ function parseData(){
 parseData().parsePrices();
 var docs = parseData().parseDocs();
 
-var w = 900;
-var h = 700;
-var margin = {
-  top: 58,
-  bottom: 250,
-  left: 80,
-  right: 100
-}
-var width = w - margin.left - margin.right;
-var height = h - margin.top - margin.bottom;
+var w = 900,
+	h = 700,
+	margin = {
+	  top: 58,
+	  bottom: 250,
+	  left: 80,
+	  right: 100
+	},
+	margin2 = {
+		top: 600,
+		bottom: 30,
+		left: 80,
+		right: 20
+	},
+	width = w - margin.left - margin.right,
+	height = h - margin.top - margin.bottom,
+	height2 = h - margin2.top - margin2.bottom;
 
 var svg = d3.select("body").append("svg")
         	.attr("id", "chart")
 			.attr("width", w)
 			.attr("height", h);
-var chart = svg.append("g")
-			.classed("display", true)
+
+svg.append("defs").append("clipPath")
+    .attr("id", "clip")
+  	.append("rect")
+    .attr("width", width)
+    .attr("height", height);
+
+var focus = svg.append("g")
+			.classed("focus", true)
 			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+var context = svg.append("g")
+				.classed("context", true)
+				.attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+
 var timeParser = d3.timeParse("%s");
+
+var maxVal = d3.max(data_prices, function(d) { return d.open; }),
+	minVal = d3.min(data_prices, function(d) { return d.open; });
 
 var x = d3.scaleTime()
 		.domain(d3.extent(data_prices, function(d){
 			var time = timeParser(d.timestamp);
 			return time;
 		}))
-		.range([0,width]);
+		.range([0,width]),
+	y = d3.scaleLinear()
+		.domain([minVal, maxVal+(0.05*maxVal)])
+		.range([height, 0]),
+	x2 = d3.scaleTime().range([0,width])
+		.domain(x.domain()),
+	y2 = d3.scaleLinear().range([height2,0])
+		.domain(y.domain());
 
-var maxVal = d3.max([d3.max([
-    d3.max(data_prices, function(d) { return d.open; }),
-    d3.max(data_prices, function(d) { return d.high; })
-]),d3.max(data_prices, function(d) { return d.low; })]);
-var minVal = d3.min([d3.min([
-    d3.min(data_prices, function(d) { return d.open; }),
-    d3.min(data_prices, function(d) { return d.high; })
-]),d3.min(data_prices, function(d) { return d.low; })]);
+var xAxis = d3.axisBottom(x)
+			.tickFormat(d3.timeFormat("%H:%M")),
+	xAxis2 = d3.axisBottom(x2),
+	yAxis = d3.axisLeft(y);
+
+
+var brush = d3.brushX()
+    .extent([[0, 0], [width, height2]])
+    .on("brush", brushed);
 
 var colorScale = d3.scaleOrdinal(d3.schemeCategory10);
-var y = d3.scaleLinear()
-		.domain([minVal, maxVal])
-		.range([height, 0]);
-var xAxis = d3.axisBottom(x)
-			.tickFormat(d3.timeFormat("%H:%M"));
-var yAxis = d3.axisLeft(y);
+
 var xGridlines = d3.axisBottom(x)
 				.tickSize(-height,-height)
 				.tickFormat("");
@@ -138,6 +157,16 @@ function drawAxes(params){
 			.attr("transform", "translate(" + 0 + "," + height + ")")
 			.call(params.axis.x);
 
+		context.append("g")
+			.classed("axis x", true)
+			.attr("transform", "translate(" + 0 + "," + height2 + ")")
+			.call(params.axis.x2);
+
+		context.append("g")
+			.attr("class", "brush")
+			.call(brush)
+			.call(brush.move, x.range());
+
 		this.append("g")
 			.classed("axis y", true)
 			.attr("transform", "translate(0,0)")
@@ -180,12 +209,24 @@ function plot(params){
 		.data([params.data_prices])
 		.enter()
 			.append("path")
+			.attr("clip-path", "url(#clip)")
 			.classed("area",true)
-	
+
 	this.selectAll(".price")
 		.data(prices)
 		.enter()
 			.append("g")
+			.attr("clip-path", "url(#clip)")
+			.attr("class", function(d){
+				return d;
+			})
+			.classed("price", true);
+
+	context.selectAll(".price")
+		.data(prices)
+		.enter()
+			.append("g")
+			.attr("clip-path", "url(#clip)")
 			.attr("class", function(d){
 				return d;
 			})
@@ -242,9 +283,10 @@ function plot(params){
 		});
 		// enter()
 		g.selectAll(".trendline")
-			.data([arr].filter(function(d,i){return d[i].key=="open"}))
+			.data([arr])
 			.enter()
 				.append("path")
+				.filter(function(d,i){return d[i].key=="open"})
 				.classed("trendline", true);
 
 		g.selectAll(".point")
@@ -309,15 +351,15 @@ function plot(params){
 					});
 
 				self.selectAll(".area")
-							.transition()
-							.style("opacity", 0.5);
+					.transition()
+					.style("opacity", 0.5);
 
 
-				var str = d.key.charAt(0).toUpperCase() + d.key.slice(1);
+/*				var str = d.key.charAt(0).toUpperCase() + d.key.slice(1);
 				if (d.key=="high"||d.key=="low") str += " Average Market Price: ";
 				else str += "ing Market Price: "; 
 				str += d.value + " at " + d3.timeFormat("%H:%M")(timeParser(d.timestamp));
-				d3.select(".chart-header").text(str);
+				d3.select(".chart-header").text(str);*/
 			})
 			.on("mouseout", function(d,i){
 				d3.select(this)
@@ -363,9 +405,9 @@ function plot(params){
 				d3.select(this)
 					.transition()
 					.style("opacity", 0.1);
-					self.selectAll(".area")
-						.transition()
-						.style("opacity", 0.15);
+				self.selectAll(".area")
+					.transition()
+					.style("opacity", 0.15);
 				g.selectAll(".point")
 					.transition()
 					.style("opacity", 0.25)
@@ -380,7 +422,7 @@ function plot(params){
 			.remove();
 
 		g.selectAll(".trendline")
-			.data(arr)
+			.data([arr])
 			.exit()
 			.remove();
 	});
@@ -401,17 +443,40 @@ function plot(params){
 		.attr("class", "tooltip")
 		.classed("tooltip", true);
 }
-plot.call(chart, {
+plot.call(focus, {
 	data_prices: data_prices,
 	axis: {
 		x: xAxis,
-		y: yAxis
+		y: yAxis,
+		x2: xAxis2
 	},
 	gridlines: {
 		x: xGridlines,
 		y: yGridlines,
 	},
 	initialise: true
-})
+});
+
+function brushed() {
+	var selection = d3.event.selection;
+	x.domain(selection.map(x2.invert, x2));
+	focus.selectAll(".point")
+		.attr("cx", function(d){
+			var time = timeParser(d.timestamp);
+			return x(time);
+		})
+		.attr("cy", function(d){
+			return y(d.value);
+		});
+	focus.selectAll(".trendline")
+		.attr("d", function(d){
+			return line(d);
+		});
+	focus.selectAll(".area")
+		.attr("d", function(d){
+			return area(d);
+		});
+	focus.select(".axis.x").call(xAxis);
+}
 </script>
 </body>
