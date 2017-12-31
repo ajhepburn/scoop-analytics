@@ -18,6 +18,11 @@ body,html{
 	text-anchor: middle;
 	font-size: 18px;
 }
+.brush .selection {
+  stroke: #ccc;
+  fill-opacity: .075;
+  shape-rendering: crispEdges;
+}
 .axis path,
 .axis line{
 	fill: none;
