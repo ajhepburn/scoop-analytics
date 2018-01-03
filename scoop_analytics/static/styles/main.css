@@ -104,3 +104,8 @@ body,html{
  	text-anchor: start;
  	opacity: 0.15;
  }
+ .zoom {
+ 	cursor: move;
+ 	fill: none;
+ 	pointer-events: all;
+ }
