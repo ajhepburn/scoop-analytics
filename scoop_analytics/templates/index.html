@@ -185,7 +185,7 @@ function drawAxes(params){
 		context.append("g")
 			.attr("class", "brush")
 			.call(brush)
-			.call(brush.move, x.range());
+			.call(brush.move, [x.range()[0], x.range()[1]/2]);
 
 		this.append("g")
 			.classed("axis y", true)
