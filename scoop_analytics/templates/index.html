@@ -13,15 +13,17 @@
 </head>
 <body>
 <script>
-var data_prices = [];
 
 function parseData(){
 	function parsePrices(){
+		var data_prices = [];
 		var prices = JSON.parse({{ share_prices | tojson | safe}});
 
-		for(var i in prices) {
-			data_prices.push(prices[i]);
-		}
+		for(var i in prices) data_prices.push(prices[i]);
+
+		return data_prices.sort(function(a,b){
+			return a.timestamp-b.timestamp;
+		});
 	}
 
 	function parseDocs(){
@@ -42,7 +44,7 @@ function parseData(){
     };
 }
 
-parseData().parsePrices();
+var data_prices = parseData().parsePrices();
 var data_tweets = parseData().parseDocs();
 
 var w = 900,
@@ -88,10 +90,6 @@ var maxVal = d3.max(data_prices, function(d) { return d.open; }),
 	minVal = d3.min(data_prices, function(d) { return d.open; });
 
 var x = d3.scaleTime()
-/*		.domain(d3.extent(data_prices, function(d){
-			var time = timeParser(d.timestamp);
-			return time;
-		}))*/
 		.domain([
 		    d3.min(data_prices, function(d){
 		    	var time = timeParser(d.timestamp);
@@ -103,10 +101,7 @@ var x = d3.scaleTime()
 		    d3.max(data_prices, function(d){
 		    	var time = timeParser(d.timestamp);
 				return time;
-			}).setMinutes(Math.ceil(d3.max(data_prices, function(d){
-				var time = timeParser(d.timestamp);
-				return time;
-			}).getMinutes() / 30) * 30)
+			})
 		])
 		.range([0,width]),
 	y = d3.scaleLinear()
