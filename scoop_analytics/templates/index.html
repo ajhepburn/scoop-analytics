@@ -46,8 +46,7 @@ var zoom = d3.zoom()
 var svg = d3.select("body").append("svg")
         	.attr("id", "chart")
 			.attr("width", w)
-			.attr("height", h)
-			.call(zoom);
+			.attr("height", h);
 
 svg.append("defs").append("clipPath")
     .attr("id", "clip")
@@ -57,7 +56,8 @@ svg.append("defs").append("clipPath")
 
 var focus = svg.append("g")
 			.classed("focus", true)
-			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+			.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+			.call(zoom);
 
 var context = svg.append("g")
 				.classed("context", true)
@@ -178,28 +178,28 @@ function drawAxes(params){
 			.attr("transform", "translate(0,0)")
 			.call(params.axis.y);
 
-		this.select(".y.axis")
+		d3.select("#chart")
 			.append("text")
 			.classed("y axis-label",true)
-			.attr("transform", "translate(-56,"+height/2+") rotate(-90)")
+			.attr("transform", "translate(+25,"+height/1.5+") rotate(-90)")
 			.text("Share Price ($)");
-		this.select(".x.axis")
+		d3.select("#chart")
 			.append("text")
 			.classed("x axis-label",true)
-			.attr("transform", "translate("+width/2+",48)")
+			.attr("transform", "translate("+width/1.65+","+height*1.275+")")
 			.text("Time (Hours, Minutes)");
-		this.append("g")
+		svg.append("g")
 			.classed("panel", true)
-			.attr("transform", "translate(0,"+(height+(height/4))+")")
-		this.select(".panel")
+			.attr("transform", "translate("+width/5.5+","+(height*1.325)+")")
+		svg.select(".panel")
 			.append("text")
 			.classed("panel panel-header", true)
 			.attr("transform", "translate(0,0)")
 			.text("Tweet Information");
-		this.select(".panel")
+		svg.select(".panel")
 			.append("text")
 			.classed("panel panel-body", true)
-			.attr("transform", "translate(0,30)")
+			.attr("transform", "translate(-25,30)")
 			.text("");
 	}
 }
@@ -524,7 +524,7 @@ function brushed() {
 			return area(d);
 		});
 	focus.select(".axis.x").call(xAxis);
-	d3.select("#chart").call(zoom.transform, d3.zoomIdentity
+	d3.select(".focus").call(zoom.transform, d3.zoomIdentity
 	 	.scale(width / (selection[1] - selection[0]))
 	 	.translate(-selection[0], 0));
 }

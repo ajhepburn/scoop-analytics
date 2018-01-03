@@ -32,7 +32,7 @@ body,html{
 .axis-label{
 	text-anchor:middle;
 	fill: black;
-	font-size:125%;
+	font-size:90%;
 }
 .gridline path,
 .gridline line{
