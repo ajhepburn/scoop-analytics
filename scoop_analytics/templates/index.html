@@ -524,7 +524,7 @@ function brushed() {
 			return area(d);
 		});
 	focus.select(".axis.x").call(xAxis);
-	svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
+	d3.select("#chart").call(zoom.transform, d3.zoomIdentity
 	 	.scale(width / (selection[1] - selection[0]))
 	 	.translate(-selection[0], 0));
 }
