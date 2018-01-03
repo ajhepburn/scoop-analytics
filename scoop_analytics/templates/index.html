@@ -10,42 +10,14 @@
   <link rel="stylesheet" href="{{ url_for('static', filename = 'styles/main.css') }}">
   <script src="{{ url_for('static', filename = 'js/d3.min.js') }}"></script>
   <script src="{{ url_for('static', filename = 'js/jquery-3.2.1.min.js') }}"></script>
+  <!-- Custom JS includes -->
+  <script src="{{ url_for('static', filename = 'js/scoop-parse.js') }}"></script>
 </head>
 <body>
 <script>
 
-function parseData(){
-	function parsePrices(){
-		var data_prices = [];
-		var prices = JSON.parse({{ share_prices | tojson | safe}});
-
-		for(var i in prices) data_prices.push(prices[i]);
-
-		return data_prices.sort(function(a,b){
-			return a.timestamp-b.timestamp;
-		});
-	}
-
-	function parseDocs(){
-		var docs = JSON.parse({{ documents | tojson | safe}});
-		var dateParser = d3.timeParse("%a %b %d %H:%M:%S %Z %Y");
-
-		for(var i in docs) {
-			var obj = docs[i];
-			obj['tweet_text'] = obj['tweet_text'].replace(/\n/g, " ");
-			var time = d3.timeFormat("%d-%m-%y, %H:%M")(dateParser(obj['tweet_created']));
-			obj['tweet_created'] = time;
-		}
-		return docs;
-	}
-	return {
-        parsePrices: parsePrices,
-        parseDocs: parseDocs
-    };
-}
-
-var data_prices = parseData().parsePrices();
-var data_tweets = parseData().parseDocs();
+var data_prices = parseData.parseFlaskJSON({{ share_prices | tojson | safe}}, {{ documents | tojson | safe}}).parsePrices();
+var data_tweets = parseData.parseFlaskJSON({{ share_prices | tojson | safe}}, {{ documents | tojson | safe}}).parseTweets();
 
 var w = 900,
 	h = 700,
@@ -245,7 +217,6 @@ function plot(params){
 			.append("path")
 			.attr("clip-path", "url(#clip)")
 			.classed("area",true)
-			// .call(zoom);
 
 	this.selectAll(".price")
 		.data(prices)
@@ -411,10 +382,10 @@ function plot(params){
 						for(tweet in data_tweets){
 							var timeParser = d3.timeParse("%s");
 
-							var tweet_time = d3.timeParse("%d-%m-%y, %H:%M")(data_tweets[tweet].tweet_created);
-							var point_time = d3.timeParse("%s")(d3.select(curr_point).data()[0].timestamp);
+							var tweet_time = timeParser(data_tweets[tweet]['timestamp_s']);
+							var point_time = timeParser(d3.select(curr_point).data()[0].timestamp);
 							var diff = point_time.getTime() - tweet_time.getTime();
-							if(diff<=1800000 && diff>=-1800000) return data_tweets[tweet].tweet_text;
+							if(diff<=1800000 && diff>=-1800000) return data_tweets[tweet]['text'];
 						}
 					});
 
@@ -534,7 +505,7 @@ plot.call(focus, {
 
 function brushed() {
 	if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return;
-	var selection = d3.event.selection || x2.range();
+	var selection = d3.event.selection;
 	x.domain(selection.map(x2.invert, x2));
 	focus.selectAll(".point")
 		.attr("cx", function(d){
@@ -554,8 +525,8 @@ function brushed() {
 		});
 	focus.select(".axis.x").call(xAxis);
 	svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
-		.scale(width / (selection[1] - selection[0]))
-		.translate(-selection[0], 0));
+	 	.scale(width / (selection[1] - selection[0]))
+	 	.translate(-selection[0], 0));
 }
 
 function zoomed() {
