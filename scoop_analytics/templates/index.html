@@ -65,10 +65,17 @@ var w = 900,
 	height = h - margin.top - margin.bottom,
 	height2 = h - margin2.top - margin2.bottom;
 
+var zoom = d3.zoom()
+    .scaleExtent([1, Infinity])
+    .translateExtent([[0, 0], [width, height]])
+    .extent([[0, 0], [width, height]])
+    .on("zoom", zoomed);
+
 var svg = d3.select("body").append("svg")
         	.attr("id", "chart")
 			.attr("width", w)
-			.attr("height", h);
+			.attr("height", h)
+			.call(zoom);
 
 svg.append("defs").append("clipPath")
     .attr("id", "clip")
@@ -122,6 +129,13 @@ var xAxis = d3.axisBottom(x);
 var brush = d3.brushX()
     .extent([[0, 0], [width, height2]])
     .on("brush", brushed);
+
+/*svg.append("rect")
+	.attr("class", "zoom")
+	.attr("width", width)
+	.attr("height", height)
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+	.call(zoom);*/
 
 var colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -231,6 +245,7 @@ function plot(params){
 			.append("path")
 			.attr("clip-path", "url(#clip)")
 			.classed("area",true)
+			// .call(zoom);
 
 	this.selectAll(".price")
 		.data(prices)
@@ -339,7 +354,7 @@ function plot(params){
 				.append("circle")
 				.filter(function(d){return d.key=="open";})
 				.classed("point", true)
-				.attr("r", 3)
+				.attr("r", 2)
 				.style("fill", "#fff")
 				.style("opacity", 0.25);
 
@@ -518,7 +533,8 @@ plot.call(focus, {
 });
 
 function brushed() {
-	var selection = d3.event.selection;
+	if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return;
+	var selection = d3.event.selection || x2.range();
 	x.domain(selection.map(x2.invert, x2));
 	focus.selectAll(".point")
 		.attr("cx", function(d){
@@ -537,6 +553,33 @@ function brushed() {
 			return area(d);
 		});
 	focus.select(".axis.x").call(xAxis);
+	svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
+		.scale(width / (selection[1] - selection[0]))
+		.translate(-selection[0], 0));
+}
+
+function zoomed() {
+	if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return;
+	var t = d3.event.transform;
+	x.domain(t.rescaleX(x2).domain());
+	focus.selectAll(".point")
+		.attr("cx", function(d){
+			var time = timeParser(d.timestamp);
+			return x(time);
+		})
+		.attr("cy", function(d){
+			return y(d.value);
+		});
+	focus.selectAll(".trendline")
+		.attr("d", function(d){
+			return line(d);
+		});
+	focus.selectAll(".area")
+		.attr("d", function(d){
+			return area(d);
+		});
+	focus.select(".axis.x").call(xAxis);
+	context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
 }
 </script>
 </body>
