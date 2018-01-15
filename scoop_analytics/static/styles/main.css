@@ -100,8 +100,14 @@ body,html{
  .panel-header {
  	font-size:100%;
  }
- .panel-body {
+ .panel-tweet-header {
  	text-anchor: start;
+ 	font-weight: bold;
+ 	opacity: 0.15;
+ 	font-size: 90%;
+ }
+ .panel-tweet-text {
+ 	text-anchor:start;
  	opacity: 0.15;
  }
  .zoom {

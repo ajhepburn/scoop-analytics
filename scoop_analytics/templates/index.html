@@ -102,13 +102,6 @@ var brush = d3.brushX()
     .extent([[0, 0], [width, height2]])
     .on("brush", brushed);
 
-/*svg.append("rect")
-	.attr("class", "zoom")
-	.attr("width", width)
-	.attr("height", height)
-	.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-	.call(zoom);*/
-
 var colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
 var xGridlines = d3.axisBottom(x)
@@ -171,7 +164,7 @@ function drawAxes(params){
 		context.append("g")
 			.attr("class", "brush")
 			.call(brush)
-			.call(brush.move, [x.range()[0], x.range()[1]/2]);
+			.call(brush.move, [x.range()[1]/4, x.range()[1]/1.4]);
 
 		this.append("g")
 			.classed("axis y", true)
@@ -188,18 +181,23 @@ function drawAxes(params){
 			.classed("x axis-label",true)
 			.attr("transform", "translate("+width/1.65+","+height*1.275+")")
 			.text("Time (Hours, Minutes)");
-		svg.append("g")
-			.classed("panel", true)
-			.attr("transform", "translate("+width/5.5+","+(height*1.325)+")")
-		svg.select(".panel")
-			.append("text")
+		var panel = svg.append("g")
+					.classed("panel", true)
+					.attr("transform", "translate("+width/5.5+","+(height*1.325)+")")
+		panel.append("text")
 			.classed("panel panel-header", true)
 			.attr("transform", "translate(0,0)")
 			.text("Tweet Information");
-		svg.select(".panel")
-			.append("text")
-			.classed("panel panel-body", true)
-			.attr("transform", "translate(-25,30)")
+		var panelBody = panel.append("g")
+						.classed("panel panel-body", true)
+						.attr("transform", "translate(-50,20)");
+		panelBody.append("text")
+			.classed("panel panel-body panel-tweet-header", true)
+			.text("");
+		panelBody.append("text")
+			.classed("panel panel-body panel-tweet-text", true)
+			.attr("dx", "0")
+			.attr("dy", "15")
 			.text("");
 	}
 }
@@ -349,6 +347,13 @@ function plot(params){
 			})
 			.on("mouseover", function(d,i){
 				var curr_point = this;
+				var timeParser = d3.timeParse("%s");
+
+				for(tweet in data_tweets){
+					var tweet_time = timeParser(data_tweets[tweet]['timestamp_s']);
+					var point_time = timeParser(d3.select(curr_point).data()[0].timestamp);
+					var diff = point_time.getTime() - tweet_time.getTime();
+				}
 				d3.select(this)
 					.transition()
 					.attr("r", 6)
@@ -375,17 +380,31 @@ function plot(params){
 						return date_format + " (<b>"+time_format+"</b>)<br/><b>High:</b>" + "&nbsp;"+prices.high+"<br/><b>Low:</b>"+"&nbsp;"+prices.low;
 					 })
 					.transition();
-				d3.selectAll(".panel-body")
+				d3.selectAll(".panel-tweet-header")
 					.transition()
 					.style("opacity", 1)
-					.text(function(d,i){
+					.text(function(){
 						for(tweet in data_tweets){
-							var timeParser = d3.timeParse("%s");
-
 							var tweet_time = timeParser(data_tweets[tweet]['timestamp_s']);
 							var point_time = timeParser(d3.select(curr_point).data()[0].timestamp);
 							var diff = point_time.getTime() - tweet_time.getTime();
-							if(diff<=1800000 && diff>=-1800000) return data_tweets[tweet]['text'];
+							if(diff<=1800000 && diff>=-1800000) {
+								var tweet_created_format = d3.timeFormat("%-I:%M%p, %e %b %Y")(d3.timeParse("%a %b %d %H:%M:%S %Z %Y")(data_tweets[tweet]['user']['created_at']));
+								return "@"+data_tweets[tweet]['user']['screen_name']+"    "+tweet_created_format;
+							}
+						}
+					});
+				d3.selectAll(".panel-tweet-text")
+					.transition()
+					.style("opacity", 1)
+					.text(function(){
+						for(tweet in data_tweets){
+							var tweet_time = timeParser(data_tweets[tweet]['timestamp_s']);
+							var point_time = timeParser(d3.select(curr_point).data()[0].timestamp);
+							var diff = point_time.getTime() - tweet_time.getTime();
+							if(diff<=1800000 && diff>=-1800000) {
+								return data_tweets[tweet]['text'];
+							}
 						}
 					});
 
@@ -405,7 +424,10 @@ function plot(params){
 				d3.selectAll(".tooltip")
 					.style("display", "none")
 					.transition();
-				d3.selectAll(".panel-body")
+				d3.selectAll(".panel-tweet-header")
+					.transition()
+					.text("");
+				d3.selectAll(".panel-tweet-text")
 					.transition()
 					.text("");
 				self.selectAll(".area")
