@@ -26,12 +26,15 @@ body,html{
 .axis path,
 .axis line{
 	fill: none;
-	stroke: #000;
+	stroke: #b9bbbf;
 	shape-rendering: crispEdges;
+}
+.axis text{
+	fill: #888a91;
 }
 .axis-label{
 	text-anchor:middle;
-	fill: black;
+	fill: #888a91;
 	font-size:90%;
 }
 .gridline path,
@@ -44,11 +47,17 @@ body,html{
 	fill: none;
 	stroke-width: 2px;
 	shape-rendering: geometricPrecision;
-	opacity: 0.1;
+	opacity:1;
 }
 .area{
-	opacity: 0.15;
-	fill: #e6e6e6;
+	opacity: 0.5;
+	fill: #fafafb;
+	stroke: #ccc;
+	stroke-width: 1px;
+}
+.areaContext{
+	opacity: 0.5;
+	fill: #fafafb;
 	stroke: #ccc;
 	stroke-width: 1px;
 }
