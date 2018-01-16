@@ -118,9 +118,8 @@ body,html{
  }
  .panel-tweet-text {
  	text-anchor:start;
- 	opacity: 0.15;
  }
- .panel-tweet-img-border {
+ .panel-tweet-img-profile-border {
  	fill: none;
  }
  .zoom {
