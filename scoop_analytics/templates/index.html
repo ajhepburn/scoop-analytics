@@ -138,9 +138,19 @@ var area = d3.area()
 				return y(d.open);
 			})
 			.curve(d3.curveCatmullRom);
+var areaCtx = d3.area()
+			.x(function(d) {
+				var time = timeParser(d.timestamp);
+				return x2(time);
+			})
+			.y0(height2)
+			.y1(function(d){
+				return y2(d.open);
+			})
+			.curve(d3.curveCatmullRom);
 
 
-function drawAxes(params){
+function drawStatic(params){
 	if(params.initialise){
 		this.append("g")
 			.classed("gridline x", true)
@@ -160,11 +170,6 @@ function drawAxes(params){
 			.classed("axis x", true)
 			.attr("transform", "translate(" + 0 + "," + height2 + ")")
 			.call(params.axis.x2);
-
-		context.append("g")
-			.attr("class", "brush")
-			.call(brush)
-			.call(brush.move, [x.range()[1]/4, x.range()[1]/1.4]);
 
 		this.append("g")
 			.classed("axis y", true)
@@ -203,7 +208,7 @@ function drawAxes(params){
 }
 
 function plot(params){
-	drawAxes.call(this, params);
+	drawStatic.call(this, params);
 	var self = this;
 	var prices = d3.keys(params.data_prices[0]).filter(function(d){
 		return d == "open" || d == "high" || d == "low";
@@ -214,7 +219,7 @@ function plot(params){
 		.enter()
 			.append("path")
 			.attr("clip-path", "url(#clip)")
-			.classed("area",true)
+			.classed("area",true);
 
 	this.selectAll(".price")
 		.data(prices)
@@ -267,17 +272,21 @@ function plot(params){
 	// update
 	this.selectAll(".price")
 		.style("stroke", function(d,i){
-			return colorScale(i);
+			// return colorScale(i);
+			return "#0065fc";
+
 		});
 
 	context.selectAll(".priceContext")
 		.style("stroke", function(d,i){
-			return colorScale(i);
+			// return colorScale(i);
+			return "#0065fc";
 		});
 
 	this.selectAll(".legend")
 		.style("fill", function(d, i){
-			return colorScale(prices.indexOf(d));
+			// return colorScale(prices.indexOf(d));
+			return "#0065fc";
 		})
 
 	prices.forEach(function(price)
@@ -293,6 +302,13 @@ function plot(params){
 			};
 		});
 		// enter()
+		ctx.selectAll(".area")
+			.data([params.data_prices])
+			.enter()
+				.append("path")
+				.attr("clip-path", "url(#clip)")
+				.classed("area",true)
+
 		g.selectAll(".trendline")
 			.data([arr])
 			.enter()
@@ -314,9 +330,7 @@ function plot(params){
 				.filter(function(d){return d.key=="open";})
 				.classed("point", true)
 				.attr("r", 4)
-				.style("fill", "#fff")
-				.style("opacity", 0.25);
-
+				.style("fill", "#fff");
 		ctx.selectAll(".point")
 			.data(arr)
 			.enter()
@@ -324,10 +338,13 @@ function plot(params){
 				.filter(function(d){return d.key=="open";})
 				.classed("point", true)
 				.attr("r", 2)
-				.style("fill", "#fff")
-				.style("opacity", 0.25);
-
+				.style("fill", "#fff");
 		//update
+		ctx.selectAll(".area")
+			.attr("d", function(d){
+				return areaCtx(d);
+			});
+
 		ctx.selectAll(".point")
 			.attr("cx", function(d){
 				var time = timeParser(d.timestamp);
@@ -356,13 +373,9 @@ function plot(params){
 				}
 				d3.select(this)
 					.transition()
-					.attr("r", 6)
-					.style("opacity", 1)
-					.style("stroke-width", 2);
-				g.selectAll(".trendline")
-					.transition()
-					.style("opacity", 1);
-				d3.select(this).attr("fill", "#588C73");
+					.attr("r", 7)
+					.style("stroke-width", 2)
+					.attr("fill", "#588C73");
     			d3.selectAll(".tooltip")
 					.style("left", d3.event.pageX+5+"px")
 					.style("top", d3.event.pageY+5+"px")
@@ -408,19 +421,15 @@ function plot(params){
 						}
 					});
 
-				self.selectAll(".area")
+/*				self.selectAll(".area")
 					.transition()
-					.style("opacity", 0.5);
+					.style("opacity", 0.5);*/
 			})
 			.on("mouseout", function(d,i){
 				d3.select(this)
 					.transition()
 					.attr("r", 4)
-					.style("opacity", 0.25)
 					.style("stroke-width", 1);
-				g.selectAll(".trendline")
-					.transition()
-					.style("opacity", 0.1);
 				d3.selectAll(".tooltip")
 					.style("display", "none")
 					.transition();
@@ -430,9 +439,6 @@ function plot(params){
 				d3.selectAll(".panel-tweet-text")
 					.transition()
 					.text("");
-				self.selectAll(".area")
-					.transition()
-					.style("opacity", 0.15);
 			});
 
 		ctx.selectAll(".trendline")
@@ -448,32 +454,25 @@ function plot(params){
 				d3.select(this)
 					.transition()
 					.style("opacity", 1);
-					if($(groupDOM).attr("class")=="open price") {
+/*					if($(groupDOM).attr("class")=="open price") {
 						self.selectAll(".area")
 							.transition()
 							.style("opacity", 0.5);
-					}
+					}*/
 				g.selectAll(".point")
 					.transition()
 					.attr("r", 4)
 					.style("opacity", 1)
 					.style("stroke-width", 1);
-			})
-			.on("mouseout", function(d,i){
-				d3.select(this)
-					.transition()
-					.style("opacity", 0.1);
-				self.selectAll(".area")
-					.transition()
-					.style("opacity", 0.15);
-				g.selectAll(".point")
-					.transition()
-					.style("opacity", 0.25)
-					.style("stroke-width", 1);
 			});
 
 
 		//exit()
+		ctx.selectAll(".area")
+			.data([params.data_prices])
+			.exit()
+			.remove();
+
 		ctx.selectAll(".point")
 			.data(arr)
 			.exit()
@@ -494,6 +493,11 @@ function plot(params){
 			.exit()
 			.remove();
 	});
+
+	context.append("g")
+			.attr("class", "brush")
+			.call(brush)
+			.call(brush.move, [x.range()[1]/4, x.range()[1]/1.4]);
 
 	this.selectAll(".area")
 		.attr("d", function(d){
