@@ -179,8 +179,10 @@ function drawStatic(params){
 		d3.select("#chart")
 			.append("text")
 			.classed("y axis-label",true)
-			.attr("transform", "translate(+25,"+height/1.5+") rotate(-90)")
-			.text("Share Price ($)");
+			.attr("transform", "translate(30,"+height/1.5+") rotate(-90)")
+			.text(function(){
+				return data_prices[0]['symbol']+" Share Price ($)";
+			});
 		d3.select("#chart")
 			.append("text")
 			.classed("x axis-label",true)
@@ -266,8 +268,7 @@ function plot(params){
 		})
 		.text(function(d){
 			return d.charAt(0).toUpperCase() + d.slice(1);
-		})
-		.style("fill", "#000");
+		});
 
 	// update
 	this.selectAll(".price")
@@ -402,7 +403,8 @@ function plot(params){
 							var point_time = timeParser(d3.select(curr_point).data()[0].timestamp);
 							var diff = point_time.getTime() - tweet_time.getTime();
 							if(diff<=1800000 && diff>=-1800000) {
-								var tweet_created_format = d3.timeFormat("%-I:%M%p, %e %b %Y")(d3.timeParse("%a %b %d %H:%M:%S %Z %Y")(data_tweets[tweet]['user']['created_at']));
+								console.log(data_tweets[tweet]);
+								var tweet_created_format = d3.timeFormat("%-I:%M%p, %e %b %Y")(d3.timeParse("%a %b %d %H:%M:%S %Z %Y")(data_tweets[tweet]['created_at']));
 								return "@"+data_tweets[tweet]['user']['screen_name']+"    "+tweet_created_format;
 							}
 						}
