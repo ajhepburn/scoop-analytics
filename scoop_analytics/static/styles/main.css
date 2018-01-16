@@ -120,6 +120,9 @@ body,html{
  	text-anchor:start;
  	opacity: 0.15;
  }
+ .panel-tweet-img-border {
+ 	fill: none;
+ }
  .zoom {
  	cursor: move;
  	fill: none;
