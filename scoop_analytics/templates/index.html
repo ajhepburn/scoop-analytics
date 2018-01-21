@@ -438,6 +438,8 @@ function plot(params){
 							var point_time = timeParser(d3.select(curr_point).data()[0].timestamp);
 							var diff = point_time.getTime() - tweet_time.getTime();
 							if(diff<=1800000 && diff>=-1800000) {
+								doWork(data_tweets[tweet]["id_str"]);
+
 								d3.select(".panel-tweet-img-profile")
 									.transition()
 								    .attr("xlink:href", data_tweets[tweet]['user']['profile_image_url']);
@@ -465,7 +467,6 @@ function plot(params){
 								d3.select(".panel-tweet-text-like")
 									.transition()
 									.text(function(){
-										doWork(data_tweets[tweet]["id_str"]);
 										return data_tweets[tweet]['favorite_count'];
 									});
 
@@ -652,7 +653,7 @@ function zoomed() {
 
 function doWork(id) {
 	$.post("receiver", {"id": id}, function(data){
-		console.log(data);
+		console.log(JSON.parse(data));
 	});
  event.preventDefault();
 }
