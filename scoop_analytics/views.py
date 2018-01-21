@@ -1,11 +1,23 @@
 from __future__ import print_function
-from flask import render_template
-from flask import json
+from flask import render_template, json, redirect, url_for
+from flask_dance.contrib.twitter import twitter
 from scoop_analytics import app
 from scoop_analytics.models import db, BaseModel, Documents, SharePrices
 from sqlalchemy import *
 import time
 import sys
+
+@app.route("/twitter")
+def twitter_login():
+	if not twitter.authorized:
+		return redirect(url_for('twitter.login'))
+	account_info = twitter.get('account/settings.json')
+	if account_info.ok:
+		account_info_json = account_info.json()
+		return '<h1>Your twitter name is @{}'.format(account_info_json['screen_name'])
+	return '<h1>Request failed!</h1>'
+
+
 
 @app.route("/")
 def main():
