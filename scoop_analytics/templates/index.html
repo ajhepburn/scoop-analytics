@@ -16,8 +16,9 @@
 <body>
 <script>
 
-var data_prices = parseData.parseFlaskJSON({{ share_prices | tojson | safe}}, {{ documents | tojson | safe}}).parsePrices();
-var data_tweets = parseData.parseFlaskJSON({{ share_prices | tojson | safe}}, {{ documents | tojson | safe}}).parseTweets();
+var data_prices = parseData.parseFlaskJSON().parsePrices({{ share_prices | tojson | safe}});
+var data_tweets = parseData.parseFlaskJSON().parseTweets({{ documents | tojson | safe}});
+var data_api = parseData.parseFlaskJSON().parseTwitterAPI('{{ acc_info | tojson |safe}}');
 
 var w = 900,
 	h = 700,

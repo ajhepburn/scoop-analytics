@@ -28,4 +28,11 @@ def main():
 	docs = json.dumps([dict(r) for r in docs_result])
 	prices = json.dumps([dict(r) for r in prices_result])
 
-	return render_template('index.html', documents=docs, share_prices=prices)
+	if not twitter.authorized:
+		return redirect(url_for('twitter.login'))
+	account_info = twitter.get('account/settings.json')
+	if account_info.ok:
+		print(type(account_info))
+		account_info_json = account_info.json()
+
+	return render_template('index.html', documents=docs, share_prices=prices, acc_info=account_info_json)
