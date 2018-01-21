@@ -465,6 +465,7 @@ function plot(params){
 								d3.select(".panel-tweet-text-like")
 									.transition()
 									.text(function(){
+										doWork(data_tweets[tweet]["id_str"]);
 										return data_tweets[tweet]['favorite_count'];
 									});
 
@@ -647,6 +648,13 @@ function zoomed() {
 		});
 	focus.select(".axis.x").call(xAxis);
 	context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
+}
+
+function doWork(id) {
+	$.post("receiver", {"id": id}, function(data){
+		console.log(data);
+	});
+ event.preventDefault();
 }
 </script>
 </body>
