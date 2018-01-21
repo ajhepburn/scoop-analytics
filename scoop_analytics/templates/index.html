@@ -19,6 +19,7 @@
 var data_prices = parseData.parseFlaskJSON().parsePrices({{ share_prices | tojson | safe}});
 var data_tweets = parseData.parseFlaskJSON().parseTweets({{ documents | tojson | safe}});
 var data_api = parseData.parseFlaskJSON().parseTwitterAPI('{{ acc_info | tojson |safe}}');
+var twt_json = {};
 
 var w = 900,
 	h = 700,
@@ -459,16 +460,27 @@ function plot(params){
 									.text(function(){
 										return data_tweets[tweet]['text'];
 									});
-								d3.select(".panel-tweet-text-retweet")
-									.transition()
-									.text(function(){
-										return data_tweets[tweet]['retweet_count'];
-									});
-								d3.select(".panel-tweet-text-like")
-									.transition()
-									.text(function(){
-										return data_tweets[tweet]['favorite_count'];
-									});
+
+								function loadStats() {
+									d3.select(".panel-tweet-text-retweet")
+										.transition()
+										.text(function(){
+											if(twt_json!={}) {
+												return twt_json['retweet_count'];
+											}
+											return data_tweets[tweet]['retweet_count'];
+										});
+									d3.select(".panel-tweet-text-like")
+										.transition()
+										.text(function(){
+											if(twt_json!={}) {
+												return twt_json['favorite_count'];
+											}
+											return data_tweets[tweet]['favorite_count'];
+										});
+								}
+
+								setTimeout(loadStats, 1000);
 
 								var tweet_created_format = d3.timeFormat("%-I:%M%p, %e %b %Y")(d3.timeParse("%a %b %d %H:%M:%S %Z %Y")(data_tweets[tweet]['created_at']));
 								return "@"+data_tweets[tweet]['user']['screen_name']+"    ("+tweet_created_format+")";
@@ -651,11 +663,16 @@ function zoomed() {
 	context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
 }
 
+function callback(data){
+	twt_json = data;
+}
+
 function doWork(id) {
 	$.post("receiver", {"id": id}, function(data){
-		console.log(JSON.parse(data));
+		twt_json = JSON.parse(data);
+		callback(JSON.parse(data));
 	});
- event.preventDefault();
+ 	event.preventDefault();
 }
 </script>
 </body>
