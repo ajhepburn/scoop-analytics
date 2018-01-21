@@ -20,7 +20,10 @@ import sys
 @app.route('/receiver', methods = ['POST'])
 def worker():
 	data = request.form['id']
-	result = json.dumps(data)
+	tweet_info = twitter.get('statuses/show/'+data+'.json')
+	tweet_info_json = tweet_info.json()
+	# result = json.dumps(tweet_info_json)
+	result = json.dumps(tweet_info_json)
 
 	return result
 
