@@ -27,8 +27,7 @@ var parseData = {
 
 		function parseTwitterAPI(json_api){
 			var api = JSON.parse(json_api);
-			console.log(api);
-
+			// console.log(api);
 		}
 		return {
 		    parsePrices: parsePrices,
