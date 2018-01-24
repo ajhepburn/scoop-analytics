@@ -27,8 +27,8 @@ var w = 900,
 	  right: 100
 	},
 	margin2 = {
-		top: 600,
-		bottom: 30,
+		top: 425,
+		bottom: 215,
 		left: 80,
 		right: 20
 	},
@@ -198,7 +198,7 @@ function drawPanel(params) {
 		.enter()
 			.append("g")
 			.attr("class", function(d){return "pan"+d['id'];})
-			.attr("transform", "translate("+((width/5.5)-50)+","+(height*1.4)+20+")")
+			.attr("transform", "translate("+((width/5.5)-50)+","+(height*1.85)+")")
 			.classed("panel", true);
 	this.selectAll(".panel")
 		.append("g")
@@ -225,10 +225,6 @@ function drawPanel(params) {
 		.append("text")
 		.attr("class", function(d){ return "pan"+d['id'];})
 		.classed("panel-tweet-header", true)
-		.text(function(d){
-			var tweet_created_format = d3.timeFormat("%-I:%M%p, %e %b %Y")(d3.timeParse("%a %b %d %H:%M:%S %Z %Y")(d['created_at']));
-			return "@"+d['user']['screen_name']+"    ("+tweet_created_format+")";
-		})
 		.attr("transform", "translate(25,7.5)");
 	this.selectAll(".panel-body")
 		.append("text")
@@ -269,6 +265,12 @@ function drawPanel(params) {
 	// update
 	params.forEach(function(panel){
 		var grouping = self.selectAll("g.pan"+panel['id']);
+		grouping.select(".panel-tweet-header")
+			.transition()
+			.text(function(d){
+				var tweet_created_format = d3.timeFormat("%-I:%M%p, %e %b %Y")(d3.timeParse("%a %b %d %H:%M:%S %Z %Y")(d['created_at']));
+				return "@"+d['user']['screen_name']+"    ("+tweet_created_format+")";
+			});
 		grouping.select(".panel-tweet-img-profile")
 			.transition()
 		    .attr("xlink:href", function(d){
@@ -292,8 +294,9 @@ function drawPanel(params) {
 			});
 		grouping.select(".panel-tweet-text-retweet")
 			.text(function(d){
-				console.log(d);
-				for(var i=0; i < twt_json['tweets'].length; i++) if(twt_json['tweets'][i]['id'] == d['id']) return twt_json['tweets'][i]['retweet_count'];
+				for(var i=0; i < twt_json['tweets'].length; i++) if(twt_json['tweets'][i]['id'] == d['id']) {
+					return twt_json['tweets'][i]['retweet_count'];
+				}
 			});
 		grouping.select(".panel-tweet-text-like")
 			.text(function(d){
@@ -511,11 +514,11 @@ function plot(params){
 					.style("display", "none")
 					.transition();
 					// exit()
-				svg.selectAll(".panel")
+				/*svg.selectAll(".panel")
 					.data(params)
 					.exit()
-					.remove();
-				twt_json['tweets'] = [];
+					.remove();*/
+				twt_json = {};
 			});
 
 		ctx.selectAll(".trendline")
@@ -658,7 +661,6 @@ function zoomed() {
 
 function callback(data){
 	temp_arr.push(data);
-	// twt_json['tweets'].push(data);
 }
 
 function doWork(id){
