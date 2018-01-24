@@ -38,8 +38,8 @@ def main():
 
 	if not twitter.authorized:
 		return redirect(url_for('twitter.login'))
-	account_info = twitter.get('account/settings.json')
-	if account_info.ok:
-		account_info_json = account_info.json()
+	# account_info = twitter.get('account/settings.json')
+	# if account_info.ok:
+	# 	account_info_json = account_info.json()
 
-	return render_template('index.html', documents=docs, share_prices=prices, acc_info=account_info_json)
+	return render_template('index.html', documents=docs, share_prices=prices)

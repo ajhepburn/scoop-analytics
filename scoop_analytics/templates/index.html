@@ -1,12 +1,9 @@
-<!-- {% for share_price in share_prices %}
-<li>{{share_price.symbol}}, {{share_price.timestamp}}, {{share_price.open}}, {{share_price.close}}, {{share_price.high}}, {{share_price.low}}, {{share_price.volume}}</li>
-{% endfor %} -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Scoop Analytics</title>
+  <link rel="icon" sizes="192x192" href="{{ url_for('static', filename = 'img/favicon.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename = 'styles/main.css') }}">
   <script src="{{ url_for('static', filename = 'js/d3.min.js') }}"></script>
   <script src="{{ url_for('static', filename = 'js/jquery-3.2.1.min.js') }}"></script>
@@ -18,14 +15,13 @@
 
 var data_prices = parseData.parseFlaskJSON().parsePrices({{ share_prices | tojson | safe}});
 var data_tweets = parseData.parseFlaskJSON().parseTweets({{ documents | tojson | safe}});
-var data_api = parseData.parseFlaskJSON().parseTwitterAPI('{{ acc_info | tojson |safe}}');
 var twt_json = {};
 
 var w = 900,
 	h = 700,
 	margin = {
 	  top: 58,
-	  bottom: 250,
+	  bottom: 350,
 	  left: 80,
 	  right: 100
 	},
@@ -193,60 +189,110 @@ function drawStatic(params){
 	}
 }
 
-function drawPanel() {
-	var panel = svg.append("g")
-			.classed("panel", true)
-			.attr("transform", "translate("+width/5.5+","+(height*1.325)+")")
-	panel.append("text")
-		.classed("panel panel-header", true)
-		.attr("transform", "translate(0,0)")
-		.text("Tweet Information");
-	var panelBody = panel.append("g")
-					.classed("panel panel-body", true)
-					.attr("transform", "translate(-50,20)");
-	panelBody.append("svg:image")
-		.classed("panel panel-body panel-tweet-img-profile", true)
+function drawPanel(params) {
+	var self = this;
+	// enter()
+	this.selectAll(".panel")
+		.data(params)
+		.enter()
+			.append("g")
+			.attr("class", function(d){return "pan"+d['id'];})
+			.attr("transform", "translate("+((width/5.5)-50)+","+(height*1.325)+20+")")
+			.classed("panel", true);
+	this.selectAll(".panel")
+		.append("g")
+		.attr("class", function(d){return "pan"+d['id'];})
+		.attr("transform", function(d,i){
+			return "translate(0,"+(50*i)+")";
+		})
+		.classed("panel-body", true);
+	this.selectAll(".panel-body")
+		.append("svg:image")
+		.attr("class", function(d){ return "pan"+d['id'];})
+		.classed("panel-tweet-img-profile", true)
 	    .attr("transform", "translate(0,0.5)")
 	    .attr("width", 20)
 	    .attr("height", 20);
-	panelBody.append("rect")
-		.classed("panel panel-body panel-tweet-img-profile-border", true)
+	this.selectAll(".panel-body")
+		.append("rect")
+		.attr("class", function(d){ return "pan"+d['id'];})
+		.classed("panel-tweet-img-profile-border", true)
 	    .attr("transform", "translate(0,0.5)")
 		.attr("width", 21)
 		.attr("height", 20);
-	panelBody.append("text")
-		.classed("panel panel-body panel-tweet-header", true)
-		.text("")
+	this.selectAll(".panel-body")
+		.append("text")
+		.attr("class", function(d){ return "pan"+d['id'];})
+		.classed("panel-tweet-header", true)
+		.text(function(d){
+			var tweet_created_format = d3.timeFormat("%-I:%M%p, %e %b %Y")(d3.timeParse("%a %b %d %H:%M:%S %Z %Y")(d['created_at']));
+			return "@"+d['user']['screen_name']+"    ("+tweet_created_format+")";
+		})
 		.attr("transform", "translate(25,7.5)");
-	panelBody.append("text")
-		.classed("panel panel-body panel-tweet-text", true)
+	this.selectAll(".panel-body")
+		.append("text")
+		.attr("class", function(d){ return "pan"+d['id'];})
+		.classed("panel-tweet-text", true)
 		.attr("dx", "0")
 		.attr("dy", "15")
 		.text("")
 		.attr("transform", "translate(25,7.5)");
-  	panelBody.append("svg:image")
-		.classed("panel panel-body panel-tweet-img-retweet", true)
+  	this.selectAll(".panel-body")
+  		.append("svg:image")
+  		.attr("class", function(d){ return "pan"+d['id'];})
+		.classed("panel-tweet-img-retweet", true)
 	    .attr("transform", "translate(25,30)")
 	    .attr("width", 18)
 	    .attr("height", 14);
-	panelBody.append("text")
-		.classed("panel panel-body panel-tweet-text-retweet", true)
+	this.selectAll(".panel-body")
+		.append("text")
+		.attr("class", function(d){ return "pan"+d['id'];})
+		.classed("panel-tweet-text-retweet", true)
 		.attr("transform", "translate(55,40)")
 		.text("");
- 	panelBody.append("svg:image")
-		.classed("panel panel-body panel-tweet-img-like", true)
+ 	this.selectAll(".panel-body")
+ 		.append("svg:image")
+ 		.attr("class", function(d){ return "pan"+d['id'];})
+		.classed("panel-tweet-img-like", true)
 	    .attr("transform", "translate(85,30)")
 	    .attr("width", 16)
 	    .attr("height", 15);
- 	panelBody.append("text")
-		.classed("panel panel-body panel-tweet-text-like", true)
+ 	this.selectAll(".panel-body")
+ 		.append("text")
+ 		.attr("class", function(d){ return "pan"+d['id'];})
+		.classed("panel-tweet-text-like", true)
 		.attr("transform", "translate(110,40)")
 		.text("");
+
+	// update
+	params.forEach(function(panel){
+		var grouping = self.selectAll("g.pan"+panel['id']);
+		grouping.select(".panel-tweet-img-profile")
+			.transition()
+		    .attr("xlink:href", function(d){
+		    	return d['user']['profile_image_url']
+		    });
+		grouping.select(".panel-tweet-img-like")
+			.transition()
+		    .attr("xlink:href", "{{ url_for('static', filename = 'img/twitter-like.svg') }}")
+		    .attr("opacity", 0.5);
+		grouping.select(".panel-tweet-img-retweet")
+			.transition()
+		    .attr("xlink:href", "{{ url_for('static', filename = 'img/twitter-retweet.svg') }}")
+		    .attr("opacity", 0.5);
+		grouping.select(".panel-tweet-img-profile-border")
+			.transition()
+			.attr("style", "stroke: #888a91; shape-rendering: crispEdges;");
+		grouping.select(".panel-tweet-text")
+			.transition()
+			.text(function(d){
+				return d['text'];
+			});
+	});
 }
 
 function plot(params){
 	drawStatic.call(this, params);
-	drawPanel.call();
 	var self = this;
 	var prices = d3.keys(params.data_prices[0]).filter(function(d){
 		return d == "open" || d == "high" || d == "low";
@@ -278,7 +324,6 @@ function plot(params){
 				return d;
 			})
 			.classed("priceContext", true);
-
 	this.selectAll(".legend")
 		.data(prices)
 		.enter()
@@ -326,8 +371,8 @@ function plot(params){
 			return "#0065fc";
 		})
 
-	prices.forEach(function(price)
-{		var g = self.selectAll("g."+price);
+	prices.forEach(function(price){		
+		var g = self.selectAll("g."+price);
 		var ctx = context.selectAll("g."+price);
 
 		var groupDOM = $(g).get(0)["_groups"][0][0];
@@ -403,11 +448,6 @@ function plot(params){
 				var curr_point = this;
 				var timeParser = d3.timeParse("%s");
 
-				for(tweet in data_tweets){
-					var tweet_time = timeParser(data_tweets[tweet]['timestamp_s']);
-					var point_time = timeParser(d3.select(curr_point).data()[0].timestamp);
-					var diff = point_time.getTime() - tweet_time.getTime();
-				}
 				d3.select(this)
 					.transition()
 					.attr("r", 7)
@@ -430,7 +470,19 @@ function plot(params){
 						return date_format + " (<b>"+time_format+"</b>)<br/><b>High:</b>" + "&nbsp;"+prices.high+"<br/><b>Low:</b>"+"&nbsp;"+prices.low;
 					 })
 					.transition();
-				d3.selectAll(".panel-tweet-header")
+
+				// PANEL MANIPULATION
+				var tweet_arr = [];
+				for(i in data_tweets){
+					var tweet_time = timeParser(data_tweets[i]['timestamp_s']);
+					var point_time = timeParser(d3.select(curr_point).data()[0].timestamp);
+					var diff = point_time.getTime() - tweet_time.getTime();
+					if(diff<=1800000 && diff>=-1800000) {
+						tweet_arr.push(data_tweets[i]);
+					}
+				}
+				drawPanel.call(svg, tweet_arr);
+				/*d3.selectAll(".panel-tweet-header")
 					.transition()
 					.style("opacity", 1)
 					.text(function(){
@@ -438,7 +490,7 @@ function plot(params){
 							var tweet_time = timeParser(data_tweets[tweet]['timestamp_s']);
 							var point_time = timeParser(d3.select(curr_point).data()[0].timestamp);
 							var diff = point_time.getTime() - tweet_time.getTime();
-							if(diff<=1800000 && diff>=-1800000) {
+							if(diff<=18000000 && diff>=-18000000) {
 								doWork(data_tweets[tweet]["id_str"]);
 
 								d3.select(".panel-tweet-img-profile")
@@ -486,7 +538,7 @@ function plot(params){
 								return "@"+data_tweets[tweet]['user']['screen_name']+"    ("+tweet_created_format+")";
 							}
 						}
-					});
+					});*/
 /*				self.selectAll(".area")
 					.transition()
 					.style("opacity", 0.5);*/
@@ -499,7 +551,12 @@ function plot(params){
 				d3.selectAll(".tooltip")
 					.style("display", "none")
 					.transition();
-				d3.selectAll(".panel-tweet-header")
+					// exit()
+				svg.selectAll(".panel")
+					.data(params)
+					.exit()
+					.remove();
+				/*d3.selectAll(".panel-tweet-header")
 					.transition()
 					.text("");
 				d3.selectAll(".panel-tweet-img-profile")
@@ -522,7 +579,7 @@ function plot(params){
 					.text("");
 				d3.selectAll(".panel-tweet-text-retweet")
 					.transition()
-					.text("");
+					.text("");*/
 			});
 
 		ctx.selectAll(".trendline")
