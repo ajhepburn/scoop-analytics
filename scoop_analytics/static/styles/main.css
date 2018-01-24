@@ -126,3 +126,22 @@ body,html{
  	fill: none;
  	pointer-events: all;
  }
+ .market {
+ 	font-weight: bold;
+ 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+ 	fill: #84c283;
+ }
+ .market-current {
+ 	font-size:150%;
+ }
+ .market-by-val {
+ 	font-size:120%;
+ }
+ .market-by-percent {
+ 	font-size: 130%
+ }
+ .market-labels {
+ 	opacity: 0;
+ 	font-size:80%;
+ 	fill: #888a91;
+ }

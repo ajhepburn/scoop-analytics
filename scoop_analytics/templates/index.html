@@ -21,8 +21,8 @@ var twt_json = {};
 var w = 900,
 	h = 700,
 	margin = {
-	  top: 58,
-	  bottom: 350,
+	  top: 88,
+	  bottom: 320,
 	  left: 80,
 	  right: 100
 	},
@@ -178,7 +178,7 @@ function drawStatic(params){
 		d3.select("#chart")
 			.append("text")
 			.classed("y axis-label",true)
-			.attr("transform", "translate(30,"+height/1.5+") rotate(-90)")
+			.attr("transform", "translate(30,"+height/1.25+") rotate(-90)")
 			.text(function(){
 				return data_prices[0]['symbol']+" Share Price ($)";
 			});
@@ -186,7 +186,33 @@ function drawStatic(params){
 			.append("text")
 			.classed("x axis-label",true)
 			.attr("transform", "translate("+width/1.65+","+height*1.35+")")
-			.text("Time");
+			// .text("Time");
+			.text("");
+		d3.select("#chart")
+			.append("text")
+			.classed("market market-by-val", true)
+			.attr("transform", "translate("+width/4.08+",30)")
+			.text("");
+		d3.select("#chart")
+			.append("text")
+			.classed("market market-by-percent", true)
+			.attr("transform", "translate("+width/4.15+",50)")
+			.text("");
+		d3.select("#chart")
+			.append("text")
+			.classed("market market-current", true)
+			.attr("transform", "translate("+width/1.15+",45)")
+			.text("");
+		d3.select("#chart")
+			.append("text")
+			.classed("market-labels market-label-change", true)
+			.attr("transform", "translate("+width/4.30+",70)")
+			.text("Market Change");
+		d3.select("#chart")
+			.append("text")
+			.classed("market-labels market-label-current", true)
+			.attr("transform", "translate("+width/1.16+",70)")
+			.text("Market Value");
 	}
 }
 
@@ -286,7 +312,7 @@ function drawPanel(params) {
 		    .attr("opacity", 0.5);
 		grouping.select(".panel-tweet-img-profile-border")
 			.transition()
-			.attr("style", "stroke: #888a91; shape-rendering: crispEdges;");
+			.attr("style", "stroke: #0065fc; shape-rendering: crispEdges;");
 		grouping.select(".panel-tweet-text")
 			.transition()
 			.text(function(d){
@@ -484,17 +510,64 @@ function plot(params){
 						return date_format + " (<b>"+time_format+"</b>)<br/><b>High:</b>" + "&nbsp;"+prices.high+"<br/><b>Low:</b>"+"&nbsp;"+prices.low;
 					 })
 					.transition();
+				d3.selectAll(".market-labels")
+					.transition().delay(50)
+					.style("opacity", 1);
+				d3.selectAll(".market-current")
+					.transition().delay(50)
+					.style("opacity", 1)
+					.text(function(){
+						return "$"+d.value.toFixed(2);
+					});
+				d3.selectAll(".market-by-val")
+					.transition().delay(50)
+					.style("opacity", 1)
+					.text(function(){
+						var index = arr.findIndex(x => x.timestamp==d.timestamp);
+						var decVal = d.value - arr[index-1].value;
+						var val = (d.value - arr[index-1].value).toFixed(2);
+
+						if(val>0) return "+"+val;
+						else return val;
+					})
+					.style("fill", function(){
+						var index = arr.findIndex(x => x.timestamp==d.timestamp);
+						var val = (d.value - arr[index-1].value).toFixed(2);
+
+						if(val>0) return "#84c283";
+						else return "#ff7575";
+					});
+				d3.selectAll(".market-by-percent")
+					.transition().delay(50)
+					.style("opacity", 1)
+					.text(function(){
+						var index = arr.findIndex(x => x.timestamp==d.timestamp);
+						var decVal = d.value - arr[index-1].value;
+						var percentage = ((decVal/arr[index-1].value)*100).toFixed(2);
+
+						if(percentage>0) return "+"+percentage+"%";
+						else return percentage+"%";
+					})
+					.style("fill", function(){
+						var index = arr.findIndex(x => x.timestamp==d.timestamp);
+						var decVal = d.value - arr[index-1].value;
+						var percentage = ((decVal/arr[index-1].value)*100).toFixed(2);
+
+						if(percentage>0) return "#84c283";
+						else return "#ff7575";
+					})
+
 
 				// PANEL MANIPULATION
 				var tweet_arr = [];
 				var c = 0;
-				for(i in data_tweets){
-					var tweet_time = timeParser(data_tweets[i]['timestamp_s']);
+				for(j in data_tweets){
+					var tweet_time = timeParser(data_tweets[j]['timestamp_s']);
 					var point_time = timeParser(d3.select(curr_point).data()[0].timestamp);
 					var diff = point_time.getTime() - tweet_time.getTime();
 					if(diff<=1800000 && diff>=-1800000) {
 						c+=1;
-						tweet_arr.push(data_tweets[i]);
+						tweet_arr.push(data_tweets[j]);
 					}
 				}
 				tweet_arr.forEach(function(tweet){
@@ -503,9 +576,21 @@ function plot(params){
 				function checkIfFinished(){
 				    return temp_arr.length == tweet_arr.length;
 				}
-				var timeout = setInterval(function() { if(checkIfFinished()) { twt_json['tweets'] = temp_arr; clearInterval(timeout); drawPanel.call(svg, tweet_arr);} }, 100);
+				var timeout = setInterval(function() { 
+					if(checkIfFinished()) { 
+						clearInterval(timeout);
+						twt_json['tweets'] = temp_arr; 
+						drawPanel.call(svg, tweet_arr);
+					} 
+				}, 100);
 			})
 			.on("mouseout", function(d,i){
+				d3.selectAll(".market")
+					.transition().delay(50)
+					.style("opacity", 0);
+				d3.selectAll(".market-labels")
+					.transition().delay(50)
+					.style("opacity",0);
 				d3.select(this)
 					.transition()
 					.attr("r", 4)
@@ -514,11 +599,11 @@ function plot(params){
 					.style("display", "none")
 					.transition();
 					// exit()
-				/*svg.selectAll(".panel")
+				svg.selectAll(".panel")
 					.data(params)
 					.exit()
-					.remove();*/
-				twt_json = {};
+					.remove();
+				var twt_json = {};
 			});
 
 		ctx.selectAll(".trendline")
