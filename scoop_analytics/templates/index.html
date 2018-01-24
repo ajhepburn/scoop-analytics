@@ -15,7 +15,7 @@
 
 var data_prices = parseData.parseFlaskJSON().parsePrices({{ share_prices | tojson | safe}});
 var data_tweets = parseData.parseFlaskJSON().parseTweets({{ documents | tojson | safe}});
-var twt_json = {};
+var twt_json = {"tweets": []};
 
 var w = 900,
 	h = 700,
@@ -184,7 +184,7 @@ function drawStatic(params){
 		d3.select("#chart")
 			.append("text")
 			.classed("x axis-label",true)
-			.attr("transform", "translate("+width/1.65+","+height*1.275+")")
+			.attr("transform", "translate("+width/1.65+","+height*1.35+")")
 			.text("Time");
 	}
 }
@@ -197,7 +197,7 @@ function drawPanel(params) {
 		.enter()
 			.append("g")
 			.attr("class", function(d){return "pan"+d['id'];})
-			.attr("transform", "translate("+((width/5.5)-50)+","+(height*1.325)+20+")")
+			.attr("transform", "translate("+((width/5.5)-50)+","+(height*1.4)+20+")")
 			.classed("panel", true);
 	this.selectAll(".panel")
 		.append("g")
@@ -473,75 +473,23 @@ function plot(params){
 
 				// PANEL MANIPULATION
 				var tweet_arr = [];
+				var c = 0;
 				for(i in data_tweets){
 					var tweet_time = timeParser(data_tweets[i]['timestamp_s']);
 					var point_time = timeParser(d3.select(curr_point).data()[0].timestamp);
 					var diff = point_time.getTime() - tweet_time.getTime();
 					if(diff<=1800000 && diff>=-1800000) {
+						c+=1;
 						tweet_arr.push(data_tweets[i]);
 					}
 				}
-				drawPanel.call(svg, tweet_arr);
-				/*d3.selectAll(".panel-tweet-header")
-					.transition()
-					.style("opacity", 1)
-					.text(function(){
-						for(tweet in data_tweets){
-							var tweet_time = timeParser(data_tweets[tweet]['timestamp_s']);
-							var point_time = timeParser(d3.select(curr_point).data()[0].timestamp);
-							var diff = point_time.getTime() - tweet_time.getTime();
-							if(diff<=18000000 && diff>=-18000000) {
-								doWork(data_tweets[tweet]["id_str"]);
-
-								d3.select(".panel-tweet-img-profile")
-									.transition()
-								    .attr("xlink:href", data_tweets[tweet]['user']['profile_image_url']);
-								d3.select(".panel-tweet-img-like")
-									.transition()
-								    .attr("xlink:href", "{{ url_for('static', filename = 'img/twitter-like.svg') }}")
-								    .attr("opacity", 0.5);
-								d3.select(".panel-tweet-img-retweet")
-									.transition()
-								    .attr("xlink:href", "{{ url_for('static', filename = 'img/twitter-retweet.svg') }}")
-								    .attr("opacity", 0.5);
-								d3.select(".panel-tweet-img-profile-border")
-									.transition()
-									.attr("style", "stroke: #888a91; shape-rendering: crispEdges;");
-								d3.select(".panel-tweet-text")
-									.transition()
-									.text(function(){
-										return data_tweets[tweet]['text'];
-									});
-
-								function loadStats() {
-									d3.select(".panel-tweet-text-retweet")
-										.transition()
-										.text(function(){
-											if(twt_json!={}) {
-												return twt_json['retweet_count'];
-											}
-											return data_tweets[tweet]['retweet_count'];
-										});
-									d3.select(".panel-tweet-text-like")
-										.transition()
-										.text(function(){
-											if(twt_json!={}) {
-												return twt_json['favorite_count'];
-											}
-											return data_tweets[tweet]['favorite_count'];
-										});
-								}
-
-								setTimeout(loadStats, 1000);
-
-								var tweet_created_format = d3.timeFormat("%-I:%M%p, %e %b %Y")(d3.timeParse("%a %b %d %H:%M:%S %Z %Y")(data_tweets[tweet]['created_at']));
-								return "@"+data_tweets[tweet]['user']['screen_name']+"    ("+tweet_created_format+")";
-							}
-						}
-					});*/
-/*				self.selectAll(".area")
-					.transition()
-					.style("opacity", 0.5);*/
+				tweet_arr.forEach(function(tweet){
+					doWork(data_tweets[i]["id_str"]);
+				});
+				function checkIfFinished(){
+				    return twt_json['tweets'].length == tweet_arr.length;
+				}
+				var timeout = setInterval(function() { if(checkIfFinished()) { clearInterval(timeout); drawPanel.call(svg, tweet_arr);  } }, 100);
 			})
 			.on("mouseout", function(d,i){
 				d3.select(this)
@@ -556,30 +504,6 @@ function plot(params){
 					.data(params)
 					.exit()
 					.remove();
-				/*d3.selectAll(".panel-tweet-header")
-					.transition()
-					.text("");
-				d3.selectAll(".panel-tweet-img-profile")
-					.transition()
-					.attr("xlink:href", "");
-				d3.selectAll(".panel-tweet-img-like")
-					.transition()
-					.attr("xlink:href", "");
-				d3.selectAll(".panel-tweet-img-retweet")
-					.transition()
-					.attr("xlink:href", "");
-				d3.selectAll(".panel-tweet-img-profile-border")
-					.transition()
-					.attr("style", "stroke: none;");
-				d3.selectAll(".panel-tweet-text")
-					.transition()
-					.text("");
-				d3.selectAll(".panel-tweet-text-like")
-					.transition()
-					.text("");
-				d3.selectAll(".panel-tweet-text-retweet")
-					.transition()
-					.text("");*/
 			});
 
 		ctx.selectAll(".trendline")
@@ -721,12 +645,11 @@ function zoomed() {
 }
 
 function callback(data){
-	twt_json = data;
+	twt_json['tweets'].push(data);
 }
 
 function doWork(id) {
 	$.post("receiver", {"id": id}, function(data){
-		twt_json = JSON.parse(data);
 		callback(JSON.parse(data));
 	});
  	event.preventDefault();
