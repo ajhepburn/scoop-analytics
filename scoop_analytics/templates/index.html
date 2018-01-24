@@ -503,7 +503,7 @@ function plot(params){
 				function checkIfFinished(){
 				    return temp_arr.length == tweet_arr.length;
 				}
-				var timeout = setInterval(function() { if(checkIfFinished()) { twt_json['tweets'] = temp_arr; clearInterval(timeout); drawPanel.call(svg, tweet_arr);} }, 150);
+				var timeout = setInterval(function() { if(checkIfFinished()) { twt_json['tweets'] = temp_arr; clearInterval(timeout); drawPanel.call(svg, tweet_arr);} }, 100);
 			})
 			.on("mouseout", function(d,i){
 				d3.select(this)
