@@ -103,9 +103,9 @@ body,html{
 	color: #081F2C;
  }
  .panel {
-	text-anchor:middle;
-	fill: #888a91;
-	font-size:90%;
+ 	text-anchor:middle;
+ 	fill: #888a91;
+ 	font-size:80%;
  }
  .panel-header {
  	font-size:100%;
@@ -113,8 +113,7 @@ body,html{
  .panel-tweet-header {
  	text-anchor: start;
  	font-weight: bold;
- 	opacity: 0.15;
- 	font-size: 90%;
+ 	font-size: 85%;
  }
  .panel-tweet-text {
  	text-anchor:start;

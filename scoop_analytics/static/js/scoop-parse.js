@@ -24,17 +24,9 @@ var parseData = {
 			}
 			return data_tweets;
 		}
-
-		function parseTwitterAPI(json_api){
-			var api = JSON.parse(json_api);
-			// console.log(api);
-		}
 		return {
 		    parsePrices: parsePrices,
-		    parseTweets: parseTweets,
-		    parseTwitterAPI: parseTwitterAPI
+		    parseTweets: parseTweets
 		};
 	}
-
-
 }
