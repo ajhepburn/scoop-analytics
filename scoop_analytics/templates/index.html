@@ -15,7 +15,8 @@
 
 var data_prices = parseData.parseFlaskJSON().parsePrices({{ share_prices | tojson | safe}});
 var data_tweets = parseData.parseFlaskJSON().parseTweets({{ documents | tojson | safe}});
-var twt_json = {"tweets": []};
+var temp_arr = [];
+var twt_json = {};
 
 var w = 900,
 	h = 700,
@@ -263,6 +264,7 @@ function drawPanel(params) {
 		.classed("panel-tweet-text-like", true)
 		.attr("transform", "translate(110,40)")
 		.text("");
+								
 
 	// update
 	params.forEach(function(panel){
@@ -287,6 +289,15 @@ function drawPanel(params) {
 			.transition()
 			.text(function(d){
 				return d['text'];
+			});
+		grouping.select(".panel-tweet-text-retweet")
+			.text(function(d){
+				console.log(d);
+				for(var i=0; i < twt_json['tweets'].length; i++) if(twt_json['tweets'][i]['id'] == d['id']) return twt_json['tweets'][i]['retweet_count'];
+			});
+		grouping.select(".panel-tweet-text-like")
+			.text(function(d){
+				for(var i=0; i < twt_json['tweets'].length; i++) if(twt_json['tweets'][i]['id'] == d['id']) return twt_json['tweets'][i]['favorite_count'];
 			});
 	});
 }
@@ -484,12 +495,12 @@ function plot(params){
 					}
 				}
 				tweet_arr.forEach(function(tweet){
-					doWork(data_tweets[i]["id_str"]);
+					doWork(tweet["id_str"]);
 				});
 				function checkIfFinished(){
-				    return twt_json['tweets'].length == tweet_arr.length;
+				    return temp_arr.length == tweet_arr.length;
 				}
-				var timeout = setInterval(function() { if(checkIfFinished()) { clearInterval(timeout); drawPanel.call(svg, tweet_arr);  } }, 100);
+				var timeout = setInterval(function() { if(checkIfFinished()) { twt_json['tweets'] = temp_arr; clearInterval(timeout); drawPanel.call(svg, tweet_arr);} }, 100);
 			})
 			.on("mouseout", function(d,i){
 				d3.select(this)
@@ -504,6 +515,7 @@ function plot(params){
 					.data(params)
 					.exit()
 					.remove();
+				twt_json['tweets'] = [];
 			});
 
 		ctx.selectAll(".trendline")
@@ -645,10 +657,11 @@ function zoomed() {
 }
 
 function callback(data){
-	twt_json['tweets'].push(data);
+	temp_arr.push(data);
+	// twt_json['tweets'].push(data);
 }
 
-function doWork(id) {
+function doWork(id){
 	$.post("receiver", {"id": id}, function(data){
 		callback(JSON.parse(data));
 	});
