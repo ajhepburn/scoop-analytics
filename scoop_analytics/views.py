@@ -1,5 +1,5 @@
 from __future__ import print_function
-from flask import render_template, json, request, redirect, url_for, Response
+from flask import render_template, json, jsonify, request, redirect, url_for, Response
 from flask_dance.contrib.twitter import twitter
 from scoop_analytics import app
 from scoop_analytics.models import db, BaseModel, Documents, SharePrices
@@ -17,15 +17,25 @@ import sys
 # 		return '<h1>Your twitter name is @{}'.format(account_info_json['screen_name'])
 # 	return '<h1>Request failed!</h1>'
 
-@app.route('/receiver', methods = ['POST'])
-def worker():
-	data = request.form['id']
-	tweet_info = twitter.get('statuses/show/'+data+'.json')
-	tweet_info_json = tweet_info.json()
-	# result = json.dumps(tweet_info_json)
-	result = json.dumps(tweet_info_json)
+# @app.route('/receiver', methods = ['POST'])
+# def worker():
+# 	data = request.form['id']
+# 	tweet_info = twitter.get('statuses/show/'+data+'.json')
+# 	tweet_info_json = tweet_info.json()
+# 	# result = json.dumps(tweet_info_json)
+# 	result = json.dumps(tweet_info_json)
 
-	return result
+# 	return result
+
+@app.route('/tweet-get', methods=['GET'])
+def worker():
+	data = json.loads(request.args.get('data'))
+	tweet_arr = []
+	for item in data:
+		tweet_info = twitter.get('statuses/show/'+str(item['id_str'])+'.json')
+		tweet_arr.append(json.loads(tweet_info.text))
+
+	return jsonify({"test": tweet_arr})
 
 @app.route("/")
 def main():
