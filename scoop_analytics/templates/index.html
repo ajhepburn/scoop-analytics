@@ -32,9 +32,16 @@ var w = 900,
 		left: 80,
 		right: 20
 	},
+	margin3 = {
+		top: 525,
+		bottom: 215,
+		left: 80,
+		right: 20
+	}
 	width = w - margin.left - margin.right,
 	height = h - margin.top - margin.bottom,
 	height2 = h - margin2.top - margin2.bottom;
+	height3 = h - margin3.top - margin3.bottom;
 
 var zoom = d3.zoom()
     .scaleExtent([1, Infinity])
@@ -58,14 +65,21 @@ var focus = svg.append("g")
 			.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 			.call(zoom);
 
+var volumes = svg.append('g')
+			    .attr('class', 'volume')
+			    .attr('transform', 'translate(' + margin2.left + ',' + margin2.top + ')');
+
 var context = svg.append("g")
 				.classed("context", true)
-				.attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+				.attr("transform", "translate(" + margin3.left + "," + margin3.top + ")");
 
 var timeParser = d3.timeParse("%s");
 
 var maxVal = d3.max(data_prices, function(d) { return d.open; }),
 	minVal = d3.min(data_prices, function(d) { return d.open; });
+var barMaxVal = d3.max(data_prices, function(d) { return d.volume; }),
+	barMinVal = d3.min(data_prices, function(d) { return d.volume; });
+
 
 var x = d3.scaleTime()
 		.domain([
@@ -83,12 +97,17 @@ var x = d3.scaleTime()
 		])
 		.range([0,width]),
 	y = d3.scaleLinear()
-		.domain([minVal, maxVal+(0.05*maxVal)])
+		.domain([minVal, maxVal]).nice()
 		.range([height, 0]),
 	x2 = d3.scaleTime().range([0,width])
 		.domain(x.domain()),
 	y2 = d3.scaleLinear().range([height2,0])
-		.domain(y.domain());
+		.domain(y.domain()),
+	x3 = d3.scaleBand().rangeRound([0, width]).padding(0.5),
+	y3 = d3.scaleLinear().range([height3, 0]);
+
+x3.domain(x.domain());
+y3.domain([barMinVal, barMaxVal]).nice();
 
 var xAxis = d3.axisBottom(x);
 			// .tickFormat(d3.timeFormat("%H:%M")),
@@ -338,6 +357,19 @@ function plot(params){
 		return d == "open" || d == "high" || d == "low";
 	});
 	// enter()
+
+	volumes.selectAll(".bar")
+	.data(params.data_prices)
+	.enter()
+		.append("rect")
+		.attr("clip-path", "url(#clip)")
+		.style("fill", "#0065fc")
+		.attr("x", function(d) { var time = timeParser(d.timestamp);return x(time); })
+		.attr("width", 2)
+		.attr("y", function(d) { console.log(d.volume);return y3(d.volume); })
+		.attr("height", function(d) { return height2 - y3(d.volume); })
+		.classed("bar", true);
+
 	this.selectAll(".area")
 		.data([params.data_prices])
 		.enter()
@@ -420,6 +452,7 @@ function plot(params){
 			return {
 				key: price,
 				timestamp: d.timestamp,
+				volume: d.volume,
 				value: d[price]
 			};
 		});
@@ -453,6 +486,7 @@ function plot(params){
 				.classed("point", true)
 				.attr("r", 4)
 				.style("fill", "#fff");
+
 		ctx.selectAll(".point")
 			.data(arr)
 			.enter()
@@ -732,6 +766,11 @@ function brushed() {
 		.attr("d", function(d){
 			return area(d);
 		});
+	volumes.selectAll(".bar")
+		.attr("x", function(d) { 
+			var time = timeParser(d.timestamp);
+			return x(time); 
+		});
 	focus.select(".axis.x").call(xAxis);
 	d3.select(".focus").call(zoom.transform, d3.zoomIdentity
 	 	.scale(width / (selection[1] - selection[0]))
@@ -742,6 +781,11 @@ function zoomed() {
 	if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return;
 	var t = d3.event.transform;
 	x.domain(t.rescaleX(x2).domain());
+	volumes.selectAll(".bar")
+	.attr("x", function(d) { 
+		var time = timeParser(d.timestamp);
+		return x(time); 
+	});
 	focus.selectAll(".point")
 		.attr("cx", function(d){
 			var time = timeParser(d.timestamp);
@@ -787,10 +831,10 @@ function doWork(arr){
 
 	    	var group = d3.selectAll("#p"+tweet['id_str']+"");
 			
-			group.append("svg:image")
+			group.append("img")
 			    .attr("width", 20)
 			    .attr("height", 20)
-			    .attr("xlink:href", function(d){return tweet['user']['profile_image_url']});
+			    .attr("src", function(d){return tweet['user']['profile_image_url']});
 
 			group.append("text")
 				.text(function(){
@@ -803,10 +847,10 @@ function doWork(arr){
 					return tweet['text'];
 				});
 
-			group.append("svg:image")
-			    .attr("xlink:href", "{{ url_for('static', filename = 'img/twitter-like.svg') }}");
-			group.append("svg:image")
-			    .attr("xlink:href", "{{ url_for('static', filename = 'img/twitter-retweet.svg') }}");
+			group.append("img")
+			    .attr("src", "{{ url_for('static', filename = 'img/twitter-like.svg') }}");
+			group.append("img")
+			    .attr("src", "{{ url_for('static', filename = 'img/twitter-retweet.svg') }}");
 
 			group.append("text")
 				.text(function(){
