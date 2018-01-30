@@ -102,7 +102,40 @@ body,html{
 	font-weight: 500;
 	color: #081F2C;
  }
- .panel {
+
+ .vol-tooltip {
+	pointer-events: none;
+	position: absolute;
+	display: none;
+	min-width: 50px;
+	height: auto;
+	background: none repeat scroll 0 0 #ffffff;
+	padding: 9px 14px 6px 14px;
+	border-radius: 4px;
+	text-align: center;
+	font-size:75%;
+	line-height: 1.5;
+	color: #5B6770;
+	box-shadow: 0px 3px 9px rgba(0, 0, 0, .15);
+}
+.vol-tooltip:after {
+	content: "";
+	width: 0;
+	height: 0;
+	border-left: 12px solid transparent;
+	border-right: 12px solid transparent;
+	border-top: 12px solid transparent;
+	position: absolute;
+	bottom: 0px;
+	left: 50%;
+	margin-left: -12px;
+}  
+.vol-tooltip span {
+	font-weight: 500;
+	color: #081F2C;
+ }
+ 
+ /* .panel {
  	text-anchor:middle;
  	fill: #888a91;
  	font-size:80%;
@@ -120,7 +153,7 @@ body,html{
  }
  .panel-tweet-img-profile-border {
  	fill: none;
- }
+ } */
  .zoom {
  	cursor: move;
  	fill: none;
