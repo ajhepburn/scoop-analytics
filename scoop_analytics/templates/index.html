@@ -216,7 +216,7 @@ function drawStatic(params){
 	}
 }
 
-function drawPanel(params) {
+/*function drawPanel(params) {
 	var self = this;
 	// enter()
 	this.selectAll(".panel")
@@ -329,7 +329,7 @@ function drawPanel(params) {
 				for(var i=0; i < twt_json['tweets'].length; i++) if(twt_json['tweets'][i]['id'] == d['id']) return twt_json['tweets'][i]['favorite_count'];
 			});
 	});
-}
+}*/
 
 function plot(params){
 	drawStatic.call(this, params);
@@ -558,7 +558,7 @@ function plot(params){
 					})
 
 
-				// PANEL MANIPULATION
+/*				// PANEL MANIPULATION
 				var tweet_arr = [];
 				var c = 0;
 				for(j in data_tweets){
@@ -582,7 +582,20 @@ function plot(params){
 						twt_json['tweets'] = temp_arr; 
 						drawPanel.call(svg, tweet_arr);
 					} 
-				}, 100);
+				}, 100);*/
+
+				// PANEL
+				var tweet_arr = [];
+				for(j in data_tweets){
+					var tweet_time = timeParser(data_tweets[j]['timestamp_s']);
+					var point_time = timeParser(d3.select(curr_point).data()[0].timestamp);
+					var diff = point_time.getTime() - tweet_time.getTime();
+					if(diff<=1800000 && diff>=-1800000) {
+						tweet_arr.push(data_tweets[j]);
+					}
+				}
+				doWork(tweet_arr);
+
 			})
 			.on("mouseout", function(d,i){
 				d3.selectAll(".market")
@@ -679,6 +692,11 @@ function plot(params){
 		.append("div")
 		.attr("class", "tooltip")
 		.classed("tooltip", true);
+
+	d3.select("body")
+		.append("div")
+		.attr("class", "panel")
+		.classed("panel", true);
 }
 plot.call(focus, {
 	data_prices: data_prices,
@@ -744,7 +762,7 @@ function zoomed() {
 	context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
 }
 
-function callback(data){
+/*function callback(data){
 	temp_arr.push(data);
 }
 
@@ -753,6 +771,20 @@ function doWork(id){
 		callback(JSON.parse(data));
 	});
  	event.preventDefault();
+}*/
+
+function doWork(arr){
+	var jqxhr = $.getJSON("tweet-get", {"data": JSON.stringify(arr)})
+	  .done(function(data) {
+	  	console.log(data)
+	    console.log( "second success" );
+	  })
+	  .fail(function() {
+	    console.log( "error" );
+	  })
+	  .always(function() {
+	    console.log( "complete" );
+	  });
 }
 </script>
 </body>
