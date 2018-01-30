@@ -35,7 +35,7 @@ def worker():
 		tweet_info = twitter.get('statuses/show/'+str(item['id_str'])+'.json')
 		tweet_arr.append(json.loads(tweet_info.text))
 
-	return jsonify({"test": tweet_arr})
+	return jsonify({"tweets": tweet_arr})
 
 @app.route("/")
 def main():

@@ -776,8 +776,47 @@ function doWork(id){
 function doWork(arr){
 	var jqxhr = $.getJSON("tweet-get", {"data": JSON.stringify(arr)})
 	  .done(function(data) {
-	  	console.log(data)
-	    console.log( "second success" );
+	    var tweet_list = data['tweets'];
+	    for(item in tweet_list) {
+	    	var tweet = tweet_list[item];
+
+	    	d3.select(".panel")
+	    		.append("g")
+	    		.attr("id", function(){return "p"+tweet['id_str'];})
+	    		.classed("panel-body", true);
+
+	    	var group = d3.selectAll("#p"+tweet['id_str']+"");
+			
+			group.append("svg:image")
+			    .attr("width", 20)
+			    .attr("height", 20)
+			    .attr("xlink:href", function(d){return tweet['user']['profile_image_url']});
+
+			group.append("text")
+				.text(function(){
+					var tweet_created_format = d3.timeFormat("%-I:%M%p, %e %b %Y")(d3.timeParse("%a %b %d %H:%M:%S %Z %Y")(tweet['created_at']));
+					return "@"+tweet['user']['screen_name']+"    ("+tweet_created_format+")";
+				});
+
+			group.append("text")
+				.text(function(){
+					return tweet['text'];
+				});
+
+			group.append("svg:image")
+			    .attr("xlink:href", "{{ url_for('static', filename = 'img/twitter-like.svg') }}");
+			group.append("svg:image")
+			    .attr("xlink:href", "{{ url_for('static', filename = 'img/twitter-retweet.svg') }}");
+
+			group.append("text")
+				.text(function(){
+					return tweet['retweet_count'];
+				});
+			group.append("text")
+				.text(function(){
+					return tweet['favorite_count'];
+				});
+		}
 	  })
 	  .fail(function() {
 	    console.log( "error" );
