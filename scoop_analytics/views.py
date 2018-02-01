@@ -1,11 +1,15 @@
 from __future__ import print_function
 from flask import render_template, json, jsonify, request, redirect, url_for, Response
 from flask_dance.contrib.twitter import twitter
+from TwitterAPI import TwitterAPI
 from scoop_analytics import app
 from scoop_analytics.models import db, BaseModel, Documents, SharePrices
 from sqlalchemy import *
+import requests
 import time
 import sys
+
+api = TwitterAPI('7u1DrWrcqlRb3shnmSV271YAC', 'BjP4LEUDaDp7oSg7H5P1i9jRPtDAnGWxN7dZCfPpqel2n7P4Mc', '2837005903-xUCqnbARCn25DbXTaRtUBLhS2r9wFLywoMoaiGc', '8QrgDtohRvv3tiP0hWWCYnvJensFMNcLMcGqEu72FSCCI')
 
 # @app.route("/twitter")
 # def twitter_login():
@@ -27,21 +31,23 @@ import sys
 
 # 	return result
 
-# @app.route('/stream', methods=['POST'])
-# class StdOutListener(StreamListener):
-#     def on_data(self, data):
-#         decoded = json.loads(data)
-#         print (decoded['user']['screen_name'], decoded['text'].encode('ascii', 'ignore'))
-#         return True
-
-#     def on_error(self, status):
-#         print(status)
+# @app.route('/tweet-stream', methods=['POST'])
+# def streamer():
+# 	cashtag = str(request.form['data'])
+# 	r = twitter.post('https://stream.twitter.com/1.1/statuses/filter.json',data={"track": "AAPL"})
+# 	# r = requests.post("https://stream.twitter.com/1.1/statuses/filter.json?", data=key, auth=('7u1DrWrcqlRb3shnmSV271YAC','BjP4LEUDaDp7oSg7H5P1i9jRPtDAnGWxN7dZCfPpqel2n7P4Mc'))
+# 	for item in r.get_iterator():
+# 	    if 'text' in item:
+# 	        print(item['text'])
+# 	result = {"Hello": "Test"}
+# 	return json.dumps(result)
 
 @app.route('/tweet-stream', methods=['POST'])
 def streamer():
-	# data = json.loads(request.args.get('data'))
-	result = {"Hello": "Test"}
-	return json.dumps(result)
+	r = api.request('statuses/filter', {'track':'$AAPL'})
+	for item in r.get_iterator():
+	    if 'text' in item:
+	        print(item['text'])
 
 @app.route('/tweet-get', methods=['GET'])
 def worker():
@@ -49,6 +55,7 @@ def worker():
 	tweet_arr = []
 	for item in data:
 		tweet_info = twitter.get('statuses/show/'+str(item['id_str'])+'.json')
+		print(tweet_info.text)
 		tweet_arr.append(json.loads(tweet_info.text))
 
 	return jsonify({"tweets": tweet_arr})
