@@ -27,6 +27,22 @@ import sys
 
 # 	return result
 
+# @app.route('/stream', methods=['POST'])
+# class StdOutListener(StreamListener):
+#     def on_data(self, data):
+#         decoded = json.loads(data)
+#         print (decoded['user']['screen_name'], decoded['text'].encode('ascii', 'ignore'))
+#         return True
+
+#     def on_error(self, status):
+#         print(status)
+
+@app.route('/tweet-stream', methods=['POST'])
+def streamer():
+	# data = json.loads(request.args.get('data'))
+	result = {"Hello": "Test"}
+	return json.dumps(result)
+
 @app.route('/tweet-get', methods=['GET'])
 def worker():
 	data = json.loads(request.args.get('data'))
