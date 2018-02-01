@@ -26,13 +26,13 @@ var w = 900,
 	  right: 100
 	},
 	margin2 = {
-		top: 425,
+		top: 400,
 		bottom: 215,
 		left: 80,
 		right: 20
 	},
 	margin3 = {
-		top: 500,
+		top: 485,
 		bottom: 215,
 		left: 80,
 		right: 20
@@ -770,7 +770,7 @@ function plot(params){
 		.attr("height", h)
 		.classed("panel", true);
 
-	twitterapi.fetch().postStream(data_prices[0]['symbol']);
+	// twitterapi.fetch().postStream(data_prices[0]['symbol']);
 }
 plot.call(focus, {
 	data_prices: data_prices,
