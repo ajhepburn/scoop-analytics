@@ -26,4 +26,4 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:\
 db.init_app(app)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

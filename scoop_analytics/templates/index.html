@@ -770,7 +770,7 @@ function plot(params){
 		.attr("height", h)
 		.classed("panel", true);
 
-	twitterapi.fetch().postStream();
+	twitterapi.fetch().postStream(data_prices[0]['symbol']);
 }
 plot.call(focus, {
 	data_prices: data_prices,

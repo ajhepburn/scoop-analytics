@@ -58,19 +58,17 @@ var twitterapi = {
 			  });
 		}
 
-		function postStream() {
-			var jqxhr = $.post("tweet-stream", {"data": "test"}, function(data) {
-							  console.log(data);
-							})
-			  .done(function() {
-			    alert( "second success" );
-			  })
-			  .fail(function() {
-			    alert( "error" );
-			  })
-			  .always(function() {
-			    alert( "finished" );
-			  });
+		function postStream(cashtag) {
+			var jqxhr = $.post("tweet-stream", {"data": cashtag})
+				.done(function() {
+					console.log( "second success" );
+				})
+				.fail(function() {
+					console.log( "error" );
+				})
+				.always(function() {
+					console.log( "finished" );
+				});
 		}
 		return {
 			getTweets: getTweets,
