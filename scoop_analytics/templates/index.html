@@ -9,14 +9,13 @@
   <script src="{{ url_for('static', filename = 'js/jquery-3.2.1.min.js') }}"></script>
   <!-- Custom JS includes -->
   <script src="{{ url_for('static', filename = 'js/scoop-parse.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'js/api-work.js') }}"></script>  
 </head>
 <body>
 <script>
 
 var data_prices = parseData.parseFlaskJSON().parsePrices({{ share_prices | tojson | safe}});
 var data_tweets = parseData.parseFlaskJSON().parseTweets({{ documents | tojson | safe}});
-var temp_arr = [];
-var twt_json = {};
 
 var w = 900,
 	h = 700,
@@ -512,7 +511,7 @@ function plot(params){
 				.append("circle")
 				.filter(function(d){return d.key=="open";})
 				.classed("point", true)
-				.attr("r", 4)
+				.attr("r", 3)
 				.style("fill", "#fff");
 
 		ctx.selectAll(".point")
@@ -521,7 +520,7 @@ function plot(params){
 				.append("circle")
 				.filter(function(d){return d.key=="open";})
 				.classed("point", true)
-				.attr("r", 2)
+				.attr("r", 1.5)
 				.style("fill", "#fff");
 		//update
 		ctx.selectAll(".area")
@@ -552,7 +551,7 @@ function plot(params){
 
 				d3.select(this)
 					.transition()
-					.attr("r", 7)
+					.attr("r", 6)
 					.style("stroke-width", 2)
 					.attr("fill", "#588C73");
     			d3.selectAll(".tooltip")
@@ -656,7 +655,7 @@ function plot(params){
 						tweet_arr.push(data_tweets[j]);
 					}
 				}
-				doWork(tweet_arr);
+				twitterapi.fetch().getTweets(tweet_arr, "{{ url_for('static', filename = 'img/twitter-retweet.svg') }}", "{{ url_for('static', filename = 'img/twitter-like.svg') }}");
 
 			})
 			.on("mouseout", function(d,i){
@@ -668,7 +667,7 @@ function plot(params){
 					.style("opacity",0);
 				d3.select(this)
 					.transition()
-					.attr("r", 4)
+					.attr("r", 3)
 					.style("stroke-width", 1);
 				d3.selectAll(".tooltip")
 					.style("display", "none")
@@ -768,7 +767,10 @@ function plot(params){
 	d3.select("body")
 		.append("div")
 		.attr("class", "panel")
+		.attr("height", h)
 		.classed("panel", true);
+
+	twitterapi.fetch().postStream();
 }
 plot.call(focus, {
 	data_prices: data_prices,
@@ -842,66 +844,6 @@ function zoomed() {
 		});
 	focus.select(".axis.x").call(xAxis);
 	context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
-}
-
-/*function callback(data){
-	temp_arr.push(data);
-}
-
-function doWork(id){
-	$.post("receiver", {"id": id}, function(data){
-		callback(JSON.parse(data));
-	});
- 	event.preventDefault();
-}*/
-
-function doWork(arr){
-	var jqxhr = $.getJSON("tweet-get", {"data": JSON.stringify(arr)})
-	  .done(function(data) {
-	    var tweet_list = data['tweets'];
-	    var tweetDivs = d3.select(".panel").selectAll("div.panel-body")
-	    					.data(tweet_list)
-	    					.enter()
-	    					.append("div")
-	    					.attr("id", function(d){return "p"+d['id_str']})
-	    					.classed("panel-body", true);
-
-		tweetDivs.append("img")
-			.attr("width", 20)
-			.attr("height", 20)
-			.attr("src", function(d){return d['user']['profile_image_url']})
-			.attr("style", "display: inline-block;");
-
-		tweetDivs.append("p")
-			.text(function(d){
-				var tweet_created_format = d3.timeFormat("%-I:%M%p, %e %b %Y")(d3.timeParse("%a %b %d %H:%M:%S %Z %Y")(d['created_at']));
-				return "@"+d['user']['screen_name']+"    ("+tweet_created_format+")";
-			})
-			.attr("style", "display: inline-block;");
-
-		tweetDivs.append("p")
-			.text(function(d){return d['text'];});
-
-        tweetDivs.append("img")
-            .attr("src", "{{ url_for('static', filename = 'img/twitter-like.svg') }}");
-        tweetDivs.append("img")
-            .attr("src", "{{ url_for('static', filename = 'img/twitter-retweet.svg') }}");
-
-        tweetDivs.append("p")
-            .text(function(d){
-                return d['retweet_count'];
-            });
-        tweetDivs.append("p")
-            .text(function(d){
-                return d['favorite_count'];
-            });
-	  })
-	  .fail(function() {
-	    console.log( "error" );
-	  })
-	  .always(function() {
-	    console.log( "complete" );
-	  });
 }
 </script>
 </body>

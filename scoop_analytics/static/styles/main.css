@@ -134,6 +134,69 @@ body,html{
 	font-weight: 500;
 	color: #081F2C;
  }
+
+ .panel {
+ 	overflow: hidden;
+ 	position: absolute;
+ 	display: inline-block;
+ 	float: right;
+ 	font-size:80%;
+ }
+
+.panel-body {
+	background:rgba(54, 25, 25, .05);
+	position: relative;
+	left: 5px;
+}
+
+.panel-body p{
+	margin: 2px;
+	padding: 5px;
+	color: #888a91;
+	left: 40px;
+}
+
+.panel-tweet-img-profile {
+ 	position: absolute;
+ 	left: 15px;
+ 	top: 17px;
+}
+
+img.panel-tweet-img-profile {
+	border: #888a91 1px solid;
+}
+
+.panel-tweet-text-header {
+	position: relative;
+	bottom: -10px;
+	text-align: left;
+}
+
+.panel-tweet-text-body, .panel-tweet-info-block {
+	position: relative;
+ 	text-align: left;
+ 	word-break: break-all;
+ }
+
+ .panel-tweet-img-favorite, .panel-tweet-img-retweet {
+  -webkit-transform: scale(0.8); /* Saf3.1+, Chrome */
+     -moz-transform: scale(0.8); /* FF3.5+ */
+      -ms-transform: scale(0.8); /* IE9 */
+       -o-transform: scale(0.8); /* Opera 10.5+ */
+          transform: scale(0.8);
+             /* IE6–IE9 */
+             filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.9999619230641713, M12=-0.008726535498373935, M21=0.008726535498373935, M22=0.9999619230641713,SizingMethod='auto expand');
+}
+
+.panel-tweet-img-favorite, .panel-tweet-text-favorite {
+	position: relative;
+	right: -20px;
+}
+
+.panel-tweet-text-favorite, .panel-tweet-text-retweet {
+	position: relative;
+	top: -4px;
+}
  
  /* .panel {
  	text-anchor:middle;
