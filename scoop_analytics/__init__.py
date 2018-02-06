@@ -7,7 +7,7 @@ from flask_socketio import SocketIO
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecret'
-socketio = SocketIO(app)
+socketio = SocketIO(app, async_mode="threading")
 
 import scoop_analytics.views
 

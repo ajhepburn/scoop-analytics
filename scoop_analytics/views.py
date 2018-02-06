@@ -8,7 +8,7 @@ from sqlalchemy import *
 from flask_socketio import SocketIO, send, emit
 import eventlet
 
-socketio = SocketIO(app)
+socketio = SocketIO(app, async_mode="threading")
 api = TwitterAPI('7u1DrWrcqlRb3shnmSV271YAC', 'BjP4LEUDaDp7oSg7H5P1i9jRPtDAnGWxN7dZCfPpqel2n7P4Mc', '2837005903-xUCqnbARCn25DbXTaRtUBLhS2r9wFLywoMoaiGc', '8QrgDtohRvv3tiP0hWWCYnvJensFMNcLMcGqEu72FSCCI')
 
 # @app.route("/twitter")
@@ -20,34 +20,6 @@ api = TwitterAPI('7u1DrWrcqlRb3shnmSV271YAC', 'BjP4LEUDaDp7oSg7H5P1i9jRPtDAnGWxN
 # 		account_info_json = account_info.json()
 # 		return '<h1>Your twitter name is @{}'.format(account_info_json['screen_name'])
 # 	return '<h1>Request failed!</h1>'
-
-# @app.route('/receiver', methods = ['POST'])
-# def worker():
-# 	data = request.form['id']
-# 	tweet_info = twitter.get('statuses/show/'+data+'.json')
-# 	tweet_info_json = tweet_info.json()
-# 	# result = json.dumps(tweet_info_json)
-# 	result = json.dumps(tweet_info_json)
-
-# 	return result
-
-# @app.route('/tweet-stream', methods=['POST'])
-# def streamer():
-# 	cashtag = str(request.form['data'])
-# 	r = twitter.post('https://stream.twitter.com/1.1/statuses/filter.json',data={"track": "AAPL"})
-# 	# r = requests.post("https://stream.twitter.com/1.1/statuses/filter.json?", data=key, auth=('7u1DrWrcqlRb3shnmSV271YAC','BjP4LEUDaDp7oSg7H5P1i9jRPtDAnGWxN7dZCfPpqel2n7P4Mc'))
-# 	for item in r.get_iterator():
-# 	    if 'text' in item:
-# 	        print(item['text'])
-# 	result = {"Hello": "Test"}
-# 	return json.dumps(result)
-
-@app.route('/tweet-stream', methods=['POST'])
-def streamer():
-	r = api.request('statuses/filter', {'track':'$AAPL'})
-	for item in r.get_iterator():
-		if 'text' in item:
-			print(item['text'])
 
 @app.route('/tweet-get', methods=['GET'])
 def worker():
@@ -79,11 +51,10 @@ def main():
 
 @socketio.on('my event')
 def handle_my_custom_event(json):
-	print('received json: ' + str(json))
-	r = api.request('statuses/filter', {'track':'pizza'})
+	json['track'] = '$AAPL'
+	print(json)
+	r = api.request('statuses/filter', json)
 	for item in r.get_iterator():
 		if 'text' in item:
-			print(item['text'])
 			json_data = {'data': item['text']}
 			emit('my response',json_data)
-			# eventlet.sleep(0)
