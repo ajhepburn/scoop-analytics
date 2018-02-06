@@ -5,7 +5,8 @@ from TwitterAPI import TwitterAPI
 from scoop_analytics import app
 from scoop_analytics.models import db, BaseModel, Documents, SharePrices
 from sqlalchemy import *
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, send, emit
+import eventlet
 
 socketio = SocketIO(app)
 api = TwitterAPI('7u1DrWrcqlRb3shnmSV271YAC', 'BjP4LEUDaDp7oSg7H5P1i9jRPtDAnGWxN7dZCfPpqel2n7P4Mc', '2837005903-xUCqnbARCn25DbXTaRtUBLhS2r9wFLywoMoaiGc', '8QrgDtohRvv3tiP0hWWCYnvJensFMNcLMcGqEu72FSCCI')
@@ -45,8 +46,8 @@ api = TwitterAPI('7u1DrWrcqlRb3shnmSV271YAC', 'BjP4LEUDaDp7oSg7H5P1i9jRPtDAnGWxN
 def streamer():
 	r = api.request('statuses/filter', {'track':'$AAPL'})
 	for item in r.get_iterator():
-	    if 'text' in item:
-	        print(item['text'])
+		if 'text' in item:
+			print(item['text'])
 
 @app.route('/tweet-get', methods=['GET'])
 def worker():
@@ -78,4 +79,11 @@ def main():
 
 @socketio.on('my event')
 def handle_my_custom_event(json):
-    print('received json: ' + str(json))
+	print('received json: ' + str(json))
+	r = api.request('statuses/filter', {'track':'pizza'})
+	for item in r.get_iterator():
+		if 'text' in item:
+			print(item['text'])
+			json_data = {'data': item['text']}
+			emit('my response',json_data)
+			# eventlet.sleep(0)
