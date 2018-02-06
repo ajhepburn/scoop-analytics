@@ -1,7 +1,12 @@
 var twitterapi = {
 	fetch: function() {
 		function getTweets(arr, imgRetweet, imgFav){
-			var jqxhr = $.getJSON("tweet-get", {"data": JSON.stringify(arr)})
+			tweet_arr = []
+			for(el in arr) {
+				tweet_arr.push(arr[el]['id_str']);
+			}
+			console.log(tweet_arr);
+			var jqxhr = $.getJSON("tweet-get", {"data": JSON.stringify(tweet_arr)})
 			  .done(function(data) {
 			    var tweet_list = data['tweets'];
 			    var tweetDivs = d3.select(".panel").selectAll("div.panel-body")

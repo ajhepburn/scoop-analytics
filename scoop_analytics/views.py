@@ -53,7 +53,7 @@ def worker():
 	data = json.loads(request.args.get('data'))
 	tweet_arr = []
 	for item in data:
-		tweet_info = twitter.get('statuses/show/'+str(item['id_str'])+'.json')
+		tweet_info = twitter.get('statuses/show/'+str(item)+'.json')
 		print(tweet_info.text)
 		tweet_arr.append(json.loads(tweet_info.text))
 
