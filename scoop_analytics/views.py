@@ -5,10 +5,9 @@ from TwitterAPI import TwitterAPI
 from scoop_analytics import app
 from scoop_analytics.models import db, BaseModel, Documents, SharePrices
 from sqlalchemy import *
-import requests
-import time
-import sys
+from flask_socketio import SocketIO
 
+socketio = SocketIO(app)
 api = TwitterAPI('7u1DrWrcqlRb3shnmSV271YAC', 'BjP4LEUDaDp7oSg7H5P1i9jRPtDAnGWxN7dZCfPpqel2n7P4Mc', '2837005903-xUCqnbARCn25DbXTaRtUBLhS2r9wFLywoMoaiGc', '8QrgDtohRvv3tiP0hWWCYnvJensFMNcLMcGqEu72FSCCI')
 
 # @app.route("/twitter")
@@ -76,3 +75,7 @@ def main():
 	# 	account_info_json = account_info.json()
 
 	return render_template('index.html', documents=docs, share_prices=prices)
+
+@socketio.on('my event')
+def handle_my_custom_event(json):
+    print('received json: ' + str(json))

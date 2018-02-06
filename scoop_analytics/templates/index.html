@@ -7,11 +7,18 @@
   <link rel="stylesheet" href="{{ url_for('static', filename = 'styles/main.css') }}">
   <script src="{{ url_for('static', filename = 'js/d3.min.js') }}"></script>
   <script src="{{ url_for('static', filename = 'js/jquery-3.2.1.min.js') }}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
   <!-- Custom JS includes -->
   <script src="{{ url_for('static', filename = 'js/scoop-parse.js') }}"></script>
   <script src="{{ url_for('static', filename = 'js/api-work.js') }}"></script>  
 </head>
 <body>
+<script type="text/javascript" charset="utf-8">
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    socket.on('connect', function() {
+        socket.emit('my event', {data: 'I\'m connected!'});
+    });
+</script>
 <script>
 
 var data_prices = parseData.parseFlaskJSON().parsePrices({{ share_prices | tojson | safe}});

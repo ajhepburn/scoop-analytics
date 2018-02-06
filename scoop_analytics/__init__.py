@@ -3,9 +3,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import render_template
 from flask_dance.contrib.twitter import make_twitter_blueprint, twitter
 from scoop_analytics.models import db, BaseModel, Documents, SharePrices
+from flask_socketio import SocketIO
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecret'
+socketio = SocketIO(app)
 
 import scoop_analytics.views
 
@@ -26,4 +28,5 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:\
 db.init_app(app)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # app.run(debug=True)
+    socketio.run(app)
