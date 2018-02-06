@@ -18,7 +18,7 @@
 var data_prices = parseData.parseFlaskJSON().parsePrices({{ share_prices | tojson | safe}});
 var data_tweets = parseData.parseFlaskJSON().parseTweets({{ documents | tojson | safe}});
 
-$(document).ready(function() {
+/*$(document).ready(function() {
 	var socket = io.connect('http://' + document.domain + ':' + location.port);
 	socket.on('connect', function() {
 	    socket.emit('my event', {'track': '$'+data_prices[0]['symbol'].toString()}, function(data){
@@ -28,7 +28,7 @@ $(document).ready(function() {
 	socket.on('my response', function(data){
 		console.log(data);
 	});
-});
+});*/
 
 var w = 900,
 	h = 700,
@@ -686,11 +686,11 @@ function plot(params){
 					.style("display", "none")
 					.transition();
 					// exit()
-				/*svg.selectAll(".panel")
-					.data(params)
+				var tweet_list = []
+				d3.selectAll(".panel-body")
+					.data(tweet_list)
 					.exit()
-					.remove();*/
-				var twt_json = {};
+					.remove();
 			});
 
 		ctx.selectAll(".trendline")
