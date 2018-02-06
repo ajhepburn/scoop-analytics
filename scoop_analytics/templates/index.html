@@ -13,16 +13,22 @@
   <script src="{{ url_for('static', filename = 'js/api-work.js') }}"></script>  
 </head>
 <body>
-<script type="text/javascript" charset="utf-8">
-    var socket = io.connect('http://' + document.domain + ':' + location.port);
-    socket.on('connect', function() {
-        socket.emit('my event', {data: 'I\'m connected!'});
-    });
-</script>
 <script>
 
 var data_prices = parseData.parseFlaskJSON().parsePrices({{ share_prices | tojson | safe}});
 var data_tweets = parseData.parseFlaskJSON().parseTweets({{ documents | tojson | safe}});
+
+$(document).ready(function() {
+	var socket = io.connect('http://' + document.domain + ':' + location.port);
+	socket.on('connect', function() {
+	    socket.emit('my event', {'track': '$'+data_prices[0]['symbol'].toString()}, function(data){
+	    	console.log(data);
+	    });
+	});
+	socket.on('my response', function(data){
+		console.log(data);
+	})
+});
 
 var w = 900,
 	h = 700,
