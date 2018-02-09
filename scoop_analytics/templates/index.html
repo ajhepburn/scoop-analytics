@@ -1,18 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Scoop Analytics</title>
   <link rel="icon" sizes="192x192" href="{{ url_for('static', filename = 'img/favicon.png') }}">
+  <!-- CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename = 'styles/main.css') }}">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <!-- JS -->
   <script src="{{ url_for('static', filename = 'js/d3.min.js') }}"></script>
   <script src="{{ url_for('static', filename = 'js/jquery-3.2.1.min.js') }}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <!-- Custom JS includes -->
   <script src="{{ url_for('static', filename = 'js/scoop-parse.js') }}"></script>
   <script src="{{ url_for('static', filename = 'js/api-work.js') }}"></script>  
 </head>
 <body>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col" id="bs-left-div">
+      One of three columns
+    </div>
+    <div class="col" id="bs-center-div">
+    </div>
+    <div class="col" id="bs-right-div">
+    </div>
+  </div>
+</div>
 <script>
 
 var data_prices = parseData.parseFlaskJSON().parsePrices({{ share_prices | tojson | safe}});
@@ -61,7 +78,7 @@ var zoom = d3.zoom()
     .extent([[0, 0], [width, height]])
     .on("zoom", zoomed);
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#bs-center-div").append("svg")
         	.attr("id", "chart")
 			.attr("width", w)
 			.attr("height", h);
@@ -247,121 +264,6 @@ function drawStatic(params){
 	}
 }
 
-/*function drawPanel(params) {
-	var self = this;
-	// enter()
-	this.selectAll(".panel")
-		.data(params)
-		.enter()
-			.append("g")
-			.attr("class", function(d){return "pan"+d['id'];})
-			.attr("transform", "translate("+((width/5.5)-50)+","+(height*1.85)+")")
-			.classed("panel", true);
-	this.selectAll(".panel")
-		.append("g")
-		.attr("class", function(d){return "pan"+d['id'];})
-		.attr("transform", function(d,i){
-			return "translate(0,"+(50*i)+")";
-		})
-		.classed("panel-body", true);
-	this.selectAll(".panel-body")
-		.append("svg:image")
-		.attr("class", function(d){ return "pan"+d['id'];})
-		.classed("panel-tweet-img-profile", true)
-	    .attr("transform", "translate(0,0.5)")
-	    .attr("width", 20)
-	    .attr("height", 20);
-	this.selectAll(".panel-body")
-		.append("rect")
-		.attr("class", function(d){ return "pan"+d['id'];})
-		.classed("panel-tweet-img-profile-border", true)
-	    .attr("transform", "translate(0,0.5)")
-		.attr("width", 21)
-		.attr("height", 20);
-	this.selectAll(".panel-body")
-		.append("text")
-		.attr("class", function(d){ return "pan"+d['id'];})
-		.classed("panel-tweet-header", true)
-		.attr("transform", "translate(25,7.5)");
-	this.selectAll(".panel-body")
-		.append("text")
-		.attr("class", function(d){ return "pan"+d['id'];})
-		.classed("panel-tweet-text", true)
-		.attr("dx", "0")
-		.attr("dy", "15")
-		.text("")
-		.attr("transform", "translate(25,7.5)");
-  	this.selectAll(".panel-body")
-  		.append("svg:image")
-  		.attr("class", function(d){ return "pan"+d['id'];})
-		.classed("panel-tweet-img-retweet", true)
-	    .attr("transform", "translate(25,30)")
-	    .attr("width", 18)
-	    .attr("height", 14);
-	this.selectAll(".panel-body")
-		.append("text")
-		.attr("class", function(d){ return "pan"+d['id'];})
-		.classed("panel-tweet-text-retweet", true)
-		.attr("transform", "translate(55,40)")
-		.text("");
- 	this.selectAll(".panel-body")
- 		.append("svg:image")
- 		.attr("class", function(d){ return "pan"+d['id'];})
-		.classed("panel-tweet-img-like", true)
-	    .attr("transform", "translate(85,30)")
-	    .attr("width", 16)
-	    .attr("height", 15);
- 	this.selectAll(".panel-body")
- 		.append("text")
- 		.attr("class", function(d){ return "pan"+d['id'];})
-		.classed("panel-tweet-text-like", true)
-		.attr("transform", "translate(110,40)")
-		.text("");
-								
-
-	// update
-	params.forEach(function(panel){
-		var grouping = self.selectAll("g.pan"+panel['id']);
-		grouping.select(".panel-tweet-header")
-			.transition()
-			.text(function(d){
-				var tweet_created_format = d3.timeFormat("%-I:%M%p, %e %b %Y")(d3.timeParse("%a %b %d %H:%M:%S %Z %Y")(d['created_at']));
-				return "@"+d['user']['screen_name']+"    ("+tweet_created_format+")";
-			});
-		grouping.select(".panel-tweet-img-profile")
-			.transition()
-		    .attr("xlink:href", function(d){
-		    	return d['user']['profile_image_url']
-		    });
-		grouping.select(".panel-tweet-img-like")
-			.transition()
-		    .attr("xlink:href", "{{ url_for('static', filename = 'img/twitter-like.svg') }}")
-		    .attr("opacity", 0.5);
-		grouping.select(".panel-tweet-img-retweet")
-			.transition()
-		    .attr("xlink:href", "{{ url_for('static', filename = 'img/twitter-retweet.svg') }}")
-		    .attr("opacity", 0.5);
-		grouping.select(".panel-tweet-img-profile-border")
-			.transition()
-			.attr("style", "stroke: #0065fc; shape-rendering: crispEdges;");
-		grouping.select(".panel-tweet-text")
-			.transition()
-			.text(function(d){
-				return d['text'];
-			});
-		grouping.select(".panel-tweet-text-retweet")
-			.text(function(d){
-				for(var i=0; i < twt_json['tweets'].length; i++) if(twt_json['tweets'][i]['id'] == d['id']) {
-					return twt_json['tweets'][i]['retweet_count'];
-				}
-			});
-		grouping.select(".panel-tweet-text-like")
-			.text(function(d){
-				for(var i=0; i < twt_json['tweets'].length; i++) if(twt_json['tweets'][i]['id'] == d['id']) return twt_json['tweets'][i]['favorite_count'];
-			});
-	});
-}*/
-
 function plot(params){
 	drawStatic.call(this, params);
 	var self = this;
@@ -487,7 +389,7 @@ function plot(params){
 		var g = self.selectAll("g."+price);
 		var ctx = context.selectAll("g."+price);
 
-		var groupDOM = $(g).get(0)["_groups"][0][0];
+		// var groupDOM = $(g).get(0)["_groups"][0][0];
 		var arr = params.data_prices.map(function(d){
 			return {
 				key: price,
@@ -629,34 +531,7 @@ function plot(params){
 
 						if(percentage>0) return "#84c283";
 						else return "#ff7575";
-					})
-
-
-/*				// PANEL MANIPULATION
-				var tweet_arr = [];
-				var c = 0;
-				for(j in data_tweets){
-					var tweet_time = timeParser(data_tweets[j]['timestamp_s']);
-					var point_time = timeParser(d3.select(curr_point).data()[0].timestamp);
-					var diff = point_time.getTime() - tweet_time.getTime();
-					if(diff<=1800000 && diff>=-1800000) {
-						c+=1;
-						tweet_arr.push(data_tweets[j]);
-					}
-				}
-				tweet_arr.forEach(function(tweet){
-					doWork(tweet["id_str"]);
-				});
-				function checkIfFinished(){
-				    return temp_arr.length == tweet_arr.length;
-				}
-				var timeout = setInterval(function() { 
-					if(checkIfFinished()) { 
-						clearInterval(timeout);
-						twt_json['tweets'] = temp_arr; 
-						drawPanel.call(svg, tweet_arr);
-					} 
-				}, 100);*/
+					});
 
 				// PANEL
 				var tweet_arr = [];
@@ -777,7 +652,7 @@ function plot(params){
 		.attr("class", "vol-tooltip")
 		.classed("vol-tooltip", true);
 
-	d3.select("body")
+	d3.select("#bs-right-div")
 		.append("div")
 		.attr("class", "panel")
 		.attr("height", h)
