@@ -145,14 +145,15 @@ body,html{
 	color: #081F2C;
  }
 
- .panel {
- 	margin-top: 5px;
- 	overflow: hidden;
- 	font-size:80%;
- 	width: 100%;
- 	-moz-box-sizing: border-box;
-    box-sizing: border-box;
- }
+/* Streaming Tweets: Right */
+/*.panel {
+	margin-top: 5px;
+	overflow: hidden;
+	font-size:80%;
+	width: 100%;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
 
 .panel-body {
 	background:rgba(54, 25, 25, .05);
@@ -169,9 +170,45 @@ img.panel-tweet-img-profile {
 	border: #888a91 1px solid;
 }
 
-.panel-tweet-header {
+p.panel-tweet-header {
 	background:rgba(84,84,84, .07);
+	position: relative;
+	text-align: left;
+	vertical-align:top;
+	padding-top: 5px !important;
+	margin: 0px !important;
+	margin-top: 1px !important;
 }
+
+text.panel-tweet-header-text {
+	left: 5px;
+}*/
+
+/* Tweet Panel: Left */
+.panel {
+	margin-top: 5px;
+	overflow: hidden;
+	font-size:80%;
+	width: 100%;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.panel-body {
+	background:rgba(54, 25, 25, .05);
+	position: relative;
+}
+
+.panel-body p{
+	margin: 2px;
+	padding: 5px;
+	color: #888a91;
+}
+
+img.panel-tweet-img-profile {
+	border: #888a91 1px solid;
+}
+
 p.panel-tweet-header {
 	background:rgba(84,84,84, .07);
 	position: relative;
@@ -209,49 +246,29 @@ text.panel-tweet-header-text {
 
 .panel-tweet-text-favorite, .panel-tweet-text-retweet {
 	position: relative;
-	top: -4px;
 }
- 
- /* .panel {
- 	text-anchor:middle;
- 	fill: #888a91;
- 	font-size:80%;
- }
- .panel-header {
- 	font-size:100%;
- }
- .panel-tweet-header {
- 	text-anchor: start;
- 	font-weight: bold;
- 	font-size: 85%;
- }
- .panel-tweet-text {
- 	text-anchor:start;
- }
- .panel-tweet-img-profile-border {
- 	fill: none;
- } */
- .zoom {
- 	cursor: move;
- 	fill: none;
- 	pointer-events: all;
- }
- .market {
- 	font-weight: bold;
- 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
- 	fill: #84c283;
- }
- .market-current {
- 	font-size:150%;
- }
- .market-by-val {
- 	font-size:120%;
- }
- .market-by-percent {
- 	font-size: 130%
- }
- .market-labels {
- 	opacity: 0;
- 	font-size:80%;
- 	fill: #888a91;
- }
+
+.zoom {
+	cursor: move;
+	fill: none;
+	pointer-events: all;
+}
+.market {
+	font-weight: bold;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+	fill: #84c283;
+}
+.market-current {
+	font-size:150%;
+}
+.market-by-val {
+	font-size:120%;
+}
+.market-by-percent {
+	font-size: 130%
+}
+.market-labels {
+	opacity: 0;
+	font-size:80%;
+	fill: #888a91;
+}
