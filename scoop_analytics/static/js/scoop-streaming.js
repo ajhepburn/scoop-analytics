@@ -42,10 +42,10 @@ $(document).ready(function() {
 					// .attr("opacity", 0)
 					.classed("panelstream-body", true);
 
-/*			tweetDivs.transition()
-					.duration(1000)
-					.ease(d3.easeLinear)
-					.attr("opacity", 1);*/
+			// tweetDivs.transition()
+			// 		.duration(1000)
+			// 		.ease(d3.easeLinear)
+			// 		.attr("opacity", 1);
 
 		var headerBlock = tweetDivs.append("p")
 						  .classed("panelstream-tweet-header", true);

@@ -1,3 +1,8 @@
+var market = "NASDAQ";
+var cashtag = data_prices[0]['symbol'];
+
+googleapi.fetch().scrapePage(market, cashtag);
+
 var w = 900,
 	h = 700,
 	margin = {
@@ -620,7 +625,7 @@ function plot(params){
 		.classed("panelstream", true);
 
 
-	// twitterapi.fetch().postStream(data_prices[0]['symbol']);
+	// twitterapi.fetch().postStream(cashtag);
 }
 plot.call(focus, {
 	data_prices: data_prices,

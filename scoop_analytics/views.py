@@ -21,6 +21,11 @@ api = TwitterAPI('7u1DrWrcqlRb3shnmSV271YAC', 'BjP4LEUDaDp7oSg7H5P1i9jRPtDAnGWxN
 # 		return '<h1>Your twitter name is @{}'.format(account_info_json['screen_name'])
 # 	return '<h1>Request failed!</h1>'
 
+@app.route('/google-get', methods=['GET'])
+def scraper():
+	result = "Hello"
+	return jsonify({"pagedata": result})
+
 @app.route('/tweet-get', methods=['GET'])
 def worker():
 	data = json.loads(request.args.get('data'))
@@ -51,7 +56,7 @@ def main():
 
 @socketio.on('my event')
 def handle_my_custom_event(json):
-	json['track'] = 'pizza'
+	json['track'] = 'cats'
 	r = api.request('statuses/filter', json)
 	for item in r.get_iterator():
 		if 'text' in item:
