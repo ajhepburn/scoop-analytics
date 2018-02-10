@@ -34,5 +34,6 @@ var data_prices = parseData.parseFlaskJSON().parsePrices({{ share_prices | tojso
 var data_tweets = parseData.parseFlaskJSON().parseTweets({{ documents | tojson | safe}});
 var tweet_urls = ["{{ url_for('static', filename = 'img/twitter-retweet.svg') }}", "{{ url_for('static', filename = 'img/twitter-like.svg') }}"];
 </script>
+<script src="{{ url_for('static', filename = 'js/scoop-streaming.js') }}"></script>  
 <script src="{{ url_for('static', filename = 'js/scoop-chart.js') }}"></script>  
 </body>

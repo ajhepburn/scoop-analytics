@@ -146,7 +146,7 @@ body,html{
  }
 
 /* Streaming Tweets: Right */
-/*.panel {
+.panelstream {
 	margin-top: 5px;
 	overflow: hidden;
 	font-size:80%;
@@ -155,22 +155,22 @@ body,html{
 	box-sizing: border-box;
 }
 
-.panel-body {
+.panelstream-body {
 	background:rgba(54, 25, 25, .05);
 	position: relative;
 }
 
-.panel-body p{
+.panelstream-body p{
 	margin: 2px;
 	padding: 5px;
 	color: #888a91;
 }
 
-img.panel-tweet-img-profile {
+img.panelstream-tweet-img-profile {
 	border: #888a91 1px solid;
 }
 
-p.panel-tweet-header {
+p.panelstream-tweet-header {
 	background:rgba(84,84,84, .07);
 	position: relative;
 	text-align: left;
@@ -180,9 +180,9 @@ p.panel-tweet-header {
 	margin-top: 1px !important;
 }
 
-text.panel-tweet-header-text {
+text.panelstream-tweet-header-text {
 	left: 5px;
-}*/
+}
 
 /* Tweet Panel: Left */
 .panel {
