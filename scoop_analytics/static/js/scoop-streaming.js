@@ -33,13 +33,20 @@ $(document).ready(function() {
 	    });
 	});
 
+	d3.selection.prototype.moveToBack = function() { 
+	    this.each(function() { 
+	        this.parentNode.firstChild
+	          && this.parentNode.insertBefore(this, firstChild);
+	    }); 
+	}
+
 	function addStreamPanel(queue) {
 		var tweetDivs = d3.select(".panelstream").selectAll("div.panelstream-body")
 				.data(queue)
 					.enter()
-					.append("div")
-					.attr("id", function(d){
-						console.log(d);
+					.insert("div", "div")
+					.attr("id", function(d,i){
+						console.log(i);
 						return "ps"+d['id_str']})
 					.classed("panelstream-body", true);
 
