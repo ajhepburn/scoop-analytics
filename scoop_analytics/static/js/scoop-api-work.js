@@ -1,6 +1,6 @@
 var twitterapi = {
 	fetch: function() {
-		function getTweets(arr, imgRetweet, imgFav){
+		function getTweets(arr, imgRetweet, imgFav) {
 			tweet_arr = []
 			for(el in arr) {
 				tweet_arr.push(arr[el]['id_str']);
@@ -88,4 +88,27 @@ var twitterapi = {
 			postStream: postStream
 		}
 	}
+}
+
+var googleapi = {
+
+	fetch: function() {
+		function scrapePage(market, cashtag) {
+			var jqxhr = $.getJSON("google-get", {"data": [market, cashtag]})
+				.done(function(data) {
+					console.log("Success");
+					console.log(data);
+				})
+				.fail(function() {
+					console.log( "error" );
+				})
+				.always(function() {
+					console.log( "finished" );
+				});
+		}
+		return {
+			scrapePage: scrapePage
+		}
+	}
+
 }

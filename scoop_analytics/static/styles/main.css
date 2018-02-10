@@ -17,7 +17,7 @@ body,html{
 }
 #chart{
 	background-color: #FFFFFF;
-	border: 1px solid #CCC;
+	/*border: 1px solid #CCC;*/
 }
 .bar{
 	fill: purple;
@@ -60,14 +60,14 @@ body,html{
 	opacity:1;
 }
 .area{
-	opacity: 0.5;
-	fill: #fafafb;
+	opacity: 0.6;
+	fill: #e6f0ff;
 	stroke: #ccc;
 	stroke-width: 1px;
 }
 .areaContext{
-	opacity: 0.5;
-	fill: #fafafb;
+	opacity: 0.6;
+	fill: #e6f0ff;
 	stroke: #ccc;
 	stroke-width: 1px;
 }
