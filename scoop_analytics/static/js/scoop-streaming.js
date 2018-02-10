@@ -33,22 +33,19 @@ $(document).ready(function() {
 	    });
 	});
 
-	d3.selection.prototype.moveToBack = function() { 
-	    this.each(function() { 
-	        this.parentNode.firstChild
-	          && this.parentNode.insertBefore(this, firstChild);
-	    }); 
-	}
-
 	function addStreamPanel(queue) {
 		var tweetDivs = d3.select(".panelstream").selectAll("div.panelstream-body")
 				.data(queue)
 					.enter()
 					.insert("div", "div")
-					.attr("id", function(d,i){
-						console.log(i);
-						return "ps"+d['id_str']})
+					.attr("id", function(d,i){return "ps"+d['id_str']})
+					// .attr("opacity", 0)
 					.classed("panelstream-body", true);
+
+/*			tweetDivs.transition()
+					.duration(1000)
+					.ease(d3.easeLinear)
+					.attr("opacity", 1);*/
 
 		var headerBlock = tweetDivs.append("p")
 						  .classed("panelstream-tweet-header", true);
@@ -75,6 +72,16 @@ $(document).ready(function() {
 				.classed("panelstream-tweet-body-text", true);
 	}
 
+	function removeStreamPanel(queue) {
+		var tweetDivs = d3.select(".panelstream").selectAll("div.panelstream-body").data(queue);
+		tweetDivs.exit()
+				.transition()
+					.duration(600)
+					.ease(d3.easeLinear)
+					.style("opacity",0)
+					.remove();
+	}
+
 	socket.on('my response', function(data){
 		if(q.size()<5) 
 		{
@@ -84,6 +91,7 @@ $(document).ready(function() {
 		else 
 		{
 			q.dequeue();
+			removeStreamPanel(q.contents());
 			q.enqueue(data['data']);
 			addStreamPanel(q.contents());
 		}
