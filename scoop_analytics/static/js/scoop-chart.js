@@ -451,6 +451,7 @@ function plot(params){
 					.style("opacity", 1)
 					.text(function(){
 						var index = arr.findIndex(x => x.timestamp==d.timestamp);
+						if (index==0) return;
 						var decVal = d.value - arr[index-1].value;
 						var val = (d.value - arr[index-1].value).toFixed(2);
 
@@ -459,6 +460,7 @@ function plot(params){
 					})
 					.style("fill", function(){
 						var index = arr.findIndex(x => x.timestamp==d.timestamp);
+						if (index==0) return;
 						var val = (d.value - arr[index-1].value).toFixed(2);
 
 						if(val>0) return "#84c283";
@@ -469,6 +471,7 @@ function plot(params){
 					.style("opacity", 1)
 					.text(function(){
 						var index = arr.findIndex(x => x.timestamp==d.timestamp);
+						if (index==0) return;
 						var decVal = d.value - arr[index-1].value;
 						var percentage = ((decVal/arr[index-1].value)*100).toFixed(2);
 
@@ -477,6 +480,7 @@ function plot(params){
 					})
 					.style("fill", function(){
 						var index = arr.findIndex(x => x.timestamp==d.timestamp);
+						if (index==0) return;
 						var decVal = d.value - arr[index-1].value;
 						var percentage = ((decVal/arr[index-1].value)*100).toFixed(2);
 

@@ -83,7 +83,7 @@ $(document).ready(function() {
 	}
 
 	socket.on('my response', function(data){
-		if(q.size()<5) 
+		if(q.size()<7) 
 		{
 			q.enqueue(data['data']);
 			addStreamPanel(q.contents());
@@ -95,6 +95,5 @@ $(document).ready(function() {
 			q.enqueue(data['data']);
 			addStreamPanel(q.contents());
 		}
-		q.print();
 	});
 });
