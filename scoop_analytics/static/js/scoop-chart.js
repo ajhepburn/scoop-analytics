@@ -1,15 +1,3 @@
-/*$(document).ready(function() {
-	var socket = io.connect('http://' + document.domain + ':' + location.port);
-	socket.on('connect', function() {
-	    socket.emit('my event', {'track': '$'+data_prices[0]['symbol'].toString()}, function(data){
-	    	console.log(data);
-	    });
-	});
-	socket.on('my response', function(data){
-		console.log(data);
-	});
-});*/
-
 var w = 900,
 	h = 700,
 	margin = {
@@ -620,6 +608,13 @@ function plot(params){
 		.attr("class", "panel")
 		.attr("height", h)
 		.classed("panel", true);
+
+	d3.select("#bs-left-div")
+		.append("div")
+		.attr("class", "panelstream")
+		.attr("height", h)
+		.classed("panelstream", true);
+
 
 	// twitterapi.fetch().postStream(data_prices[0]['symbol']);
 }
