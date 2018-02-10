@@ -156,7 +156,7 @@ body,html{
 }
 
 .panelstream-body {
-	background:rgba(54, 25, 25, .05);
+	background:rgba(248,248,248, .05);
 	position: relative;
 }
 
@@ -171,7 +171,7 @@ img.panelstream-tweet-img-profile {
 }
 
 p.panelstream-tweet-header {
-	background:rgba(84,84,84, .07);
+	background:rgba(0,101,252, .07);
 	position: relative;
 	text-align: left;
 	vertical-align:top;
@@ -195,7 +195,7 @@ text.panelstream-tweet-header-text {
 }
 
 .panel-body {
-	background:rgba(54, 25, 25, .05);
+	background:rgba(248,248,248, .05);
 	position: relative;
 }
 
@@ -210,7 +210,7 @@ img.panel-tweet-img-profile {
 }
 
 p.panel-tweet-header {
-	background:rgba(84,84,84, .07);
+	background:rgba(0,101,252, .07);
 	position: relative;
 	text-align: left;
 	vertical-align:top;
