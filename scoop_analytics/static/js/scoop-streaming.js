@@ -1,4 +1,4 @@
-function fifoQueue(){
+/*function fifoQueue(){
 	collection = [];
 	this.print = function() {
 	    console.log(collection);
@@ -96,4 +96,4 @@ $(document).ready(function() {
 			addStreamPanel(q.contents());
 		}
 	});
-});
+});*/

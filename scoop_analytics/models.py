@@ -53,3 +53,16 @@ class SharePrices(BaseModel, db.Model):
 
     def __repr__(self):
         return '<SharePrices %r>' % (self.symbol)
+
+class GooglePrices(BaseModel, db.Model):
+    __tablename__ = 'google_prices'
+    symbol = db.Column(db.String)
+    timestamp = db.Column(db.Integer, primary_key=True)
+    close = db.Column(db.Integer)
+    high = db.Column(db.Integer)
+    low = db.Column(db.Integer)
+    open = db.Column(db.Integer)
+    volume = db.Column(db.Integer)
+
+    def __repr__(self):
+        return '<GooglePrices %r>' % (self.symbol)
