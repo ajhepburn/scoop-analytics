@@ -26,8 +26,20 @@ api = TwitterAPI('7u1DrWrcqlRb3shnmSV271YAC', 'BjP4LEUDaDp7oSg7H5P1i9jRPtDAnGWxN
 @app.route('/google-get', methods=['GET'])
 def scraper():
 	page = requests.get('https://finance.google.com/finance/getprices?f=d,o,h,l,c,v&df=cpct&x=NASDAQ&q=HMNY&i=60s&p=10d')
-	content = page.content.splitlines()
-	print([c.decode() for c in content])
+	content = [c.decode() for c in page.content.splitlines()]
+	content = content[7:]
+	for i, c in enumerate(content):
+		content[i] = c.split(",")
+		if content[i][0].startswith('a'):
+			count = 0
+			current_epoch = int(content[i][0][1:])
+			content[i][0] = current_epoch
+			content[i][1:] = [float(x) for x in content[i][1:]]
+		else:
+			count+=1
+			content[i][0] = current_epoch + (count*60)
+			content[i][1:] = [float(x) for x in content[i][1:]]
+	print(content)
 	result = "Hello"
 	return jsonify({"pagedata": result})
 
