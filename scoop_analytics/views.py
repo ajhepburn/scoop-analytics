@@ -24,8 +24,14 @@ api = TwitterAPI('7u1DrWrcqlRb3shnmSV271YAC', 'BjP4LEUDaDp7oSg7H5P1i9jRPtDAnGWxN
 # 	return '<h1>Request failed!</h1>'
 
 @app.route('/google-get', methods=['GET'])
-def scraper():
-	page = requests.get('https://finance.google.com/finance/getprices?f=d,o,h,l,c,v&df=cpct&x=NASDAQ&q=HMNY&i=60s&p=10d')
+def scraper(*args):
+	if len(args) == 2:
+		market = args[0]
+		cashtag = args[1]
+	elif len(args) == 1 and type(args[0]) is dict:
+		market = args[0]['data'][0]
+		cashtag = args[0]['data'][1]
+	page = requests.get('https://finance.google.com/finance/getprices?f=d,o,h,l,c,v&df=cpct&x='+market+'&q='+cashtag+'&i=60s&p=10d')
 	content = [c.decode() for c in page.content.splitlines()]
 	content = content[7:]
 	for i, c in enumerate(content):
@@ -42,16 +48,23 @@ def scraper():
 
 	def db_insert():
 		obj = db.session.query(GooglePrices).order_by(GooglePrices.timestamp.desc()).first()
-		for i, c in enumerate(content):
-			if c[0]==obj.timestamp:
-				try:
-					check = True
-					next_pos = i+1
-				except IndexError:
-					check = False
-		if check:
-			for c in content[next_pos:len(content)]:
-				line = GooglePrices(symbol='HMNY',timestamp=c[0],close=c[1],high=c[2],low=c[3],open=c[4],volume=c[5])
+		isempty = db.session.query(GooglePrices).first()
+		if isempty is not None:
+			for i, c in enumerate(content):
+				if c[0]==obj.timestamp:
+					try:
+						index_check = True
+						next_pos = i+1
+					except IndexError:
+						index_check = False
+			if index_check:
+				for c in content[next_pos:len(content)]:
+					line = GooglePrices(symbol=''+cashtag+'',timestamp=c[0],close=c[1],high=c[2],low=c[3],open=c[4],volume=c[5])
+					db.session.add(line)
+					db.session.commit()
+		else:
+			for c in content:
+				line = GooglePrices(symbol=''+cashtag+'',timestamp=c[0],close=c[1],high=c[2],low=c[3],open=c[4],volume=c[5])
 				db.session.add(line)
 				db.session.commit()
 
@@ -72,7 +85,7 @@ def worker():
 
 @app.route("/")
 def main():
-	scraper()
+	scraper('NASDAQ', 'HMNY')
 	prices_result = db.engine.execute("SELECT symbol, timestamp, open, close, high, low, volume FROM share_prices WHERE (close >= 1.025 * open) AND volume <> 0 AND symbol LIKE 'AKTX';")
 	docs_result = db.engine.execute("SELECT * FROM documents, jsonb_array_elements(data->'entities'->'symbols') where value->>'text' in ('AKTX');")
 	gprices_result = db.engine.execute("SELECT * FROM google_prices;")
