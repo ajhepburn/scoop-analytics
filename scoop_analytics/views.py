@@ -25,15 +25,23 @@ api = TwitterAPI('7u1DrWrcqlRb3shnmSV271YAC', 'BjP4LEUDaDp7oSg7H5P1i9jRPtDAnGWxN
 
 @app.route('/google-get', methods=['GET'])
 def scraper(*args):
+	data = request.args.get('data')
+
 	if len(args) == 2:
 		market = args[0]
 		cashtag = args[1]
-	elif len(args) == 1 and type(args[0]) is dict:
-		market = args[0]['data'][0]
-		cashtag = args[0]['data'][1]
+		on_init = True
+	elif data is not None:
+		data = json.loads(data)
+		market = data[0]
+		cashtag = data[1]
+		last_el = data[2]
+		on_init = False
+
 	page = requests.get('https://finance.google.com/finance/getprices?f=d,o,h,l,c,v&df=cpct&x='+market+'&q='+cashtag+'&i=60s&p=10d')
 	content = [c.decode() for c in page.content.splitlines()]
 	content = content[7:]
+
 	for i, c in enumerate(content):
 		content[i] = c.split(",")
 		if content[i][0].startswith('a'):
@@ -47,6 +55,7 @@ def scraper(*args):
 			content[i][1:] = [float(x) for x in content[i][1:]]
 
 	def db_insert():
+		new_points = []
 		obj = db.session.query(GooglePrices).order_by(GooglePrices.timestamp.desc()).first()
 		isempty = db.session.query(GooglePrices).first()
 		if isempty is not None:
@@ -62,14 +71,29 @@ def scraper(*args):
 					line = GooglePrices(symbol=''+cashtag+'',timestamp=c[0],close=c[1],high=c[2],low=c[3],open=c[4],volume=c[5])
 					db.session.add(line)
 					db.session.commit()
+			if not on_init:
+				for i,c in enumerate(content):
+					if c[0]==last_el['timestamp']:
+						try:
+							index_check = True
+							next_pos = i+1
+						except IndexError:
+							index_check = False
+				if index_check:
+					for c in content[next_pos:len(content)]:
+						new_points.append(c)
+
+
 		else:
 			for c in content:
 				line = GooglePrices(symbol=''+cashtag+'',timestamp=c[0],close=c[1],high=c[2],low=c[3],open=c[4],volume=c[5])
 				db.session.add(line)
 				db.session.commit()
+		
+		if new_points!=[]:
+			return new_points
 
-	db_insert()
-	result = "Hello"
+	result = db_insert()
 	return jsonify({"pagedata": result})
 
 @app.route('/tweet-get', methods=['GET'])
@@ -86,15 +110,14 @@ def worker():
 @app.route("/")
 def main():
 	scraper('NASDAQ', 'HMNY')
-	prices_result = db.engine.execute("SELECT symbol, timestamp, open, close, high, low, volume FROM share_prices WHERE (close >= 1.025 * open) AND volume <> 0 AND symbol LIKE 'AKTX';")
-	docs_result = db.engine.execute("SELECT * FROM documents, jsonb_array_elements(data->'entities'->'symbols') where value->>'text' in ('AKTX');")
-	gprices_result = db.engine.execute("SELECT * FROM google_prices;")
-
-	gprices = json.dumps([dict(r) for r in gprices_result])
+	prices_result = db.engine.execute("SELECT symbol, timestamp, open, close, high, low, volume FROM share_prices WHERE (close >= 1.025 * open) AND volume <> 0 AND symbol LIKE 'HMNY';")
+	docs_result = db.engine.execute("SELECT * FROM documents, jsonb_array_elements(data->'entities'->'symbols') where value->>'text' in ('HMNY');")
+	gprices_result = db.engine.execute("SELECT * FROM google_prices WHERE volume <> 0 ORDER BY timestamp desc LIMIT 50;")
 	# docs_result = db.engine.execute("SELECT DISTINCT data->'id' as tweet_id, data->'text' as tweet_text, data->'timestamp_s' as tweet_created, value as cashtag FROM documents, jsonb_array_elements(data->'entities'->'symbols') where value->>'text' in ('HMNY');")
 	
 	docs = json.dumps([dict(r) for r in docs_result])
 	prices = json.dumps([dict(r) for r in prices_result])
+	gprices = json.dumps([dict(r) for r in gprices_result])
 
 	if not twitter.authorized:
 		return redirect(url_for('twitter.login'))
@@ -102,7 +125,7 @@ def main():
 	# if account_info.ok:
 	# 	account_info_json = account_info.json()
 
-	return render_template('index.html', documents=docs, share_prices=prices)
+	return render_template('index.html', documents=docs, share_prices=prices, google_prices=gprices)
 
 @socketio.on('my event')
 def handle_my_custom_event(json):

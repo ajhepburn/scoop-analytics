@@ -93,8 +93,8 @@ var twitterapi = {
 var googleapi = {
 
 	fetch: function() {
-		function scrapePage(market, cashtag) {
-			var jqxhr = $.getJSON("google-get", {"data": [market, cashtag]})
+		function scrapePage(market, cashtag, last_el) {
+			var jqxhr = $.getJSON("google-get", {"data": JSON.stringify([market, cashtag, last_el])})
 				.done(function(data) {
 					console.log("Success");
 					console.log(data);
