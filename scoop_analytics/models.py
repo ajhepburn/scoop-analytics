@@ -58,11 +58,20 @@ class GooglePrices(BaseModel, db.Model):
     __tablename__ = 'google_prices'
     symbol = db.Column(db.String)
     timestamp = db.Column(db.Integer, primary_key=True)
-    close = db.Column(db.Integer)
-    high = db.Column(db.Integer)
-    low = db.Column(db.Integer)
-    open = db.Column(db.Integer)
+    close = db.Column(db.Float)
+    high = db.Column(db.Float)
+    low = db.Column(db.Float)
+    open = db.Column(db.Float)
     volume = db.Column(db.Integer)
+
+    def __init__(self, symbol, timestamp, close, high, low, open, volume):
+        self.symbol = symbol
+        self.timestamp = timestamp
+        self.close = close
+        self.high = high
+        self.low = low
+        self.open = open
+        self.volume = volume
 
     def __repr__(self):
         return '<GooglePrices %r>' % (self.symbol)
