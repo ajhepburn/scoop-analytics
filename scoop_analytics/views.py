@@ -39,7 +39,13 @@ def scraper():
 			count+=1
 			content[i][0] = current_epoch + (count*60)
 			content[i][1:] = [float(x) for x in content[i][1:]]
-	print(content)
+
+	def db_insert():
+		for c in content:
+			line = GooglePrices(symbol='HMNY',timestamp=c[0],close=c[1],high=c[2],low=c[3],open=c[4],volume=c[5])
+			db.session.add(line)
+			db.session.commit()
+	db_insert()
 	result = "Hello"
 	return jsonify({"pagedata": result})
 
