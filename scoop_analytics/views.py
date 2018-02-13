@@ -41,10 +41,20 @@ def scraper():
 			content[i][1:] = [float(x) for x in content[i][1:]]
 
 	def db_insert():
-		for c in content:
-			line = GooglePrices(symbol='HMNY',timestamp=c[0],close=c[1],high=c[2],low=c[3],open=c[4],volume=c[5])
-			db.session.add(line)
-			db.session.commit()
+		obj = db.session.query(GooglePrices).order_by(GooglePrices.timestamp.desc()).first()
+		for i, c in enumerate(content):
+			if c[0]==obj.timestamp:
+				try:
+					check = True
+					next_pos = i+1
+				except IndexError:
+					check = False
+		if check:
+			for c in content[next_pos:len(content)]:
+				line = GooglePrices(symbol='HMNY',timestamp=c[0],close=c[1],high=c[2],low=c[3],open=c[4],volume=c[5])
+				db.session.add(line)
+				db.session.commit()
+
 	db_insert()
 	result = "Hello"
 	return jsonify({"pagedata": result})
