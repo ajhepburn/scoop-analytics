@@ -1,7 +1,7 @@
 var market = "NASDAQ";
 var cashtag = data_prices[0]['symbol'];
 
-googleapi.fetch().scrapePage(market, cashtag);
+// googleapi.fetch().scrapePage(market, cashtag);
 
 var w = 900,
 	h = 700,
