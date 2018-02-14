@@ -83,7 +83,6 @@ def scraper(*args):
 					for c in content[next_pos:len(content)]:
 						new_points.append(c)
 
-
 		else:
 			for c in content:
 				line = GooglePrices(symbol=''+cashtag+'',timestamp=c[0],close=c[1],high=c[2],low=c[3],open=c[4],volume=c[5])

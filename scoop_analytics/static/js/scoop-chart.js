@@ -1,9 +1,10 @@
 var market = "NASDAQ";
 var cashtag = data_prices[0]['symbol'];
 
-setInterval(function(){ 
+/*setInterval(function(){ 
 googleapi.fetch().scrapePage(market, cashtag, data_gprices[data_gprices.length-1]);
-}, 60000);
+}, 60000);*/
+
 var w = 900,
 	h = 700,
 	margin = {
@@ -152,6 +153,11 @@ var areaCtx = d3.area()
 				return y2(d.open);
 			})
 			.curve(d3.curveCatmullRom);
+var overlay = focus.append("rect")
+		      .attr("class", "overlay")
+		      .attr("width", width)
+		      .attr("height", height)
+		      .attr("opacity", "0");
 
 
 function drawStatic(params){
