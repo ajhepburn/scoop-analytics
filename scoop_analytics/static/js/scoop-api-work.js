@@ -98,12 +98,17 @@ var googleapi = {
 				.done(function(data) {
 					console.log("Success");
 					console.log(data);
+					if (data['pagedata']!=null) {
+						for(item in data['pagedata']){
+							if(!data_gprices.includes(item)) data_gprices.push(item);
+						}
+					}
 				})
 				.fail(function() {
 					console.log( "error" );
 				})
 				.always(function() {
-					console.log( "finished" );
+					// console.log( "finished" );
 				});
 		}
 		return {
