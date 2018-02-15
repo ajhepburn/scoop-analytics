@@ -47,6 +47,11 @@ body,html{
 	fill: #888a91;
 	font-size:90%;
 }
+#text-open, #text-high, #text-low {
+	fill: #0065fc;
+	font-size:90%;
+	font-weight: bold;
+}
 .gridline path,
 .gridline line{
 	fill: none;
