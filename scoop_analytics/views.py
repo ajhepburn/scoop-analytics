@@ -58,6 +58,7 @@ def scraper(*args):
 		new_points = []
 		obj = db.session.query(GooglePrices).order_by(GooglePrices.timestamp.desc()).first()
 		isempty = db.session.query(GooglePrices).first()
+		index_check = False
 		if isempty is not None:
 			for i, c in enumerate(content):
 				if c[0]==obj.timestamp:
@@ -72,6 +73,7 @@ def scraper(*args):
 					db.session.add(line)
 					db.session.commit()
 			if not on_init:
+				index_check = False
 				for i,c in enumerate(content):
 					if c[0]==last_el['timestamp']:
 						try:
@@ -81,6 +83,7 @@ def scraper(*args):
 							index_check = False
 				if index_check:
 					for c in content[next_pos:len(content)]:
+						c.append((c[1]+c[2]+c[3]+c[4])/4)
 						new_points.append(c)
 
 		else:
@@ -111,7 +114,7 @@ def main():
 	scraper('NASDAQ', 'HMNY')
 	prices_result = db.engine.execute("SELECT symbol, timestamp, open, close, high, low, volume FROM share_prices WHERE (close >= 1.025 * open) AND volume <> 0 AND symbol LIKE 'HMNY';")
 	docs_result = db.engine.execute("SELECT * FROM documents, jsonb_array_elements(data->'entities'->'symbols') where value->>'text' in ('HMNY');")
-	gprices_result = db.engine.execute("SELECT * FROM google_prices WHERE volume <> 0 ORDER BY timestamp desc LIMIT 25;")
+	gprices_result = db.engine.execute("SELECT * FROM google_prices WHERE volume <> 0 ORDER BY timestamp desc LIMIT 40;")
 	# docs_result = db.engine.execute("SELECT DISTINCT data->'id' as tweet_id, data->'text' as tweet_text, data->'timestamp_s' as tweet_created, value as cashtag FROM documents, jsonb_array_elements(data->'entities'->'symbols') where value->>'text' in ('HMNY');")
 	
 	docs = json.dumps([dict(r) for r in docs_result])

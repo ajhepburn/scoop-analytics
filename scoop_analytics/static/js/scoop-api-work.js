@@ -99,8 +99,15 @@ var googleapi = {
 					console.log("Success");
 					console.log(data);
 					if (data['pagedata']!=null) {
-						for(item in data['pagedata']){
-							if(!data_gprices.includes(item)) data_gprices.push(item);
+						for(result in data['pagedata']) {
+							var item = {'timestamp':data['pagedata'][result][0], 
+											 'close':data['pagedata'][result][1], 
+											 'high':data['pagedata'][result][2], 
+											 'low':data['pagedata'][result][3], 
+											 'open':data['pagedata'][result][4], 
+											 'volume':data['pagedata'][result][5], 
+											 'average':data['pagedata'][result][6]}
+							if(!data_prices.includes(item)) data_prices.push(item);
 						}
 					}
 				})
