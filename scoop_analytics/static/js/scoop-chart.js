@@ -153,11 +153,6 @@ var areaCtx = d3.area()
 				return y2(d.open);
 			})
 			.curve(d3.curveCatmullRom);
-var overlay = focus.append("rect")
-		      .attr("class", "overlay")
-		      .attr("width", width)
-		      .attr("height", height)
-		      .attr("opacity", "0");
 
 
 function drawStatic(params){
@@ -706,4 +701,55 @@ function zoomed() {
 		});
 	focus.select(".axis.x").call(xAxis);
 	context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
+}
+
+var overlay = focus.append("rect")
+		      .attr("class", "overlay")
+		      .attr("width", width)
+		      .attr("height", height)
+		      .attr("opacity", "0")
+              .on("mouseover", function() { dataOverlay.style("display", null); })
+			  .on("mouseout", function() { dataOverlay.style("display", "none"); })
+			  .on("mousemove", mousemove);
+
+var dataOverlay = focus.append("g")
+  .attr("class", "data-overlay")
+  .style("display", "none");
+
+// dataOverlay.append("circle")
+//   .attr("r", 4)
+//   .attr("fill", "#0065fc")
+//   .attr("transform","translate(0,-1)");
+
+dataOverlay.append("text")
+  .attr("id", "text-open")
+  .attr("x", -7)
+  .attr("dy", ".35em")
+
+dataOverlay.append("text")
+  .attr("id", "text-high")
+  .attr("x", 65)
+  .attr("dy", ".35em")
+
+dataOverlay.append("text")
+  .attr("id", "text-low")
+  .attr("x", 159)
+  .attr("dy", ".35em")
+
+function mousemove() {
+	var timestamp_parse = function(d){var time = timeParser(d.timestamp);return time;}
+	var bisectDate = d3.bisector(function(d) { var time = timeParser(d.timestamp); return time; }).left,
+	    formatValue = d3.format(",.2f"),
+	    formatCurrency = function(d) { return "$" + formatValue(d); };
+
+	var x0 = x.invert(d3.mouse(this)[0]),
+	    i = bisectDate(data_prices, x0, 1),
+	    d0 = data_prices[i - 1],
+	    d1 = data_prices[i],
+	    d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0;
+	dataOverlay.attr("transform", "translate(10,15)");
+	// dataOverlay.attr("transform", "translate(" + x(timestamp_parse(d.timestamp)) + "," + y(d.open) + ")");
+	dataOverlay.select("#text-open").text("O: "+formatCurrency(d.open));
+	dataOverlay.select("#text-high").text("H: "+formatCurrency(d.high));
+	dataOverlay.select("#text-low").text("L: "+formatCurrency(d.low));
 }
