@@ -1,9 +1,9 @@
 var market = "NASDAQ";
 var cashtag = data_prices[0]['symbol'];
 
-/*setInterval(function(){ 
-googleapi.fetch().scrapePage(market, cashtag, data_prices[data_prices.length-1]);
-}, 60000);*/
+setInterval(function(){ 
+	googleapi.fetch().scrapePage(market, cashtag, data_prices[data_prices.length-1]);
+}, 60000);
 
 var w = 900,
 	h = 700,
