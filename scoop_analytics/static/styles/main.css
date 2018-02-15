@@ -47,10 +47,10 @@ body,html{
 	fill: #888a91;
 	font-size:90%;
 }
-#text-open, #text-high, #text-low {
-	fill: #0065fc;
-	font-size:90%;
-	font-weight: bold;
+#text-open, #text-high, #text-low, #text-average {
+	fill: #888a91;
+	font-size:70%;
+	font-weight: none;
 }
 .gridline path,
 .gridline line{
@@ -63,6 +63,13 @@ body,html{
 	stroke-width: 2px;
 	shape-rendering: geometricPrecision;
 	opacity:1;
+}
+.avgLine {
+	fill: none;
+	stroke-width: 2px;
+	shape-rendering: geometricPrecision;
+	opacity: 0.5;
+	stroke: #ffb2b2 !important;
 }
 .area{
 	opacity: 0.6;
