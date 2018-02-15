@@ -123,7 +123,7 @@ var line = d3.line()
 			.y(function(d){
 				return y(d.value);
 			})
-			.curve(d3.curveCatmullRom);
+			.curve(d3.curveMonotoneX);
 var lineCtx = d3.line()
 			.x(function(d){
 				var time = timeParser(d.timestamp);
@@ -132,7 +132,7 @@ var lineCtx = d3.line()
 			.y(function(d){
 				return y2(d.value);
 			})
-			.curve(d3.curveCatmullRom);
+			.curve(d3.curveMonotoneX);
 var area = d3.area()
 			.x(function(d) {
 				var time = timeParser(d.timestamp);
@@ -142,7 +142,7 @@ var area = d3.area()
 			.y1(function(d){
 				return y(d.open);
 			})
-			.curve(d3.curveCatmullRom);
+			.curve(d3.curveMonotoneX);
 var areaCtx = d3.area()
 			.x(function(d) {
 				var time = timeParser(d.timestamp);
@@ -378,39 +378,39 @@ function plot(params){
 				.filter(function(d,i){return d[i].key=="open"})
 				.classed("trendline", true);
 
-		g.selectAll(".point")
+/*		g.selectAll(".point")
 			.data(arr)
 			.enter()
 				.append("circle")
 				.filter(function(d){return d.key=="open";})
 				.classed("point", true)
 				.attr("r", 3)
-				.style("fill", "#fff");
+				.style("fill", "#fff");*/
 
-		ctx.selectAll(".point")
+/*		ctx.selectAll(".point")
 			.data(arr)
 			.enter()
 				.append("circle")
 				.filter(function(d){return d.key=="open";})
 				.classed("point", true)
 				.attr("r", 1.5)
-				.style("fill", "#fff");
+				.style("fill", "#fff");*/
 		//update
 		ctx.selectAll(".area")
 			.attr("d", function(d){
 				return areaCtx(d);
 			});
 
-		ctx.selectAll(".point")
+/*		ctx.selectAll(".point")
 			.attr("cx", function(d){
 				var time = timeParser(d.timestamp);
 				return x2(time);
 			})
 			.attr("cy", function(d){
 				return y2(d.value);
-			});
+			});*/
 
-		g.selectAll(".point")
+/*		g.selectAll(".point")
 			.attr("cx", function(d){
 				var time = timeParser(d.timestamp);
 				return x(time);
@@ -528,7 +528,7 @@ function plot(params){
 					.data(tweet_list)
 					.exit()
 					.remove();
-			});
+			});*/
 
 		ctx.selectAll(".trendline")
 			.attr("d", function(d){
@@ -548,11 +548,11 @@ function plot(params){
 							.transition()
 							.style("opacity", 0.5);
 					}*/
-				g.selectAll(".point")
+/*				g.selectAll(".point")
 					.transition()
 					.attr("r", 4)
 					.style("opacity", 1)
-					.style("stroke-width", 1);
+					.style("stroke-width", 1);*/
 			});
 
 
@@ -562,20 +562,20 @@ function plot(params){
 			.exit()
 			.remove();
 
-		ctx.selectAll(".point")
+/*		ctx.selectAll(".point")
 			.data(arr)
 			.exit()
-			.remove();
+			.remove();*/
 
 		ctx.selectAll(".trendline")
 			.data([arr])
 			.exit()
 			.remove();
 
-		g.selectAll(".point")
+/*		g.selectAll(".point")
 			.data(arr)
 			.exit()
-			.remove();
+			.remove();*/
 
 		g.selectAll(".trendline")
 			.data([arr])
@@ -647,14 +647,14 @@ function brushed() {
 	if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return;
 	var selection = d3.event.selection;
 	x.domain(selection.map(x2.invert, x2));
-	focus.selectAll(".point")
+/*	focus.selectAll(".point")
 		.attr("cx", function(d){
 			var time = timeParser(d.timestamp);
 			return x(time);
 		})
 		.attr("cy", function(d){
 			return y(d.value);
-		});
+		});*/
 	focus.selectAll(".trendline")
 		.attr("d", function(d){
 			return line(d);
@@ -683,14 +683,14 @@ function zoomed() {
 		var time = timeParser(d.timestamp);
 		return x(time); 
 	});
-	focus.selectAll(".point")
+/*	focus.selectAll(".point")
 		.attr("cx", function(d){
 			var time = timeParser(d.timestamp);
 			return x(time);
 		})
 		.attr("cy", function(d){
 			return y(d.value);
-		});
+		});*/
 	focus.selectAll(".trendline")
 		.attr("d", function(d){
 			return line(d);
@@ -738,6 +738,7 @@ dataOverlay.append("text")
 
 var lastGet = 0;
 var lastRemove = 0;
+
 function mousemove() {
 	var timeParser = d3.timeParse("%s");
 	var timestamp_parse = function(d){var time = timeParser(d.timestamp);return time;}
