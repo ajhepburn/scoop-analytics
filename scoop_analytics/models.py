@@ -63,8 +63,9 @@ class GooglePrices(BaseModel, db.Model):
     low = db.Column(db.Float)
     open = db.Column(db.Float)
     volume = db.Column(db.Integer)
+    average = db.Column(db.Float)
 
-    def __init__(self, symbol, timestamp, close, high, low, open, volume):
+    def __init__(self, symbol, timestamp, close, high, low, open, volume, average):
         self.symbol = symbol
         self.timestamp = timestamp
         self.close = close
@@ -72,6 +73,7 @@ class GooglePrices(BaseModel, db.Model):
         self.low = low
         self.open = open
         self.volume = volume
+        self.average = average
 
     def __repr__(self):
         return '<GooglePrices %r>' % (self.symbol)

@@ -2,7 +2,7 @@ var market = "NASDAQ";
 var cashtag = data_prices[0]['symbol'];
 
 /*setInterval(function(){ 
-googleapi.fetch().scrapePage(market, cashtag, data_gprices[data_gprices.length-1]);
+googleapi.fetch().scrapePage(market, cashtag, data_prices[data_prices.length-1]);
 }, 60000);*/
 
 var w = 900,
@@ -62,8 +62,8 @@ var context = svg.append("g")
 
 var timeParser = d3.timeParse("%s");
 
-var maxVal = d3.max(data_prices, function(d) { return d.open; }),
-	minVal = d3.min(data_prices, function(d) { return d.open; });
+var maxVal = d3.max(data_prices, function(d) { return d.close; }),
+	minVal = d3.min(data_prices, function(d) { return d.close; });
 var barMaxVal = d3.max(data_prices, function(d) { return d.volume; }),
 	barMinVal = d3.min(data_prices, function(d) { return d.volume; });
 
@@ -130,7 +130,7 @@ var line = d3.line()
 			.y(function(d){
 				return y(d.value);
 			})
-			.curve(d3.curveMonotoneX);
+			.curve(d3.curveLinear);
 var lineCtx = d3.line()
 			.x(function(d){
 				var time = timeParser(d.timestamp);
@@ -139,7 +139,7 @@ var lineCtx = d3.line()
 			.y(function(d){
 				return y2(d.value);
 			})
-			.curve(d3.curveMonotoneX);
+			.curve(d3.curveLinear);
 var area = d3.area()
 			.x(function(d) {
 				var time = timeParser(d.timestamp);
@@ -147,9 +147,9 @@ var area = d3.area()
 			})
 			.y0(height)
 			.y1(function(d){
-				return y(d.open);
+				return y(d.close);
 			})
-			.curve(d3.curveMonotoneX);
+			.curve(d3.curveLinear);
 var areaCtx = d3.area()
 			.x(function(d) {
 				var time = timeParser(d.timestamp);
@@ -157,9 +157,9 @@ var areaCtx = d3.area()
 			})
 			.y0(height2)
 			.y1(function(d){
-				return y2(d.open);
+				return y2(d.close);
 			})
-			.curve(d3.curveMonotoneX);
+			.curve(d3.curveLinear);
 
 
 function drawStatic(params){
@@ -233,7 +233,7 @@ function plot(params){
 	drawStatic.call(this, params);
 	var self = this;
 	var prices = d3.keys(params.data_prices[0]).filter(function(d){
-		return d == "open" || d == "high" || d == "low";
+		return d == "close" || d == "high" || d == "low" || d=="average";
 	});
 	// enter()
 
@@ -280,7 +280,7 @@ function plot(params){
 		.data(prices)
 		.enter()
 		.append("g")
-		.filter(function(d){return d=="open";})
+		.filter(function(d){return d=="close";})
 		.attr("class", function(d){
 			return "_"+d;
 		})
@@ -375,15 +375,29 @@ function plot(params){
 			.data([arr])
 			.enter()
 				.append("path")
-				.filter(function(d,i){return d[i].key=="open"})
+				.filter(function(d,i){return d[i].key=="close"})
 				.classed("trendline", true);
+
+		g.selectAll(".avgLine")
+			.data([arr])
+			.enter()
+				.append("path")
+				.filter(function(d,i){return d[i].key=="average"})
+				.classed("avgLine", true);
 
 		ctx.selectAll(".trendline")
 			.data([arr])
 			.enter()
 				.append("path")
-				.filter(function(d,i){return d[i].key=="open"})
+				.filter(function(d,i){return d[i].key=="close"})
 				.classed("trendline", true);
+
+		ctx.selectAll(".avgLine")
+			.data([arr])
+			.enter()
+				.append("path")
+				.filter(function(d,i){return d[i].key=="average"})
+				.classed("avgLine", true);
 
 /*		g.selectAll(".point")
 			.data(arr)
@@ -540,27 +554,39 @@ function plot(params){
 		ctx.selectAll(".trendline")
 			.attr("d", function(d){
 				return lineCtx(d);
-			})
+			});
 
 		g.selectAll(".trendline")
 			.attr("d", function(d){
 				return line(d);
-			})
-			.on("mouseover", function(d,i){
+			});
+
+		ctx.selectAll(".avgLine")
+			.attr("d", function(d){
+				return lineCtx(d);
+			});
+
+		g.selectAll(".avgLine")
+			.attr("d", function(d){
+				return line(d);
+			});
+
+
+			/*.on("mouseover", function(d,i){
 				d3.select(this)
 					.transition()
 					.style("opacity", 1);
-/*					if($(groupDOM).attr("class")=="open price") {
+					if($(groupDOM).attr("class")=="open price") {
 						self.selectAll(".area")
 							.transition()
 							.style("opacity", 0.5);
-					}*/
-/*				g.selectAll(".point")
+					}
+				g.selectAll(".point")
 					.transition()
 					.attr("r", 4)
 					.style("opacity", 1)
-					.style("stroke-width", 1);*/
-			});
+					.style("stroke-width", 1);
+			});*/
 
 
 		//exit()
@@ -585,6 +611,16 @@ function plot(params){
 			.remove();*/
 
 		g.selectAll(".trendline")
+			.data([arr])
+			.exit()
+			.remove();
+
+		ctx.selectAll(".avgLine")
+			.data([arr])
+			.exit()
+			.remove();
+
+		g.selectAll(".avgLine")
 			.data([arr])
 			.exit()
 			.remove();
@@ -666,6 +702,10 @@ function brushed() {
 		.attr("d", function(d){
 			return line(d);
 		});
+	focus.selectAll(".avgLine")
+		.attr("d", function(d){
+			return line(d);
+		});
 	focus.selectAll(".area")
 		.attr("d", function(d){
 			return area(d);
@@ -702,6 +742,10 @@ function zoomed() {
 		.attr("d", function(d){
 			return line(d);
 		});
+	focus.selectAll(".avgLine")
+		.attr("d", function(d){
+			return line(d);
+		});
 	focus.selectAll(".area")
 		.attr("d", function(d){
 			return area(d);
@@ -719,7 +763,7 @@ var overlay = focus.append("rect")
 			  .on("mouseout", function() { dataOverlay.style("display", "none"); })
 			  .on("mousemove", mousemove);
 
-var dataOverlay = focus.append("g")
+var dataOverlay = svg.append("g")
   .attr("class", "data-overlay")
   .style("display", "none");
 
@@ -730,17 +774,22 @@ var dataOverlay = focus.append("g")
 
 dataOverlay.append("text")
   .attr("id", "text-open")
-  .attr("x", -7)
+  .attr("x", 75)
   .attr("dy", ".35em")
 
 dataOverlay.append("text")
   .attr("id", "text-high")
-  .attr("x", 65)
+  .attr("x", 175)
   .attr("dy", ".35em")
 
 dataOverlay.append("text")
   .attr("id", "text-low")
-  .attr("x", 159)
+  .attr("x", 275)
+  .attr("dy", ".35em")
+
+dataOverlay.append("text")
+  .attr("id", "text-average")
+  .attr("x", 375)
   .attr("dy", ".35em")
 
 var lastGet = 0;
@@ -760,9 +809,10 @@ function mousemove() {
 	    d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0;
 	dataOverlay.attr("transform", "translate(10,15)");
 	// dataOverlay.attr("transform", "translate(" + x(timestamp_parse(d.timestamp)) + "," + y(d.open) + ")");
-	dataOverlay.select("#text-open").text("O: "+formatCurrency(d.open));
-	dataOverlay.select("#text-high").text("H: "+formatCurrency(d.high));
-	dataOverlay.select("#text-low").text("L: "+formatCurrency(d.low));
+	dataOverlay.select("#text-open").text("Close: "+formatCurrency(d.close));
+	dataOverlay.select("#text-high").text("High: "+formatCurrency(d.high));
+	dataOverlay.select("#text-low").text("Low: "+formatCurrency(d.low));
+	dataOverlay.select("#text-average").text("Avg: "+formatCurrency(d.average));
 
 /*	d3.selectAll(".market-labels")
 		.transition().delay(50)
