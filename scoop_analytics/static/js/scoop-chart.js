@@ -69,7 +69,7 @@ var barMaxVal = d3.max(data_prices, function(d) { return d.volume; }),
 
 
 var x = d3.scaleTime()
-		.domain([
+/*		.domain([
 		    d3.min(data_prices, function(d){
 		    	var time = timeParser(d.timestamp);
 				return time;
@@ -81,7 +81,14 @@ var x = d3.scaleTime()
 		    	var time = timeParser(d.timestamp);
 				return time;
 			})
-		])
+		])*/
+		.domain([d3.min(data_prices, function(d){
+		    	var time = timeParser(d.timestamp);
+				return time;
+			}), d3.max(data_prices, function(d){
+		    	var time = timeParser(d.timestamp);
+				return time;
+			})])
 		.range([0,width]),
 	y = d3.scaleLinear()
 		.domain([minVal, maxVal]).nice()
@@ -152,7 +159,7 @@ var areaCtx = d3.area()
 			.y1(function(d){
 				return y2(d.open);
 			})
-			.curve(d3.curveCatmullRom);
+			.curve(d3.curveMonotoneX);
 
 
 function drawStatic(params){

@@ -30,8 +30,8 @@
   </div>
 </div>
 <script>
-var data_prices = parseData.parseFlaskJSON().parsePrices({{ share_prices | tojson | safe}});
-var data_gprices = parseData.parseFlaskJSON().parsePrices({{ google_prices | tojson | safe}});
+var data_prices_old = parseData.parseFlaskJSON().parsePrices({{ share_prices | tojson | safe}});
+var data_prices = parseData.parseFlaskJSON().parsePrices({{ google_prices | tojson | safe}});
 var data_tweets = parseData.parseFlaskJSON().parseTweets({{ documents | tojson | safe}});
 var tweet_urls = ["{{ url_for('static', filename = 'img/twitter-retweet.svg') }}", "{{ url_for('static', filename = 'img/twitter-like.svg') }}"];
 </script>
