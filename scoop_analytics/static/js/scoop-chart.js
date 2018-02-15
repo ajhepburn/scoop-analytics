@@ -736,7 +736,10 @@ dataOverlay.append("text")
   .attr("x", 159)
   .attr("dy", ".35em")
 
+var lastGet = 0;
+var lastRemove = 0;
 function mousemove() {
+	var timeParser = d3.timeParse("%s");
 	var timestamp_parse = function(d){var time = timeParser(d.timestamp);return time;}
 	var bisectDate = d3.bisector(function(d) { var time = timeParser(d.timestamp); return time; }).left,
 	    formatValue = d3.format(",.2f"),
@@ -752,4 +755,92 @@ function mousemove() {
 	dataOverlay.select("#text-open").text("O: "+formatCurrency(d.open));
 	dataOverlay.select("#text-high").text("H: "+formatCurrency(d.high));
 	dataOverlay.select("#text-low").text("L: "+formatCurrency(d.low));
+
+/*	d3.selectAll(".market-labels")
+		.transition().delay(50)
+		.style("opacity", 1);
+	d3.selectAll(".market-current")
+		.transition().delay(50)
+		.style("opacity", 1)
+		.text(function(){
+			return "$"+d.value.toFixed(2);
+		});
+	d3.selectAll(".market-by-val")
+		.transition().delay(50)
+		.style("opacity", 1)
+		.text(function(){
+			var index = arr.findIndex(x => x.timestamp==d.timestamp);
+			if (index==0) return;
+			var decVal = d.value - arr[index-1].value;
+			var val = (d.value - arr[index-1].value).toFixed(2);
+
+			if(val>0) return "+"+val;
+			else return val;
+		})
+		.style("fill", function(){
+			var index = arr.findIndex(x => x.timestamp==d.timestamp);
+			if (index==0) return;
+			var val = (d.value - arr[index-1].value).toFixed(2);
+
+			if(val>0) return "#84c283";
+			else return "#ff7575";
+		});
+	d3.selectAll(".market-by-percent")
+		.transition().delay(50)
+		.style("opacity", 1)
+		.text(function(d){
+			console.log(d);
+			var index = arr.findIndex(x => x.timestamp==d.timestamp);
+			if (index==0) return;
+			var decVal = d.value - arr[index-1].value;
+			var percentage = ((decVal/arr[index-1].value)*100).toFixed(2);
+
+			if(percentage>0) return "+"+percentage+"%";
+			else return percentage+"%";
+		})
+		.style("fill", function(){
+			var index = arr.findIndex(x => x.timestamp==d.timestamp);
+			if (index==0) return;
+			var decVal = d.value - arr[index-1].value;
+			var percentage = ((decVal/arr[index-1].value)*100).toFixed(2);
+
+			if(percentage>0) return "#84c283";
+			else return "#ff7575";
+		});*/
+
+	// PANEL
+	var tweet_arr = [];
+	for(j in data_tweets){
+		var tweet_time = timeParser(data_tweets[j]['timestamp_s']);
+		var point_time = timeParser(d.timestamp);
+		var diff = point_time.getTime() - tweet_time.getTime();
+		if(diff<=1800000 && diff>=-1800000) {
+			tweet_arr.push(data_tweets[j]);
+		} else {
+			if(Date.now() - lastRemove>1000) {
+				var tweet_list = []
+				d3.selectAll(".panel-body")
+					.data(tweet_list)
+					.exit()
+					.remove();
+				lastRemove = Date.now()
+			}
+		}
+	}
+
+	if(Date.now() - lastGet > 1000) {
+		twitterapi.fetch().getTweets(tweet_arr, tweet_urls[0], tweet_urls[1])
+        lastGet = Date.now();
+    }
 }
+
+$(".overlay").hover(function(){}, function(){
+var clearPanel = setInterval(function(){
+	var tweet_list = []
+	d3.selectAll(".panel-body")
+		.data(tweet_list)
+		.exit()
+		.remove();
+	},100);
+setTimeout(function(){clearInterval(clearPanel);},1000);
+});
