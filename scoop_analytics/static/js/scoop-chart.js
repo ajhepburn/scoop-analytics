@@ -6,34 +6,6 @@ setInterval(function(){
 	googleapi.fetch().scrapePage(market, cashtag, data_prices[data_prices.length-1]);
 }, 60000);
 
-setInterval(function() {
-    d3.select(".focus").selectAll("*").remove();
-    d3.select(".context").selectAll("*").remove();
-    d3.select(".volume").selectAll("*").remove();
-
-    d3.select(".x.axis-label").remove();
-    d3.select(".y.axis-label").remove();
-    d3.select(".market.market-by-val").remove();
-    d3.select(".market.market-by-percent").remove();
-    d3.select(".market.market-current").remove();
-    d3.select(".market-labels.market-label-change").remove();
-    d3.select(".market-labels.market-label-current").remove();
-    
-    plot.call(focus, {
-		data_prices: data_prices,
-		axis: {
-			x: xAxis,
-			y: yAxis,
-			x2: xAxis2
-		},
-		gridlines: {
-			x: xGridlines,
-			y: yGridlines,
-		},
-		initialise: true
-	});
-},5000);
-
 var w = 900,
 	h = 700,
 	margin = {
@@ -98,19 +70,6 @@ var barMaxVal = d3.max(data_prices, function(d) { return d.volume; }),
 
 
 var x = d3.scaleTime()
-/*		.domain([
-		    d3.min(data_prices, function(d){
-		    	var time = timeParser(d.timestamp);
-				return time;
-			}).setMinutes(Math.floor(d3.min(data_prices, function(d){
-				var time = timeParser(d.timestamp);
-				return time;
-			}).getMinutes() / 30) * 30), 
-		    d3.max(data_prices, function(d){
-		    	var time = timeParser(d.timestamp);
-				return time;
-			})
-		])*/
 		.domain([d3.min(data_prices, function(d){
 		    	var time = timeParser(d.timestamp);
 				return time;
@@ -132,10 +91,29 @@ var x = d3.scaleTime()
 x3.domain(x.domain());
 y3.domain([barMinVal, barMaxVal]).nice();
 
-var xAxis = d3.axisBottom(x);
-			// .tickFormat(d3.timeFormat("%H:%M")),
-	xAxis2 = d3.axisBottom(x2);
-			// .tickFormat(d3.timeFormat("%H:%M")),
+var formatMillisecond = d3.timeFormat(".%L"),
+    formatSecond = d3.timeFormat(":%S"),
+    formatMinute = d3.timeFormat("%H:%M"),
+    formatHour = d3.timeFormat("%H:%M"),
+    formatDay = d3.timeFormat("%a %d"),
+    formatWeek = d3.timeFormat("%b %d"),
+    formatMonth = d3.timeFormat("%B"),
+    formatYear = d3.timeFormat("%Y");
+
+function multiFormat(date) {
+  return (d3.timeSecond(date) < date ? formatMillisecond
+    : d3.timeMinute(date) < date ? formatSecond
+    : d3.timeHour(date) < date ? formatMinute
+    : d3.timeDay(date) < date ? formatHour
+    : d3.timeMonth(date) < date ? (d3.timeWeek(date) < date ? formatDay : formatWeek)
+    : d3.timeYear(date) < date ? formatMonth
+    : formatYear)(date);
+}
+
+var xAxis = d3.axisBottom(x)
+			.tickFormat(multiFormat);
+	xAxis2 = d3.axisBottom(x2)
+			.tickFormat(multiFormat);
 	yAxis = d3.axisLeft(y);
 
 
@@ -208,14 +186,14 @@ function drawStatic(params){
 			.attr("transform", "translate(0,0)")
 			.call(params.axis.y);
 
-/*		this.append("g")
+		this.append("g")
 			.classed("gridline x", true)
 			.attr("transform", "translate(0,"+height+")")
 			.call(params.gridlines.x);
 		this.append("g")
 			.classed("gridline y", true)
 			.attr("transform", "translate(0,0)")
-			.call(params.gridlines.y);*/
+			.call(params.gridlines.y);
 
 		d3.select("#chart")
 			.append("text")
@@ -309,7 +287,7 @@ function plot(params){
 		.data(prices)
 		.enter()
 		.append("g")
-		.filter(function(d){return d=="close";})
+		.filter(function(d){return d=="close" || d=="average";})
 		.attr("class", function(d){
 			return "_"+d;
 		})
@@ -385,7 +363,8 @@ function plot(params){
 	this.selectAll(".legend")
 		.style("fill", function(d, i){
 			// return colorScale(prices.indexOf(d));
-			return "#0065fc";
+			if(d=="average") return '#ffb2b2';
+			else if(d=="close") return "#0065fc";
 		})
 
 	prices.forEach(function(price){		
@@ -437,157 +416,11 @@ function plot(params){
 				.filter(function(d,i){return d[i].key=="average"})
 				.classed("avgLine", true);
 
-/*		g.selectAll(".point")
-			.data(arr)
-			.enter()
-				.append("circle")
-				.filter(function(d){return d.key=="open";})
-				.classed("point", true)
-				.attr("r", 3)
-				.style("fill", "#fff");*/
-
-/*		ctx.selectAll(".point")
-			.data(arr)
-			.enter()
-				.append("circle")
-				.filter(function(d){return d.key=="open";})
-				.classed("point", true)
-				.attr("r", 1.5)
-				.style("fill", "#fff");*/
 		//update
 		ctx.selectAll(".area")
 			.attr("d", function(d){
 				return areaCtx(d);
 			});
-
-/*		ctx.selectAll(".point")
-			.attr("cx", function(d){
-				var time = timeParser(d.timestamp);
-				return x2(time);
-			})
-			.attr("cy", function(d){
-				return y2(d.value);
-			});*/
-
-/*		g.selectAll(".point")
-			.attr("cx", function(d){
-				var time = timeParser(d.timestamp);
-				return x(time);
-			})
-			.attr("cy", function(d){
-				return y(d.value);
-			})
-			.on("mouseover", function(d,i){
-				var curr_point = this;
-				var timeParser = d3.timeParse("%s");
-
-				d3.select(this)
-					.transition()
-					.attr("r", 6)
-					.style("stroke-width", 2)
-					.attr("fill", "#588C73");
-    			d3.selectAll(".tooltip")
-					.style("left", d3.event.pageX+5+"px")
-					.style("top", d3.event.pageY+5+"px")
-					.style("display", "inline-block")
-					.html(function(){
-						var curr_time = d.timestamp;
-						var curr_obj = params.data_prices.filter(function(d){return d.timestamp==curr_time;})[0];
-						var date_format = d3.timeFormat("%d-%m")(timeParser(d.timestamp));
-						var time_format = d3.timeFormat("%H:%M")(timeParser(d.timestamp));
-						var prices = {
-							high: parseFloat(curr_obj.high).toFixed(2),
-							low: parseFloat(curr_obj.low).toFixed(2)
-						}
-
-						return date_format + " (<b>"+time_format+"</b>)<br/><b>High:</b>" + "&nbsp;"+prices.high+"<br/><b>Low:</b>"+"&nbsp;"+prices.low;
-					 })
-					.transition();
-				d3.selectAll(".market-labels")
-					.transition().delay(50)
-					.style("opacity", 1);
-				d3.selectAll(".market-current")
-					.transition().delay(50)
-					.style("opacity", 1)
-					.text(function(){
-						return "$"+d.value.toFixed(2);
-					});
-				d3.selectAll(".market-by-val")
-					.transition().delay(50)
-					.style("opacity", 1)
-					.text(function(){
-						var index = arr.findIndex(x => x.timestamp==d.timestamp);
-						if (index==0) return;
-						var decVal = d.value - arr[index-1].value;
-						var val = (d.value - arr[index-1].value).toFixed(2);
-
-						if(val>0) return "+"+val;
-						else return val;
-					})
-					.style("fill", function(){
-						var index = arr.findIndex(x => x.timestamp==d.timestamp);
-						if (index==0) return;
-						var val = (d.value - arr[index-1].value).toFixed(2);
-
-						if(val>0) return "#84c283";
-						else return "#ff7575";
-					});
-				d3.selectAll(".market-by-percent")
-					.transition().delay(50)
-					.style("opacity", 1)
-					.text(function(){
-						var index = arr.findIndex(x => x.timestamp==d.timestamp);
-						if (index==0) return;
-						var decVal = d.value - arr[index-1].value;
-						var percentage = ((decVal/arr[index-1].value)*100).toFixed(2);
-
-						if(percentage>0) return "+"+percentage+"%";
-						else return percentage+"%";
-					})
-					.style("fill", function(){
-						var index = arr.findIndex(x => x.timestamp==d.timestamp);
-						if (index==0) return;
-						var decVal = d.value - arr[index-1].value;
-						var percentage = ((decVal/arr[index-1].value)*100).toFixed(2);
-
-						if(percentage>0) return "#84c283";
-						else return "#ff7575";
-					});
-
-				// PANEL
-				var tweet_arr = [];
-				for(j in data_tweets){
-					var tweet_time = timeParser(data_tweets[j]['timestamp_s']);
-					var point_time = timeParser(d3.select(curr_point).data()[0].timestamp);
-					var diff = point_time.getTime() - tweet_time.getTime();
-					if(diff<=1800000 && diff>=-1800000) {
-						tweet_arr.push(data_tweets[j]);
-					}
-				}
-				twitterapi.fetch().getTweets(tweet_arr, tweet_urls[0], tweet_urls[1]);
-
-			})
-			.on("mouseout", function(d,i){
-				d3.selectAll(".market")
-					.transition().delay(50)
-					.style("opacity", 0);
-				d3.selectAll(".market-labels")
-					.transition().delay(50)
-					.style("opacity",0);
-				d3.select(this)
-					.transition()
-					.attr("r", 3)
-					.style("stroke-width", 1);
-				d3.selectAll(".tooltip")
-					.style("display", "none")
-					.transition();
-					// exit()
-				var tweet_list = []
-				d3.selectAll(".panel-body")
-					.data(tweet_list)
-					.exit()
-					.remove();
-			});*/
 
 		ctx.selectAll(".trendline")
 			.attr("d", function(d){
@@ -610,43 +443,16 @@ function plot(params){
 			});
 
 
-			/*.on("mouseover", function(d,i){
-				d3.select(this)
-					.transition()
-					.style("opacity", 1);
-					if($(groupDOM).attr("class")=="open price") {
-						self.selectAll(".area")
-							.transition()
-							.style("opacity", 0.5);
-					}
-				g.selectAll(".point")
-					.transition()
-					.attr("r", 4)
-					.style("opacity", 1)
-					.style("stroke-width", 1);
-			});*/
-
-
 		//exit()
 		ctx.selectAll(".area")
 			.data([params.data_prices])
 			.exit()
 			.remove();
 
-/*		ctx.selectAll(".point")
-			.data(arr)
-			.exit()
-			.remove();*/
-
 		ctx.selectAll(".trendline")
 			.data([arr])
 			.exit()
 			.remove();
-
-/*		g.selectAll(".point")
-			.data(arr)
-			.exit()
-			.remove();*/
 
 		g.selectAll(".trendline")
 			.data([arr])
@@ -712,8 +518,6 @@ function plot(params){
 		.attr("height", h)
 		.classed("panelstream", true);
 
-
-	// twitterapi.fetch().postStream(cashtag);
 }
 plot.call(focus, {
 	data_prices: data_prices,
@@ -734,14 +538,7 @@ function brushed() {
 	var selection = d3.event.selection;
 	init_brush = selection;
 	x.domain(selection.map(x2.invert, x2));
-/*	focus.selectAll(".point")
-		.attr("cx", function(d){
-			var time = timeParser(d.timestamp);
-			return x(time);
-		})
-		.attr("cy", function(d){
-			return y(d.value);
-		});*/
+
 	focus.selectAll(".trendline")
 		.attr("d", function(d){
 			return line(d);
@@ -774,14 +571,6 @@ function zoomed() {
 		var time = timeParser(d.timestamp);
 		return x(time); 
 	});
-/*	focus.selectAll(".point")
-		.attr("cx", function(d){
-			var time = timeParser(d.timestamp);
-			return x(time);
-		})
-		.attr("cy", function(d){
-			return y(d.value);
-		});*/
 	focus.selectAll(".trendline")
 		.attr("d", function(d){
 			return line(d);
@@ -803,11 +592,6 @@ function zoomed() {
 var dataOverlay = svg.append("g")
   .attr("class", "data-overlay")
   .style("display", "none");
-
-// dataOverlay.append("circle")
-//   .attr("r", 4)
-//   .attr("fill", "#0065fc")
-//   .attr("transform","translate(0,-1)");
 
 dataOverlay.append("text")
   .attr("id", "text-open")
