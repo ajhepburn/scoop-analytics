@@ -794,6 +794,8 @@ function zoomed() {
 		.attr("d", function(d){
 			return area(d);
 		});
+		
+	init_brush = x.range().map(t.invertX, t);
 	focus.select(".axis.x").call(xAxis);
 	context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
 }
