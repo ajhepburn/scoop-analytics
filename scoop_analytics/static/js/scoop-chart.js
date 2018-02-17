@@ -1,9 +1,38 @@
 var market = "NASDAQ";
 var cashtag = data_prices[0]['symbol'];
+var init_brush = null;
 
 setInterval(function(){ 
 	googleapi.fetch().scrapePage(market, cashtag, data_prices[data_prices.length-1]);
 }, 60000);
+
+setInterval(function() {
+    d3.select(".focus").selectAll("*").remove();
+    d3.select(".context").selectAll("*").remove();
+    d3.select(".volume").selectAll("*").remove();
+
+    d3.select(".x.axis-label").remove();
+    d3.select(".y.axis-label").remove();
+    d3.select(".market.market-by-val").remove();
+    d3.select(".market.market-by-percent").remove();
+    d3.select(".market.market-current").remove();
+    d3.select(".market-labels.market-label-change").remove();
+    d3.select(".market-labels.market-label-current").remove();
+    
+    plot.call(focus, {
+		data_prices: data_prices,
+		axis: {
+			x: xAxis,
+			y: yAxis,
+			x2: xAxis2
+		},
+		gridlines: {
+			x: xGridlines,
+			y: yGridlines,
+		},
+		initialise: true
+	});
+},5000);
 
 var w = 900,
 	h = 700,
@@ -165,15 +194,6 @@ var areaCtx = d3.area()
 function drawStatic(params){
 	if(params.initialise){
 		this.append("g")
-			.classed("gridline x", true)
-			.attr("transform", "translate(0,"+height+")")
-			.call(params.gridlines.x);
-		this.append("g")
-			.classed("gridline y", true)
-			.attr("transform", "translate(0,0)")
-			.call(params.gridlines.y);
-
-		this.append("g")
 			.classed("axis x", true)
 			.attr("transform", "translate(" + 0 + "," + height + ")")
 			.call(params.axis.x);
@@ -187,6 +207,15 @@ function drawStatic(params){
 			.classed("axis y", true)
 			.attr("transform", "translate(0,0)")
 			.call(params.axis.y);
+
+/*		this.append("g")
+			.classed("gridline x", true)
+			.attr("transform", "translate(0,"+height+")")
+			.call(params.gridlines.x);
+		this.append("g")
+			.classed("gridline y", true)
+			.attr("transform", "translate(0,0)")
+			.call(params.gridlines.y);*/
 
 		d3.select("#chart")
 			.append("text")
@@ -302,6 +331,15 @@ function plot(params){
 		.text(function(d){
 			return d.charAt(0).toUpperCase() + d.slice(1);
 		});
+
+	var overlay = focus.append("rect")
+		      .attr("class", "overlay")
+		      .attr("width", width)
+		      .attr("height", height)
+		      .attr("opacity", "0")
+              .on("mouseover", function() { dataOverlay.style("display", null); })
+			  .on("mouseout", function() { dataOverlay.style("display", "none"); })
+			  .on("mousemove", mousemove);
 
 	// update
 	this.selectAll(".price")
@@ -630,11 +668,16 @@ function plot(params){
 			.exit()
 			.remove();
 	});
-
-	context.append("g")
-			.attr("class", "brush")
-			.call(brush)
-			.call(brush.move, [x.range()[1]/4, x.range()[1]/1.4]);
+	
+	var brushGroup = context.append("g")
+						.attr("class", "brush")
+						.call(brush)
+						
+	if(init_brush!=null) {
+		console.log(init_brush);
+		brushGroup.call(brush.move, init_brush);
+	}
+	else brushGroup.call(brush.move, [x.range()[1]/4, x.range()[1]/1.4]);
 
 	this.selectAll(".area")
 		.attr("d", function(d){
@@ -689,6 +732,7 @@ plot.call(focus, {
 function brushed() {
 	if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return;
 	var selection = d3.event.selection;
+	init_brush = selection;
 	x.domain(selection.map(x2.invert, x2));
 /*	focus.selectAll(".point")
 		.attr("cx", function(d){
@@ -753,15 +797,6 @@ function zoomed() {
 	focus.select(".axis.x").call(xAxis);
 	context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
 }
-
-var overlay = focus.append("rect")
-		      .attr("class", "overlay")
-		      .attr("width", width)
-		      .attr("height", height)
-		      .attr("opacity", "0")
-              .on("mouseover", function() { dataOverlay.style("display", null); })
-			  .on("mouseout", function() { dataOverlay.style("display", "none"); })
-			  .on("mousemove", mousemove);
 
 var dataOverlay = svg.append("g")
   .attr("class", "data-overlay")
