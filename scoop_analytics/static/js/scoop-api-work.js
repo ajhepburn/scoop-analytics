@@ -70,22 +70,8 @@ var twitterapi = {
 				  });
 			}
 		}
-
-		function postStream(cashtag) {
-			var jqxhr = $.post("tweet-stream", {"data": cashtag})
-				.done(function() {
-					console.log( "second success" );
-				})
-				.fail(function() {
-					console.log( "error" );
-				})
-				.always(function() {
-					console.log( "finished" );
-				});
-		}
 		return {
 			getTweets: getTweets,
-			postStream: postStream
 		}
 	}
 }
@@ -113,72 +99,21 @@ var googleapi = {
                     }
                 }
 
-                /*function replot(params) {
-                	var self = this;
-                    var prices = d3.keys(params.data_prices[0]).filter(function(d){
-                        return d == "close" || d == "high" || d == "low" || d=="average";
-                    });
-
-                    prices.forEach(function(price){     
-                        var g = self.selectAll("g."+price);
-                        var ctx = context.selectAll("g."+price);
-
-                        var arr = params.data_prices.map(function(d){
-                            return {
-                                key: price,
-                                timestamp: d.timestamp,
-                                volume: d.volume,
-                                value: d[price]
-                            };
-                        });
-
-						ctx.selectAll(".area")
-							.data([params.data_prices])
-							.exit()
-							.remove();
-
-						ctx.selectAll(".trendline")
-							.data([arr])
-							.exit()
-							.remove();
-
-						g.selectAll(".trendline")
-							.data([arr])
-							.exit()
-							.remove();
-
-						ctx.selectAll(".avgLine")
-							.data([arr])
-							.exit()
-							.remove();
-
-						g.selectAll(".avgLine")
-							.data([arr])
-							.exit()
-							.remove();
-
-						volumes.selectAll(".bar")
-							.data(params.data_prices)
-							.exit()
-							.remove();
-
-                    });
-
-
-
-                    context.select(".brush")
-                    		.remove();
-
-                	context.append("g")
-						.attr("class", "brush")
-						.call(brush)
-						.call(brush.move, [x.range()[1]/4, x.range()[1]/1.4]);
-                }*/
                 d3.select(".focus").selectAll("*").remove();
-                d3.select(".context").selectAll("*").remove();
-                d3.select(".volume").selectAll("*").remove();
-                
-                plot.call(focus, {
+			    d3.select(".context").selectAll("*").remove();
+			    d3.select(".volume").selectAll("*").remove();
+
+			    d3.select(".x.axis-label").remove();
+			    d3.select(".y.axis-label").remove();
+			    d3.select(".gridline.x").remove();
+			    d3.select(".gridline.y").remove();    
+			    d3.select(".market.market-by-val").remove();
+			    d3.select(".market.market-by-percent").remove();
+			    d3.select(".market.market-current").remove();
+			    d3.select(".market-labels.market-label-change").remove();
+			    d3.select(".market-labels.market-label-current").remove();
+			    
+			    plot.call(focus, {
 					data_prices: data_prices,
 					axis: {
 						x: xAxis,
