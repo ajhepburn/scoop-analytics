@@ -95,22 +95,103 @@ var googleapi = {
 	fetch: function() {
 		function scrapePage(market, cashtag, last_el) {
 			var jqxhr = $.getJSON("google-get", {"data": JSON.stringify([market, cashtag, last_el])})
-				.done(function(data) {
-					console.log("Success");
-					console.log(data);
-					if (data['pagedata']!=null) {
-						for(result in data['pagedata']) {
-							var item = {'timestamp':data['pagedata'][result][0], 
-											 'close':data['pagedata'][result][1], 
-											 'high':data['pagedata'][result][2], 
-											 'low':data['pagedata'][result][3], 
-											 'open':data['pagedata'][result][4], 
-											 'volume':data['pagedata'][result][5], 
-											 'average':data['pagedata'][result][6]}
-							if(!data_prices.includes(item)) data_prices.push(item);
-						}
-					}
-				})
+			.done(function(data) {
+                console.log("Success");
+                console.log(data);
+                if (data['pagedata']!=null) {
+                    for(result in data['pagedata']) {
+                        var item = {'timestamp':data['pagedata'][result][0], 
+                                         'close':data['pagedata'][result][1], 
+                                         'high':data['pagedata'][result][2], 
+                                         'low':data['pagedata'][result][3], 
+                                         'open':data['pagedata'][result][4], 
+                                         'volume':data['pagedata'][result][5], 
+                                         'average':data['pagedata'][result][6]}
+                        if(!data_prices.includes(item)) {
+                            data_prices.push(item);
+                        }
+                    }
+                }
+
+                /*function replot(params) {
+                	var self = this;
+                    var prices = d3.keys(params.data_prices[0]).filter(function(d){
+                        return d == "close" || d == "high" || d == "low" || d=="average";
+                    });
+
+                    prices.forEach(function(price){     
+                        var g = self.selectAll("g."+price);
+                        var ctx = context.selectAll("g."+price);
+
+                        var arr = params.data_prices.map(function(d){
+                            return {
+                                key: price,
+                                timestamp: d.timestamp,
+                                volume: d.volume,
+                                value: d[price]
+                            };
+                        });
+
+						ctx.selectAll(".area")
+							.data([params.data_prices])
+							.exit()
+							.remove();
+
+						ctx.selectAll(".trendline")
+							.data([arr])
+							.exit()
+							.remove();
+
+						g.selectAll(".trendline")
+							.data([arr])
+							.exit()
+							.remove();
+
+						ctx.selectAll(".avgLine")
+							.data([arr])
+							.exit()
+							.remove();
+
+						g.selectAll(".avgLine")
+							.data([arr])
+							.exit()
+							.remove();
+
+						volumes.selectAll(".bar")
+							.data(params.data_prices)
+							.exit()
+							.remove();
+
+                    });
+
+
+
+                    context.select(".brush")
+                    		.remove();
+
+                	context.append("g")
+						.attr("class", "brush")
+						.call(brush)
+						.call(brush.move, [x.range()[1]/4, x.range()[1]/1.4]);
+                }*/
+                d3.select(".focus").selectAll("*").remove();
+                d3.select(".context").selectAll("*").remove();
+                d3.select(".volume").selectAll("*").remove();
+                
+                plot.call(focus, {
+					data_prices: data_prices,
+					axis: {
+						x: xAxis,
+						y: yAxis,
+						x2: xAxis2
+					},
+					gridlines: {
+						x: xGridlines,
+						y: yGridlines,
+					},
+					initialise: true
+				});
+            })
 				.fail(function() {
 					console.log( "error" );
 				})
