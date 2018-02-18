@@ -131,9 +131,14 @@ def main():
 
 @socketio.on('my event')
 def handle_my_custom_event(json):
-	# json['track'] = 'cats'
+	# json['track'] = 'pizza'
 	r = api.request('statuses/filter', json)
 	for item in r.get_iterator():
 		if 'text' in item:
 			json_data = {'data': item}
 			emit('my response',json_data)
+		elif 'limit' in item:
+			print ('%d tweets missed') % item['limit'].get('track')
+		elif 'disconnect' in item:
+			print ('disconnecting because %s') % item['disconnect'].get('reason')
+			break
