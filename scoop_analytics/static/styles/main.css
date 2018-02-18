@@ -47,7 +47,7 @@ body,html{
 	fill: #888a91;
 	font-size:90%;
 }
-#text-open, #text-high, #text-low, #text-average {
+#text-open, #text-high, #text-low, #text-average, .lastupdated {
 	fill: #888a91;
 	font-size:70%;
 	font-weight: none;
