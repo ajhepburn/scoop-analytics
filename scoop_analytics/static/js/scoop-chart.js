@@ -324,8 +324,22 @@ function plot(params){
 		      .attr("height", height)
 		      .attr("opacity", "0")
               .on("mouseover", function() { dataOverlay.style("display", null); })
-			  .on("mouseout", function() { dataOverlay.style("display", "none"); })
+			  .on("mouseout", function() { hoverLineX.style("opacity", 1e-6); hoverLineY.style("opacity", 1e-6); dataOverlay.style("display", "none"); })
 			  .on("mousemove", mousemove);
+
+	var hoverLineGroup = focus.append("g")
+						.attr("class", "hover-line-group");
+	var hoverLineX = hoverLineGroup.append("line")
+					.attr("id", "hover-line-x")
+					.attr("x1", 10).attr("x2", 10) 
+					.attr("y1", 0).attr("y2", height); 
+	hoverLineX.style("opacity", 1e-6);
+
+	var hoverLineY = hoverLineGroup.append("line")
+					.attr("id", "hover-line-y")
+					.attr("x1", 0).attr("x2", width) 
+					.attr("y1", 10).attr("y2", 10); 
+	hoverLineY.style("opacity", 1e-6);
 
 	// update
 	this.selectAll(".price")
@@ -488,7 +502,6 @@ function plot(params){
 						.call(brush)
 						
 	if(init_brush!=null) {
-		console.log(init_brush);
 		brushGroup.call(brush.move, init_brush);
 	}
 	else brushGroup.call(brush.move, [x.range()[1]/4, x.range()[1]/1.4]);
@@ -646,6 +659,12 @@ function mousemove() {
 	dataOverlay.select("#text-high").text("High: "+formatCurrency(d.high));
 	dataOverlay.select("#text-low").text("Low: "+formatCurrency(d.low));
 	dataOverlay.select("#text-average").text("Avg: "+formatCurrency(d.average));
+
+	var xpos = d3.mouse(this)[0];
+	var ypos = d3.mouse(this)[1];
+	d3.select("#hover-line-x").attr("x1", xpos-3).attr("x2", xpos-3).style("opacity", 1);
+	d3.select("#hover-line-y").attr("y1", ypos-3).attr("y2", ypos-3).style("opacity", 1);
+
 
 /*	d3.selectAll(".market-labels")
 		.transition().delay(50)

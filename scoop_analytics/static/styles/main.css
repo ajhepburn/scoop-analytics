@@ -58,6 +58,13 @@ body,html{
 	stroke: #ccc;
 	shape-rendering: crispEdges;
 }
+#hover-line-x, #hover-line-y { 
+  stroke: #585858;
+  stroke-dasharray: 5,5;  
+  fill: none;
+  stroke-width: 1px;
+  shape-rendering: crispEdges;
+}
 .trendline {
 	fill: none;
 	stroke-width: 2px;
