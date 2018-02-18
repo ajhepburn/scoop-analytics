@@ -1,4 +1,4 @@
-/*function fifoQueue(){
+function fifoQueue(){
 	collection = [];
 	this.print = function() {
 	    console.log(collection);
@@ -39,13 +39,7 @@ $(document).ready(function() {
 					.enter()
 					.insert("div", "div")
 					.attr("id", function(d,i){return "ps"+d['id_str']})
-					// .attr("opacity", 0)
 					.classed("panelstream-body", true);
-
-			// tweetDivs.transition()
-			// 		.duration(1000)
-			// 		.ease(d3.easeLinear)
-			// 		.attr("opacity", 1);
 
 		var headerBlock = tweetDivs.append("p")
 						  .classed("panelstream-tweet-header", true);
@@ -96,4 +90,4 @@ $(document).ready(function() {
 			addStreamPanel(q.contents());
 		}
 	});
-});*/
+});
