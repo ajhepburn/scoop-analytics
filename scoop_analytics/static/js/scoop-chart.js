@@ -1,5 +1,5 @@
 var market = "NASDAQ";
-var cashtag = data_prices[0]['symbol'];
+var cashtag = "HMNY"
 var init_brush = null;
 
 setInterval(function(){ 
@@ -200,7 +200,7 @@ function drawStatic(params){
 			.classed("y axis-label",true)
 			.attr("transform", "translate(30,"+height/1.25+") rotate(-90)")
 			.text(function(){
-				return data_prices[0]['symbol']+" Share Price ($)";
+				return market+":"+cashtag+" Share Price ($)";
 			});
 		d3.select("#chart")
 			.append("text")
@@ -233,6 +233,14 @@ function drawStatic(params){
 			.classed("market-labels market-label-current", true)
 			.attr("transform", "translate("+width/1.16+",70)")
 			.text("Market Value");
+		d3.select("#chart")
+			.append("text")
+			.classed("lastupdated", true)
+			.attr("transform", "translate(50,25)")
+			.text(function(){
+				var lastUpdated = String(timeParser(data_prices[data_prices.length-1].timestamp)).slice(0,-15);
+				return "Last updated: "+lastUpdated;
+			});
 	}
 }
 
@@ -595,22 +603,26 @@ var dataOverlay = svg.append("g")
 
 dataOverlay.append("text")
   .attr("id", "text-open")
-  .attr("x", 75)
+  .attr("x", 275)
+  .attr("y", 50)
   .attr("dy", ".35em")
 
 dataOverlay.append("text")
   .attr("id", "text-high")
-  .attr("x", 175)
+  .attr("x", 350)
+  .attr("y", 50)
   .attr("dy", ".35em")
 
 dataOverlay.append("text")
   .attr("id", "text-low")
-  .attr("x", 275)
+  .attr("x", 425)
+  .attr("y", 50)
   .attr("dy", ".35em")
 
 dataOverlay.append("text")
   .attr("id", "text-average")
-  .attr("x", 375)
+  .attr("x", 500)  
+  .attr("y", 50)
   .attr("dy", ".35em")
 
 var lastGet = 0;
