@@ -1,4 +1,4 @@
-function fifoQueue(){
+/*function fifoQueue(){
 	collection = [];
 	this.print = function() {
 	    console.log(collection);
@@ -28,7 +28,7 @@ var q = new fifoQueue();
 $(document).ready(function() {
 	var socket = io.connect('http://' + document.domain + ':' + location.port);
 	socket.on('connect', function() {
-	    socket.emit('my event', {'track': '$'+data_prices[0]['symbol'].toString()}, function(data){
+	    socket.emit('my event', {'track': data_prices[0]['symbol'].toString()}, function(data){
 	    	console.log(data);
 	    });
 	});
@@ -90,4 +90,4 @@ $(document).ready(function() {
 			addStreamPanel(q.contents());
 		}
 	});
-});
+});*/

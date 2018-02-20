@@ -113,6 +113,8 @@ var googleapi = {
 			    d3.select(".market-labels.market-label-change").remove();
 			    d3.select(".market-labels.market-label-current").remove();
 			    d3.select(".lastupdated").remove();
+
+			    console.log(data_prices);
 			    
 			    plot.call(focus, {
 					data_prices: data_prices,
