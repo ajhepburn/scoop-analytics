@@ -250,6 +250,7 @@ function plot(params){
 	var prices = d3.keys(params.data_prices[0]).filter(function(d){
 		return d == "close" || d == "high" || d == "low" || d=="average";
 	});
+
 	// enter()
 
 	volumes.selectAll(".bar")
@@ -402,6 +403,7 @@ function plot(params){
 				value: d[price]
 			};
 		});
+
 		// enter()
 		ctx.selectAll(".area")
 			.data([params.data_prices])
@@ -465,7 +467,7 @@ function plot(params){
 			});
 
 
-		//exit()
+/*		//exit()
 		ctx.selectAll(".area")
 			.data([params.data_prices])
 			.exit()
@@ -494,7 +496,7 @@ function plot(params){
 		volumes.selectAll(".bar")
 			.data(params.data_prices)
 			.exit()
-			.remove();
+			.remove();*/
 	});
 	
 	var brushGroup = context.append("g")
@@ -527,18 +529,6 @@ function plot(params){
 		.attr("class", "vol-tooltip")
 		.classed("vol-tooltip", true);
 
-	d3.select("#bs-right-div")
-		.append("div")
-		.attr("class", "panel")
-		.attr("height", h)
-		.classed("panel", true);
-
-	d3.select("#bs-left-div")
-		.append("div")
-		.attr("class", "panelstream")
-		.attr("height", h)
-		.classed("panelstream", true);
-
 }
 plot.call(focus, {
 	data_prices: data_prices,
@@ -553,6 +543,18 @@ plot.call(focus, {
 	},
 	initialise: true
 });
+
+d3.select("#bs-right-div")
+	.append("div")
+	.attr("class", "panel")
+	.attr("height", h)
+	.classed("panel", true);
+
+d3.select("#bs-left-div")
+	.append("div")
+	.attr("class", "panelstream")
+	.attr("height", h)
+	.classed("panelstream", true);
 
 function brushed() {
 	if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return;
@@ -616,25 +618,25 @@ var dataOverlay = svg.append("g")
 
 dataOverlay.append("text")
   .attr("id", "text-open")
-  .attr("x", 275)
+  .attr("x", 200)
   .attr("y", 50)
   .attr("dy", ".35em")
 
 dataOverlay.append("text")
   .attr("id", "text-high")
-  .attr("x", 350)
+  .attr("x", 300)
   .attr("y", 50)
   .attr("dy", ".35em")
 
 dataOverlay.append("text")
   .attr("id", "text-low")
-  .attr("x", 425)
+  .attr("x", 375)
   .attr("y", 50)
   .attr("dy", ".35em")
 
 dataOverlay.append("text")
   .attr("id", "text-average")
-  .attr("x", 500)  
+  .attr("x", 450)  
   .attr("y", 50)
   .attr("dy", ".35em")
 
@@ -655,7 +657,7 @@ function mousemove() {
 	    d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0;
 	dataOverlay.attr("transform", "translate(10,15)");
 	// dataOverlay.attr("transform", "translate(" + x(timestamp_parse(d.timestamp)) + "," + y(d.open) + ")");
-	dataOverlay.select("#text-open").text("Close: "+formatCurrency(d.close));
+	// dataOverlay.select("#text-open").text("Close: "+formatCurrency(d.close));
 	dataOverlay.select("#text-high").text("High: "+formatCurrency(d.high));
 	dataOverlay.select("#text-low").text("Low: "+formatCurrency(d.low));
 	dataOverlay.select("#text-average").text("Avg: "+formatCurrency(d.average));
@@ -666,58 +668,56 @@ function mousemove() {
 	d3.select("#hover-line-y").attr("y1", ypos-3).attr("y2", ypos-3).style("opacity", 1);
 
 
-/*	d3.selectAll(".market-labels")
+	d3.selectAll(".market-labels")
 		.transition().delay(50)
 		.style("opacity", 1);
 	d3.selectAll(".market-current")
 		.transition().delay(50)
 		.style("opacity", 1)
 		.text(function(){
-			return "$"+d.value.toFixed(2);
+			return "$"+d.close.toFixed(2);
 		});
-	d3.selectAll(".market-by-val")
+	/*d3.selectAll(".market-by-val")
 		.transition().delay(50)
 		.style("opacity", 1)
 		.text(function(){
-			var index = arr.findIndex(x => x.timestamp==d.timestamp);
+			var index = data_prices.findIndex(x => x.timestamp==d.timestamp);
 			if (index==0) return;
-			var decVal = d.value - arr[index-1].value;
-			var val = (d.value - arr[index-1].value).toFixed(2);
+			var decVal = d.close - data_prices[index-1].close;
+			var val = (d.close - data_prices[index-1].close).toFixed(2);
 
 			if(val>0) return "+"+val;
 			else return val;
 		})
 		.style("fill", function(){
-			var index = arr.findIndex(x => x.timestamp==d.timestamp);
+			var index = data_prices.findIndex(x => x.timestamp==d.timestamp);
 			if (index==0) return;
-			var val = (d.value - arr[index-1].value).toFixed(2);
+			var val = (d.close - data_prices[index-1].close).toFixed(2);
 
 			if(val>0) return "#84c283";
 			else return "#ff7575";
-		});
+		});*/
 	d3.selectAll(".market-by-percent")
 		.transition().delay(50)
 		.style("opacity", 1)
-		.text(function(d){
-			console.log(d);
-			var index = arr.findIndex(x => x.timestamp==d.timestamp);
+		.text(function(){
+			var index = data_prices.findIndex(x => x.timestamp==d.timestamp);
 			if (index==0) return;
-			var decVal = d.value - arr[index-1].value;
-			var percentage = ((decVal/arr[index-1].value)*100).toFixed(2);
+			var decVal = d.close - data_prices[index-1].close;
+			var percentage = ((decVal/data_prices[index-1].close)*100).toFixed(2);
 
 			if(percentage>0) return "+"+percentage+"%";
 			else return percentage+"%";
 		})
 		.style("fill", function(){
-			var index = arr.findIndex(x => x.timestamp==d.timestamp);
+			var index = data_prices.findIndex(x => x.timestamp==d.timestamp);
 			if (index==0) return;
-			var decVal = d.value - arr[index-1].value;
-			var percentage = ((decVal/arr[index-1].value)*100).toFixed(2);
+			var decVal = d.close - data_prices[index-1].close;
+			var percentage = ((decVal/data_prices[index-1].close)*100).toFixed(2);
 
 			if(percentage>0) return "#84c283";
 			else return "#ff7575";
-		});*/
-
+		});
 	// PANEL
 	var tweet_arr = [];
 	for(j in data_tweets){
