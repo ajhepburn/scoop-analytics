@@ -199,9 +199,7 @@ function drawStatic(params){
 			});
 		d3.select("#chart")
 			.append("text")
-			.classed("x axis-label",true)
-			.attr("transform", "translate("+width/2.08+",45)")
-			.text("");
+			.classed("x axis-label",true);
 		d3.select("#chart")
 			.append("text")
 			.classed("market market-by-val", true)
@@ -568,8 +566,8 @@ function brushed() {
 			else return d3.timeFormat("%b %d, %Y")(x.domain()[0])+" - "+d3.timeFormat("%b %d, %Y")(x.domain()[1]);
 		})
 		.attr("transform", function(){
-			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width/1.9+",45)";
-			else return "translate("+width/2.08+",45)";
+			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width/1.9+",70)";
+			else return "translate("+width/2.08+",70)";
 		});
 
 	focus.selectAll(".trendline")
@@ -605,8 +603,8 @@ function zoomed() {
 			else return d3.timeFormat("%b %d, %Y")(x.domain()[0])+" - "+d3.timeFormat("%b %d, %Y")(x.domain()[1]);
 		})
 		.attr("transform", function(){
-			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width/1.9+",45)";
-			else return "translate("+width/2.08+",45)";
+			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width/1.9+",70)";
+			else return "translate("+width/2.08+",70)";
 		});
 
 	volumes.selectAll(".bar")
@@ -639,25 +637,25 @@ var dataOverlay = svg.append("g")
 dataOverlay.append("text")
   .attr("id", "text-open")
   .attr("x", 200)
-  .attr("y", 50)
+  .attr("y", 30)
   .attr("dy", ".35em")
 
 dataOverlay.append("text")
   .attr("id", "text-high")
   .attr("x", 300)
-  .attr("y", 50)
+  .attr("y", 30)
   .attr("dy", ".35em")
 
 dataOverlay.append("text")
   .attr("id", "text-low")
   .attr("x", 375)
-  .attr("y", 50)
+  .attr("y", 30)
   .attr("dy", ".35em")
 
 dataOverlay.append("text")
   .attr("id", "text-average")
   .attr("x", 450)  
-  .attr("y", 50)
+  .attr("y", 30)
   .attr("dy", ".35em")
 
 var lastGet = 0;
