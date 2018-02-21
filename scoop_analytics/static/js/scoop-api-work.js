@@ -99,38 +99,7 @@ var googleapi = {
                     }
                 }
 
-                d3.select(".focus").selectAll("*").remove();
-			    d3.select(".context").selectAll("*").remove();
-			    d3.select(".volume").selectAll("*").remove();
-
-			    d3.select(".x.axis-label").remove();
-			    d3.select(".y.axis-label").remove();
-			    d3.select(".gridline.x").remove();
-			    d3.select(".gridline.y").remove();    
-			    d3.select(".market.market-by-val").remove();
-			    d3.select(".market.market-by-percent").remove();
-			    d3.select(".market.market-current").remove();
-			    d3.select(".market-labels.market-label-change").remove();
-			    d3.select(".market-labels.market-label-current").remove();
-			    d3.select(".lastupdated").remove();
-
-			    console.log(data_prices);
-
-			    x.domain([d3.min(data_prices, function(d){
-					    	var time = timeParser(d.timestamp);
-							return time;
-						}), d3.max(data_prices, function(d){
-					    	var time = timeParser(d.timestamp);
-							return time;
-						})]);
-
-			    y.domain([d3.min(data_prices, function(d) { return d.close; }), d3.max(data_prices, function(d) { return d.close; })]).nice()
-
-			    x2.domain(x.domain());
-			    y2.domain(y.domain());
-
-			    x3.domain(x.domain());
-				y3.domain([d3.min(data_prices, function(d) { return d.volume; }), d3.max(data_prices, function(d) { return d.volume; })]).nice();
+                resetGraph();
 			    
 			    plot.call(focus, {
 					data_prices: data_prices,
