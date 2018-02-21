@@ -49,7 +49,7 @@ body,html{
 }
 #text-open, #text-high, #text-low, #text-average, .lastupdated {
 	fill: #888a91;
-	font-size:70%;
+	font-size:75%;
 	font-weight: none;
 }
 .gridline path,

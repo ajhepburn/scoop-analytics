@@ -131,7 +131,7 @@ def main():
 
 @socketio.on('my event')
 def handle_my_custom_event(json):
-	# json['track'] = 'dog'
+	json['track'] = 'vodka'
 	r = api.request('statuses/filter', json)
 	for item in r.get_iterator():
 		if 'text' in item:
