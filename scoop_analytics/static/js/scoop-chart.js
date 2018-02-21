@@ -32,21 +32,21 @@ var w = 900,
 	height3 = h - margin3.top - margin3.bottom;
 
 var zoom = d3.zoom()
-	.scaleExtent([1, Infinity])
-	.translateExtent([[0, 0], [width, height]])
-	.extent([[0, 0], [width, height]])
-	.on("zoom", zoomed);
+    .scaleExtent([1, Infinity])
+    .translateExtent([[0, 0], [width, height]])
+    .extent([[0, 0], [width, height]])
+    .on("zoom", zoomed);
 
 var svg = d3.select("#bs-center-div").append("svg")
-			.attr("id", "chart")
+        	.attr("id", "chart")
 			.attr("width", w)
 			.attr("height", h);
 
 svg.append("defs").append("clipPath")
-	.attr("id", "clip")
-	.append("rect")
-	.attr("width", width)
-	.attr("height", height);
+    .attr("id", "clip")
+  	.append("rect")
+    .attr("width", width)
+    .attr("height", height);
 
 var focus = svg.append("g")
 			.classed("focus", true)
@@ -54,8 +54,8 @@ var focus = svg.append("g")
 			.call(zoom);
 
 var volumes = svg.append('g')
-				.attr('class', 'volume')
-				.attr('transform', 'translate(' + margin2.left + ',' + margin2.top + ')');
+			    .attr('class', 'volume')
+			    .attr('transform', 'translate(' + margin2.left + ',' + margin2.top + ')');
 
 var context = svg.append("g")
 				.classed("context", true)
@@ -66,10 +66,10 @@ var timeParser = d3.timeParse("%s");
 
 var x = d3.scaleTime()
 		.domain([d3.min(data_prices, function(d){
-				var time = timeParser(d.timestamp);
+		    	var time = timeParser(d.timestamp);
 				return time;
 			}), d3.max(data_prices, function(d){
-				var time = timeParser(d.timestamp);
+		    	var time = timeParser(d.timestamp);
 				return time;
 			})])
 		.range([0,width]),
@@ -87,22 +87,22 @@ x3.domain(x.domain());
 y3.domain([d3.min(data_prices, function(d) { return d.volume; }), d3.max(data_prices, function(d) { return d.volume; })]).nice();
 
 var formatMillisecond = d3.timeFormat(".%L"),
-	formatSecond = d3.timeFormat(":%S"),
-	formatMinute = d3.timeFormat("%H:%M"),
-	formatHour = d3.timeFormat("%H:%M"),
-	formatDay = d3.timeFormat("%a %d"),
-	formatWeek = d3.timeFormat("%b %d"),
-	formatMonth = d3.timeFormat("%B"),
-	formatYear = d3.timeFormat("%Y");
+    formatSecond = d3.timeFormat(":%S"),
+    formatMinute = d3.timeFormat("%H:%M"),
+    formatHour = d3.timeFormat("%H:%M"),
+    formatDay = d3.timeFormat("%a %d"),
+    formatWeek = d3.timeFormat("%b %d"),
+    formatMonth = d3.timeFormat("%B"),
+    formatYear = d3.timeFormat("%Y");
 
 function multiFormat(date) {
   return (d3.timeSecond(date) < date ? formatMillisecond
-	: d3.timeMinute(date) < date ? formatSecond
-	: d3.timeHour(date) < date ? formatMinute
-	: d3.timeDay(date) < date ? formatHour
-	: d3.timeMonth(date) < date ? (d3.timeWeek(date) < date ? formatDay : formatWeek)
-	: d3.timeYear(date) < date ? formatMonth
-	: formatYear)(date);
+    : d3.timeMinute(date) < date ? formatSecond
+    : d3.timeHour(date) < date ? formatMinute
+    : d3.timeDay(date) < date ? formatHour
+    : d3.timeMonth(date) < date ? (d3.timeWeek(date) < date ? formatDay : formatWeek)
+    : d3.timeYear(date) < date ? formatMonth
+    : formatYear)(date);
 }
 
 var xAxis = d3.axisBottom(x)
@@ -113,8 +113,8 @@ var xAxis = d3.axisBottom(x)
 
 
 var brush = d3.brushX()
-	.extent([[0, 0], [width, height2]])
-	.on("brush", brushed);
+    .extent([[0, 0], [width, height2]])
+    .on("brush", brushed);
 
 var colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -200,8 +200,7 @@ function drawStatic(params){
 		d3.select("#chart")
 			.append("text")
 			.classed("x axis-label",true)
-			.attr("transform", "translate("+width/1.65+","+height*1.35+")")
-			// .text("Time");
+			.attr("transform", "translate("+width/2.08+",45)")
 			.text("");
 		d3.select("#chart")
 			.append("text")
@@ -287,7 +286,6 @@ function plot(params){
 				return d;
 			})
 			.classed("priceContext", true);
-
 	this.selectAll(".legend")
 		.data(prices)
 		.enter()
@@ -305,8 +303,8 @@ function plot(params){
 		})
 		.attr("width", 10)
 		.attr("height", 10);
-	this.selectAll(".legend")
-		.append("text")
+  	this.selectAll(".legend")
+  		.append("text")
 		.attr("x", width+38)
 		.attr("y", function(d,i){
 			return (i*20)+9;
@@ -316,18 +314,18 @@ function plot(params){
 		});
 
 	var overlay = focus.append("rect")
-			  .attr("class", "overlay")
-			  .attr("width", width)
-			  .attr("height", height)
-			  .attr("opacity", "0")
-			  .on("mouseover", function() { dataOverlay.style("display", null); })
+		      .attr("class", "overlay")
+		      .attr("width", width)
+		      .attr("height", height)
+		      .attr("opacity", "0")
+              .on("mouseover", function() { dataOverlay.style("display", null); })
 			  .on("mouseout", function() { 
-				hoverLineX.style("opacity", 1e-6); 
-				hoverLineY.style("opacity", 1e-6); 
-				dataOverlay.style("display", "none"); 
-				d3.selectAll(".market-labels").style("opacity", 0);
-				d3.selectAll(".market-current").style("opacity", 0);
-				d3.selectAll(".market-by-percent").style("opacity", 0);
+			  	hoverLineX.style("opacity", 1e-6); 
+			  	hoverLineY.style("opacity", 1e-6); 
+			  	dataOverlay.style("display", "none"); 
+			  	d3.selectAll(".market-labels").style("opacity", 0);
+			  	d3.selectAll(".market-current").style("opacity", 0);
+			  	d3.selectAll(".market-by-percent").style("opacity", 0);
 			  })
 			  .on("mousemove", mousemove);
 
@@ -564,6 +562,15 @@ function brushed() {
 	var selection = d3.event.selection;
 	init_brush = selection;
 	x.domain(selection.map(x2.invert, x2));
+	d3.select(".x.axis-label")
+		.text(function(){
+			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return d3.timeFormat("%b %d, %Y")(x.domain()[0]);
+			else return d3.timeFormat("%b %d, %Y")(x.domain()[0])+" - "+d3.timeFormat("%b %d, %Y")(x.domain()[1]);
+		})
+		.attr("transform", function(){
+			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width/1.9+",45)";
+			else return "translate("+width/2.08+",45)";
+		});
 
 	focus.selectAll(".trendline")
 		.attr("d", function(d){
@@ -584,14 +591,24 @@ function brushed() {
 		});
 	focus.select(".axis.x").call(xAxis);
 	d3.select(".focus").call(zoom.transform, d3.zoomIdentity
-		.scale(width / (selection[1] - selection[0]))
-		.translate(-selection[0], 0));
+	 	.scale(width / (selection[1] - selection[0]))
+	 	.translate(-selection[0], 0));
 }
 
 function zoomed() {
 	if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return;
 	var t = d3.event.transform;
 	x.domain(t.rescaleX(x2).domain());
+	d3.select(".x.axis-label")
+		.text(function(){
+			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return d3.timeFormat("%b %d, %Y")(x.domain()[0]);
+			else return d3.timeFormat("%b %d, %Y")(x.domain()[0])+" - "+d3.timeFormat("%b %d, %Y")(x.domain()[1]);
+		})
+		.attr("transform", function(){
+			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width/1.9+",45)";
+			else return "translate("+width/2.08+",45)";
+		});
+
 	volumes.selectAll(".bar")
 	.attr("x", function(d) { 
 		var time = timeParser(d.timestamp);
@@ -650,14 +667,14 @@ function mousemove() {
 	var timeParser = d3.timeParse("%s");
 	var timestamp_parse = function(d){var time = timeParser(d.timestamp);return time;}
 	var bisectDate = d3.bisector(function(d) { var time = timeParser(d.timestamp); return time; }).left,
-		formatValue = d3.format(",.2f"),
-		formatCurrency = function(d) { return "$" + formatValue(d); };
+	    formatValue = d3.format(",.2f"),
+	    formatCurrency = function(d) { return "$" + formatValue(d); };
 
 	var x0 = x.invert(d3.mouse(this)[0]),
-		i = bisectDate(data_prices, x0, 1),
-		d0 = data_prices[i - 1],
-		d1 = data_prices[i],
-		d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0;
+	    i = bisectDate(data_prices, x0, 1),
+	    d0 = data_prices[i - 1],
+	    d1 = data_prices[i],
+	    d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0;
 	dataOverlay.attr("transform", "translate(10,15)");
 	// dataOverlay.attr("transform", "translate(" + x(timestamp_parse(d.timestamp)) + "," + y(d.open) + ")");
 	// dataOverlay.select("#text-open").text("Close: "+formatCurrency(d.close));
@@ -742,8 +759,8 @@ function mousemove() {
 
 	if(Date.now() - lastGet > 1000) {
 		twitterapi.fetch().getTweets(tweet_arr, tweet_urls[0], tweet_urls[1])
-		lastGet = Date.now();
-	}
+        lastGet = Date.now();
+    }
 }
 
 $(".overlay").hover(function(){}, function(){
@@ -758,34 +775,34 @@ setTimeout(function(){clearInterval(clearPanel);},1000);
 });
 
 function resetGraph() {
-	d3.select(".focus").selectAll("*").remove();
-	d3.select(".context").selectAll("*").remove();
-	d3.select(".volume").selectAll("*").remove();
+    d3.select(".focus").selectAll("*").remove();
+    d3.select(".context").selectAll("*").remove();
+    d3.select(".volume").selectAll("*").remove();
 
-	d3.select(".x.axis-label").remove();
-	d3.select(".y.axis-label").remove();
-	d3.select(".gridline.x").remove();
-	d3.select(".gridline.y").remove();    
-	d3.select(".market.market-by-val").remove();
-	d3.select(".market.market-by-percent").remove();
-	d3.select(".market.market-current").remove();
-	d3.select(".market-labels.market-label-change").remove();
-	d3.select(".market-labels.market-label-current").remove();
-	d3.select(".lastupdated").remove();
+    d3.select(".x.axis-label").remove();
+    d3.select(".y.axis-label").remove();
+    d3.select(".gridline.x").remove();
+    d3.select(".gridline.y").remove();    
+    d3.select(".market.market-by-val").remove();
+    d3.select(".market.market-by-percent").remove();
+    d3.select(".market.market-current").remove();
+    d3.select(".market-labels.market-label-change").remove();
+    d3.select(".market-labels.market-label-current").remove();
+    d3.select(".lastupdated").remove();
 
-	x.domain([d3.min(data_prices, function(d){
-				var time = timeParser(d.timestamp);
+    x.domain([d3.min(data_prices, function(d){
+		    	var time = timeParser(d.timestamp);
 				return time;
 			}), d3.max(data_prices, function(d){
-				var time = timeParser(d.timestamp);
+		    	var time = timeParser(d.timestamp);
 				return time;
 			})]);
 
-	y.domain([d3.min(data_prices, function(d) { return d.close; }), d3.max(data_prices, function(d) { return d.close; })]).nice()
+    y.domain([d3.min(data_prices, function(d) { return d.close; }), d3.max(data_prices, function(d) { return d.close; })]).nice()
 
-	x2.domain(x.domain());
-	y2.domain(y.domain());
+    x2.domain(x.domain());
+    y2.domain(y.domain());
 
-	x3.domain(x.domain());
+    x3.domain(x.domain());
 	y3.domain([d3.min(data_prices, function(d) { return d.volume; }), d3.max(data_prices, function(d) { return d.volume; })]).nice();
 }
