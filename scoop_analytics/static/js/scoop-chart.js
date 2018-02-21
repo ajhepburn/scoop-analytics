@@ -63,11 +63,6 @@ var context = svg.append("g")
 
 var timeParser = d3.timeParse("%s");
 
-var maxVal = d3.max(data_prices, function(d) { return d.close; }),
-	minVal = d3.min(data_prices, function(d) { return d.close; });
-var barMaxVal = d3.max(data_prices, function(d) { return d.volume; }),
-	barMinVal = d3.min(data_prices, function(d) { return d.volume; });
-
 
 var x = d3.scaleTime()
 		.domain([d3.min(data_prices, function(d){
@@ -79,7 +74,7 @@ var x = d3.scaleTime()
 			})])
 		.range([0,width]),
 	y = d3.scaleLinear()
-		.domain([minVal, maxVal]).nice()
+		.domain([d3.min(data_prices, function(d) { return d.close; }), d3.max(data_prices, function(d) { return d.close; })]).nice()
 		.range([height, 0]),
 	x2 = d3.scaleTime().range([0,width])
 		.domain(x.domain()),
@@ -89,7 +84,7 @@ var x = d3.scaleTime()
 	y3 = d3.scaleLinear().range([height2, 0]);
 
 x3.domain(x.domain());
-y3.domain([barMinVal, barMaxVal]).nice();
+y3.domain([d3.min(data_prices, function(d) { return d.volume; }), d3.max(data_prices, function(d) { return d.volume; })]).nice();
 
 var formatMillisecond = d3.timeFormat(".%L"),
     formatSecond = d3.timeFormat(":%S"),
