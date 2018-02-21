@@ -42,12 +42,12 @@ body,html{
 .axis text{
 	fill: #888a91;
 }
-.axis-label{
+.axis-label.y{
 	text-anchor:middle;
 	fill: #888a91;
 	font-size:90%;
 }
-#text-open, #text-high, #text-low, #text-average, .lastupdated {
+#text-open, #text-high, #text-low, #text-average, .axis-label.x, .lastupdated {
 	fill: #888a91;
 	font-size:75%;
 	font-weight: none;
