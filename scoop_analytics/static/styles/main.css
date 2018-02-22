@@ -276,9 +276,11 @@ text.panel-tweet-header-text {
 	font-weight: bold;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
 	fill: #84c283;
+	font-size:80%;
 }
 .market-labels {
 	font-size:100%;
+	font-weight: bold;
 }
 .market-by-val {
 	font-size:120%;

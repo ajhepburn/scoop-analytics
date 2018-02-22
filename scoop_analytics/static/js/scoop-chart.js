@@ -206,44 +206,53 @@ function drawStatic(params){
 			.text("");
 		var marketData = d3.select("#chart")
 						.append("g")
-						.attr("transform", "translate("+width/7+",75)")
+						.attr("transform", "translate("+width/8+",75)")
 						.classed("m-data", true);
 		/*marketData.append("text")
 				.classed("market market-by-percent", true)
 				.attr("transform", "translate(0,-20)")
 				.text("");*/
-		marketData.append("text")
+		var dataRange = ['current','high', 'low', 'avg'];
+		for(var i=0; i<dataRange.length; i++){
+			var txt = dataRange[i];
+			marketData.append("text")
+						.classed("market market-"+dataRange[i],true)
+						.attr("transform", "translate("+(45*i)+",0)");
+		}
+		/*marketData.append("text")
 				.classed("market market-current", true)
 				.attr("transform", "translate(0,0)")
 				.text("");
 		marketData.append("text")
 				.classed("market market-high", true)
-				.attr("transform", "translate(65,0)")
+				.attr("transform", "translate(45,0)")
 				.text("");
 		marketData.append("text")
 				.classed("market market-low", true)
-				.attr("transform", "translate(130,0)")
+				.attr("transform", "translate(90,0)")
 				.text("");
 		marketData.append("text")
 				.classed("market market-avg", true)
-				.attr("transform", "translate(190,0)")
-				.text("");
+				.attr("transform", "translate(185,0)")
+				.text("");*/
 
 		var marketLabels = d3.select("#chart")
 							.append("g")
-							.attr("transform", "translate("+width/8.5+",75)")
+							.attr("transform", "translate("+width/9+",75)")
 							.classed("m-labels", true);
-		var labelRange = ['C:', 'H:', 'L:', 'A:'];
+
+		var labelRange = ['C', 'H', 'L', 'A'];
 		for(var i=0; i<labelRange.length; i++){
 			var txt = labelRange[i];
 			marketLabels.append("text")
-						.classed("market-labels market-"+labelRange[i].slice(0,1),true)
-						.text(txt)
+						.classed("market-labels market-"+labelRange[i],true)
+						.attr("transform", "translate("+(45*i)+",0)")
+						.text(txt);
 		}
-		d3.select(".market-C").attr("transform", "translate(0,0)");
-		d3.select(".market-H").attr("transform", "translate(65,0)");
-		d3.select(".market-L").attr("transform", "translate(130,0)");
-		d3.select(".market-A").attr("transform", "translate(190,0)");
+		/*d3.select(".market-C").attr("transform", "translate(0,0)");
+		d3.select(".market-H").attr("transform", "translate(45,0)");
+		d3.select(".market-L").attr("transform", "translate(90,0)");
+		d3.select(".market-A").attr("transform", "translate(135,0)");*/
 		d3.select("#chart")
 			.append("text")
 			.classed("lastupdated", true)
