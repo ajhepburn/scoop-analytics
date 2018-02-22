@@ -298,9 +298,15 @@ text.panel-tweet-header-text {
 	stroke: steelblue;
 }
 .lineTrackA circle{
-	stroke: pink;
+	stroke: palevioletred;
 }
 .lineTrackC text, .lineTrackA text {
 	font-size: 75%;
-	fill: #585858;
+	/*fill: #585858;*/
+}
+.lineTrackC text{
+	fill: steelblue;
+}
+.lineTrackA text{
+	fill: palevioletred;
 }
