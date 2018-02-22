@@ -163,7 +163,6 @@ var areaCtx = d3.area()
 			})
 			.curve(d3.curveLinear);
 
-
 function drawStatic(params){
 	if(params.initialise){
 		this.append("g")
@@ -205,26 +204,46 @@ function drawStatic(params){
 			.classed("market market-by-val", true)
 			.attr("transform", "translate("+width/4.08+",30)")
 			.text("");
-		d3.select("#chart")
-			.append("text")
-			.classed("market market-by-percent", true)
-			.attr("transform", "translate("+width/4.15+",50)")
-			.text("");
-		d3.select("#chart")
-			.append("text")
-			.classed("market market-current", true)
-			.attr("transform", "translate("+width/1.15+",45)")
-			.text("");
-		d3.select("#chart")
-			.append("text")
-			.classed("market-labels market-label-change", true)
-			.attr("transform", "translate("+width/4.30+",70)")
-			.text("Market Change");
-		d3.select("#chart")
-			.append("text")
-			.classed("market-labels market-label-current", true)
-			.attr("transform", "translate("+width/1.16+",70)")
-			.text("Market Value");
+		var marketData = d3.select("#chart")
+						.append("g")
+						.attr("transform", "translate("+width/7+",75)")
+						.classed("m-data", true);
+		/*marketData.append("text")
+				.classed("market market-by-percent", true)
+				.attr("transform", "translate(0,-20)")
+				.text("");*/
+		marketData.append("text")
+				.classed("market market-current", true)
+				.attr("transform", "translate(0,0)")
+				.text("");
+		marketData.append("text")
+				.classed("market market-high", true)
+				.attr("transform", "translate(65,0)")
+				.text("");
+		marketData.append("text")
+				.classed("market market-low", true)
+				.attr("transform", "translate(130,0)")
+				.text("");
+		marketData.append("text")
+				.classed("market market-avg", true)
+				.attr("transform", "translate(190,0)")
+				.text("");
+
+		var marketLabels = d3.select("#chart")
+							.append("g")
+							.attr("transform", "translate("+width/8.5+",75)")
+							.classed("m-labels", true);
+		var labelRange = ['C:', 'H:', 'L:', 'A:'];
+		for(var i=0; i<labelRange.length; i++){
+			var txt = labelRange[i];
+			marketLabels.append("text")
+						.classed("market-labels market-"+labelRange[i].slice(0,1),true)
+						.text(txt)
+		}
+		d3.select(".market-C").attr("transform", "translate(0,0)");
+		d3.select(".market-H").attr("transform", "translate(65,0)");
+		d3.select(".market-L").attr("transform", "translate(130,0)");
+		d3.select(".market-A").attr("transform", "translate(190,0)");
 		d3.select("#chart")
 			.append("text")
 			.classed("lastupdated", true)
@@ -242,9 +261,8 @@ function plot(params){
 	var prices = d3.keys(params.data_prices[0]).filter(function(d){
 		return d == "close" || d == "high" || d == "low" || d=="average";
 	});
-
+	
 	// enter()
-
 	volumes.selectAll(".bar")
 	.data(params.data_prices)
 	.enter()
@@ -316,14 +334,14 @@ function plot(params){
 		      .attr("width", width)
 		      .attr("height", height)
 		      .attr("opacity", "0")
-              .on("mouseover", function() { dataOverlay.style("display", null); })
+		      .on("mouseover", function(){ lineTrackC.style("display", null); lineTrackA.style("display", null); })
 			  .on("mouseout", function() { 
 			  	hoverLineX.style("opacity", 1e-6); 
 			  	hoverLineY.style("opacity", 1e-6); 
-			  	dataOverlay.style("display", "none"); 
 			  	d3.selectAll(".market-labels").style("opacity", 0);
-			  	d3.selectAll(".market-current").style("opacity", 0);
-			  	d3.selectAll(".market-by-percent").style("opacity", 0);
+			  	d3.selectAll(".market").style("opacity", 0);
+			  	lineTrackC.style("display", "none");
+			  	lineTrackA.style("display", "none");
 			  })
 			  .on("mousemove", mousemove);
 
@@ -528,6 +546,28 @@ function plot(params){
 		.attr("class", "vol-tooltip")
 		.classed("vol-tooltip", true);
 
+	var lineTrackC = focus.append("g")
+		.attr("class", "lineTrackC")
+		.style("display", "none");
+
+	var lineTrackA = focus.append("g")
+		.attr("class", "lineTrackA")
+		.style("display", "none");
+
+	lineTrackC.append("circle")
+		.attr("r", 4.5);
+
+	lineTrackC.append("text")
+		.attr("x", 9)
+		.attr("dy", ".35em");
+
+	lineTrackA.append("circle")
+		.attr("r", 4.5);
+
+	lineTrackA.append("text")
+		.attr("x", 9)
+		.attr("dy", ".35em");
+
 }
 plot.call(focus, {
 	data_prices: data_prices,
@@ -566,8 +606,8 @@ function brushed() {
 			else return d3.timeFormat("%b %d, %Y")(x.domain()[0])+" - "+d3.timeFormat("%b %d, %Y")(x.domain()[1]);
 		})
 		.attr("transform", function(){
-			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width/1.9+",70)";
-			else return "translate("+width/2.08+",70)";
+			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width+",70)";
+			else return "translate("+(width-70)+",70)";
 		});
 
 	focus.selectAll(".trendline")
@@ -603,8 +643,8 @@ function zoomed() {
 			else return d3.timeFormat("%b %d, %Y")(x.domain()[0])+" - "+d3.timeFormat("%b %d, %Y")(x.domain()[1]);
 		})
 		.attr("transform", function(){
-			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width/1.9+",70)";
-			else return "translate("+width/2.08+",70)";
+			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width+",70)";
+			else return "translate("+(width-70)+",70)";
 		});
 
 	volumes.selectAll(".bar")
@@ -630,34 +670,6 @@ function zoomed() {
 	context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
 }
 
-var dataOverlay = svg.append("g")
-  .attr("class", "data-overlay")
-  .style("display", "none");
-
-dataOverlay.append("text")
-  .attr("id", "text-open")
-  .attr("x", 200)
-  .attr("y", 30)
-  .attr("dy", ".35em")
-
-dataOverlay.append("text")
-  .attr("id", "text-high")
-  .attr("x", 300)
-  .attr("y", 30)
-  .attr("dy", ".35em")
-
-dataOverlay.append("text")
-  .attr("id", "text-low")
-  .attr("x", 375)
-  .attr("y", 30)
-  .attr("dy", ".35em")
-
-dataOverlay.append("text")
-  .attr("id", "text-average")
-  .attr("x", 450)  
-  .attr("y", 30)
-  .attr("dy", ".35em")
-
 var lastGet = 0;
 var lastRemove = 0;
 
@@ -673,27 +685,60 @@ function mousemove() {
 	    d0 = data_prices[i - 1],
 	    d1 = data_prices[i],
 	    d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0;
-	dataOverlay.attr("transform", "translate(10,15)");
-	// dataOverlay.attr("transform", "translate(" + x(timestamp_parse(d.timestamp)) + "," + y(d.open) + ")");
-	// dataOverlay.select("#text-open").text("Close: "+formatCurrency(d.close));
-	dataOverlay.select("#text-high").text("High: "+formatCurrency(d.high));
-	dataOverlay.select("#text-low").text("Low: "+formatCurrency(d.low));
-	dataOverlay.select("#text-average").text("Avg: "+formatCurrency(d.average));
+
+	d3.select(".lineTrackC").attr("transform", "translate(" + x(timeParser(d.timestamp)) + "," + y(d.close) + ")");
+	d3.select(".lineTrackA").attr("transform", "translate(" + x(timeParser(d.timestamp)) + "," + y(d.average) + ")");
+    d3.select(".lineTrackC").select("text").text(formatCurrency(d.close));
+    d3.select(".lineTrackA").select("text").text(formatCurrency(d.average));
 
 	var xpos = d3.mouse(this)[0];
 	var ypos = d3.mouse(this)[1];
-	d3.select("#hover-line-x").attr("x1", xpos-3).attr("x2", xpos-3).style("opacity", 1);
-	d3.select("#hover-line-y").attr("y1", ypos-3).attr("y2", ypos-3).style("opacity", 1);
+	d3.select("#hover-line-x").attr("x1", xpos-4).attr("x2", xpos-4).style("opacity", 1);
+	d3.select("#hover-line-y").attr("y1", ypos-4).attr("y2", ypos-4).style("opacity", 1);
 
+	function fill(key){
+		var index = data_prices.findIndex(x => x.timestamp==d.timestamp);
+		if (index==0) return;
+		var val = (d[key] - data_prices[index-1][key]).toFixed(2);
+
+		if(val>0) return "#84c283";
+		else return "#ff7575";
+	}
 
 	d3.selectAll(".market-labels")
 		.style("opacity", 1);
 	d3.selectAll(".market-current")
 		.style("opacity", 1)
-		.transition()
 		.text(function(){
-			return "$"+d.close.toFixed(2);
-		});
+			if(market=="NASDAQ") return "$"+d.close.toFixed(2);
+			if(market=="LON") return "£"+d.close.toFixed(2);
+			return d.close.toFixed(2);
+		})
+		.style("fill", fill('close'));
+	d3.selectAll(".market-high")
+		.style("opacity", 1)
+		.text(function(){
+			if(market=="NASDAQ") return "$"+d.high.toFixed(2);
+			if(market=="LON") return "£"+d.high.toFixed(2);
+			return d.high.toFixed(2);
+		})
+		.style("fill", fill('high'));
+	d3.selectAll(".market-low")
+		.style("opacity", 1)
+		.text(function(){
+			if(market=="NASDAQ") return "$"+d.low.toFixed(2);
+			if(market=="LON") return "£"+d.low.toFixed(2);
+			return d.low.toFixed(2);
+		})
+		.style("fill", fill('low'));
+	d3.selectAll(".market-avg")
+		.style("opacity", 1)
+		.text(function(){
+			if(market=="NASDAQ") return "$"+d.average.toFixed(2);
+			if(market=="LON") return "£"+d.average.toFixed(2);
+			return d.average.toFixed(2);
+		})
+		.style("fill", fill('average'));
 	/*d3.selectAll(".market-by-val")
 		.transition().delay(50)
 		.style("opacity", 1)
@@ -716,7 +761,6 @@ function mousemove() {
 		});*/
 	d3.selectAll(".market-by-percent")
 		.style("opacity", 1)
-		.transition()
 		.text(function(){
 			var index = data_prices.findIndex(x => x.timestamp==d.timestamp);
 			if (index==0) return;
@@ -777,15 +821,10 @@ function resetGraph() {
     d3.select(".context").selectAll("*").remove();
     d3.select(".volume").selectAll("*").remove();
 
-    d3.select(".x.axis-label").remove();
-    d3.select(".y.axis-label").remove();
-    d3.select(".gridline.x").remove();
-    d3.select(".gridline.y").remove();    
-    d3.select(".market.market-by-val").remove();
-    d3.select(".market.market-by-percent").remove();
-    d3.select(".market.market-current").remove();
-    d3.select(".market-labels.market-label-change").remove();
-    d3.select(".market-labels.market-label-current").remove();
+    d3.selectAll(".axis-label").remove();
+    d3.selectAll(".gridline").remove();
+    d3.selectAll(".market").remove();
+    d3.selectAll(".market-labels").remove();
     d3.select(".lastupdated").remove();
 
     x.domain([d3.min(data_prices, function(d){

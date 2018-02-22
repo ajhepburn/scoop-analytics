@@ -277,17 +277,28 @@ text.panel-tweet-header-text {
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
 	fill: #84c283;
 }
-.market-current {
-	font-size:150%;
+.market-labels {
+	font-size:100%;
 }
 .market-by-val {
 	font-size:120%;
-}
-.market-by-percent {
-	font-size: 130%
 }
 .market-labels {
 	opacity: 0;
 	font-size:80%;
 	fill: #888a91;
+}
+
+.lineTrackC circle, .lineTrackA circle {
+  fill: none;
+}
+.lineTrackC circle{
+	stroke: steelblue;
+}
+.lineTrackA circle{
+	stroke: pink;
+}
+.lineTrackC text, .lineTrackA text {
+	font-size: 75%;
+	fill: #585858;
 }
