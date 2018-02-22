@@ -212,7 +212,7 @@ function drawStatic(params){
 				.classed("market market-by-percent", true)
 				.attr("transform", "translate(0,-20)")
 				.text("");*/
-		var dataRange = ['current','high', 'low', 'avg'];
+		var dataRange = ['current','high', 'low', 'avg', 'vol'];
 		for(var i=0; i<dataRange.length; i++){
 			var txt = dataRange[i];
 			marketData.append("text")
@@ -241,7 +241,7 @@ function drawStatic(params){
 							.attr("transform", "translate("+width/9+",75)")
 							.classed("m-labels", true);
 
-		var labelRange = ['C', 'H', 'L', 'A'];
+		var labelRange = ['C', 'H', 'L', 'A', 'V'];
 		for(var i=0; i<labelRange.length; i++){
 			var txt = labelRange[i];
 			marketLabels.append("text")
@@ -256,7 +256,7 @@ function drawStatic(params){
 		d3.select("#chart")
 			.append("text")
 			.classed("lastupdated", true)
-			.attr("transform", "translate(50,25)")
+			.attr("transform", "translate("+width/9+",25)")
 			.text(function(){
 				var lastUpdated = String(timeParser(data_prices[data_prices.length-1].timestamp)).slice(0,-15);
 				return "Last updated: "+lastUpdated;
@@ -615,8 +615,8 @@ function brushed() {
 			else return d3.timeFormat("%b %d, %Y")(x.domain()[0])+" - "+d3.timeFormat("%b %d, %Y")(x.domain()[1]);
 		})
 		.attr("transform", function(){
-			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width+",70)";
-			else return "translate("+(width-70)+",70)";
+			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width+",75)";
+			else return "translate("+(width-70)+",75)";
 		});
 
 	focus.selectAll(".trendline")
@@ -652,8 +652,8 @@ function zoomed() {
 			else return d3.timeFormat("%b %d, %Y")(x.domain()[0])+" - "+d3.timeFormat("%b %d, %Y")(x.domain()[1]);
 		})
 		.attr("transform", function(){
-			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width+",70)";
-			else return "translate("+(width-70)+",70)";
+			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width+",75)";
+			else return "translate("+(width-70)+",75)";
 		});
 
 	volumes.selectAll(".bar")
@@ -746,6 +746,12 @@ function mousemove() {
 			if(market=="NASDAQ") return "$"+d.average.toFixed(2);
 			if(market=="LON") return "£"+d.average.toFixed(2);
 			return d.average.toFixed(2);
+		})
+		.style("fill", fill('average'));
+	d3.selectAll(".market-vol")
+		.style("opacity", 1)
+		.text(function(){
+			return String(d.volume).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 		})
 		.style("fill", fill('average'));
 	/*d3.selectAll(".market-by-val")
