@@ -114,7 +114,7 @@ def main():
 	scraper('NASDAQ', 'HMNY')
 	prices_result = db.engine.execute("SELECT symbol, timestamp, open, close, high, low, volume FROM share_prices WHERE (close >= 1.025 * open) AND volume <> 0 AND symbol LIKE 'HMNY';")
 	docs_result = db.engine.execute("SELECT * FROM documents, jsonb_array_elements(data->'entities'->'symbols') where value->>'text' in ('HMNY');")
-	gprices_result = db.engine.execute("SELECT * FROM google_prices ORDER BY timestamp desc LIMIT 40;")
+	gprices_result = db.engine.execute("SELECT * FROM google_prices ORDER BY timestamp desc LIMIT 1000;")
 	# docs_result = db.engine.execute("SELECT DISTINCT data->'id' as tweet_id, data->'text' as tweet_text, data->'timestamp_s' as tweet_created, value as cashtag FROM documents, jsonb_array_elements(data->'entities'->'symbols') where value->>'text' in ('HMNY');")
 	
 	docs = json.dumps([dict(r) for r in docs_result])
