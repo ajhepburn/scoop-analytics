@@ -1,4 +1,4 @@
-/*function fifoQueue(){
+function fifoQueue(){
 	collection = [];
 	this.print = function() {
 	    console.log(collection);
@@ -77,7 +77,7 @@ $(document).ready(function() {
 	}
 
 	socket.on('my response', function(data){
-		if(q.size()<7) 
+		if(q.size()<8) 
 		{
 			q.enqueue(data['data']);
 			addStreamPanel(q.contents());
@@ -90,4 +90,4 @@ $(document).ready(function() {
 			addStreamPanel(q.contents());
 		}
 	});
-});*/
+});

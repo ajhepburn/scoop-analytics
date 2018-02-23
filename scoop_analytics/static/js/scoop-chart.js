@@ -89,12 +89,10 @@ x3.domain(x.domain());
 y3.domain([d3.min(data_prices, function(d) { return d.volume; }), d3.max(data_prices, function(d) { return d.volume; })]).nice();
 
 function setDiscontinuities(){
-
+	x.discontinuityProvider(fc.discontinuityRange.apply(this,discontinuityList));
+	x2.discontinuityProvider(fc.discontinuityRange.apply(this,discontinuityList));
 }
-
-x.discontinuityProvider(fc.discontinuityRange.apply(this,discontinuityList));
-x2.discontinuityProvider(fc.discontinuityRange.apply(this,discontinuityList));
-
+setDiscontinuities();
 /*var discCheck = setInterval(function(){
 	if(discontinuityList.length!=0){
 		x.discontinuityProvider(fc.discontinuityRange.apply(this,discontinuityList));
