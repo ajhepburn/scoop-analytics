@@ -100,6 +100,7 @@ var googleapi = {
                 }
 
                 resetGraph();
+                setDiscontinuities();
 			    
 			    plot.call(focus, {
 					data_prices: data_prices,

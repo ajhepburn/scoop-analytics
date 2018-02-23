@@ -63,6 +63,7 @@ var context = svg.append("g")
 
 var timeParser = d3.timeParse("%s");
 
+var discontinuityList = collectDiscontinuities();
 
 var x = fc.scaleDiscontinuous(d3.scaleTime())
 		.domain([d3.min(data_prices, function(d){
@@ -73,14 +74,12 @@ var x = fc.scaleDiscontinuous(d3.scaleTime())
 				return time;
 			})])
 		.range([0,width])
-		.discontinuityProvider(fc.discontinuitySkipWeekends()),
 	y = d3.scaleLinear()
 		.domain([d3.min(data_prices, function(d) { return d.close; }), d3.max(data_prices, function(d) { return d.close; })]).nice()
 		.range([height, 0]),
 	x2 = fc.scaleDiscontinuous(d3.scaleTime())
 		.range([0,width])
-		.domain(x.domain())
-		.discontinuityProvider(fc.discontinuityRange(fc.discontinuitySkipWeekends()));
+		.domain(x.domain()),
 	y2 = d3.scaleLinear().range([height2,0])
 		.domain(y.domain()),
 	x3 = d3.scaleBand().rangeRound([0, width]).padding(0.5),
@@ -88,6 +87,21 @@ var x = fc.scaleDiscontinuous(d3.scaleTime())
 
 x3.domain(x.domain());
 y3.domain([d3.min(data_prices, function(d) { return d.volume; }), d3.max(data_prices, function(d) { return d.volume; })]).nice();
+
+function setDiscontinuities(){
+
+}
+
+x.discontinuityProvider(fc.discontinuityRange.apply(this,discontinuityList));
+x2.discontinuityProvider(fc.discontinuityRange.apply(this,discontinuityList));
+
+/*var discCheck = setInterval(function(){
+	if(discontinuityList.length!=0){
+		x.discontinuityProvider(fc.discontinuityRange.apply(this,discontinuityList));
+		x2.discontinuityProvider(fc.discontinuityRange.apply(this,discontinuityList));
+		clearInterval(discCheck);
+	} else console.log("Error");
+},100);*/
 
 var formatMillisecond = d3.timeFormat(".%L"),
     formatSecond = d3.timeFormat(":%S"),
@@ -671,19 +685,21 @@ function plot(params){
 	drawRects.call(this, params);
 
 }
-plot.call(focus, {
-	data_prices: data_prices,
-	axis: {
-		x: xAxis,
-		y: yAxis,
-		x2: xAxis2
-	},
-	gridlines: {
-		x: xGridlines,
-		y: yGridlines,
-	},
-	initialise: true
-});
+setTimeout(function(){
+	plot.call(focus, {
+		data_prices: data_prices,
+		axis: {
+			x: xAxis,
+			y: yAxis,
+			x2: xAxis2
+		},
+		gridlines: {
+			x: xGridlines,
+			y: yGridlines,
+		},
+		initialise: true
+	});
+},1000);
 
 d3.select("#bs-right-div")
 	.append("div")
