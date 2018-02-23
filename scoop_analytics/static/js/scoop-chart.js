@@ -64,7 +64,7 @@ var context = svg.append("g")
 var timeParser = d3.timeParse("%s");
 
 
-var x = d3.scaleTime()
+var x = fc.scaleDiscontinuous(d3.scaleTime())
 		.domain([d3.min(data_prices, function(d){
 		    	var time = timeParser(d.timestamp);
 				return time;
@@ -72,12 +72,15 @@ var x = d3.scaleTime()
 		    	var time = timeParser(d.timestamp);
 				return time;
 			})])
-		.range([0,width]),
+		.range([0,width])
+		.discontinuityProvider(fc.discontinuitySkipWeekends()),
 	y = d3.scaleLinear()
 		.domain([d3.min(data_prices, function(d) { return d.close; }), d3.max(data_prices, function(d) { return d.close; })]).nice()
 		.range([height, 0]),
-	x2 = d3.scaleTime().range([0,width])
-		.domain(x.domain()),
+	x2 = fc.scaleDiscontinuous(d3.scaleTime())
+		.range([0,width])
+		.domain(x.domain())
+		.discontinuityProvider(fc.discontinuityRange(fc.discontinuitySkipWeekends()));
 	y2 = d3.scaleLinear().range([height2,0])
 		.domain(y.domain()),
 	x3 = d3.scaleBand().rangeRound([0, width]).padding(0.5),
