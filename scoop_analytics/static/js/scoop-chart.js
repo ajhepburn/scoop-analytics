@@ -163,6 +163,67 @@ var areaCtx = d3.area()
 			})
 			.curve(d3.curveLinear);
 
+function drawRects(params){
+	this.append("g")
+		.classed("axis y-layer-lastval", true)
+		.attr("transform", "translate(0,0)")
+		.attr("width", d3.select(".axis.y").node().getBBox().width)
+		.attr("height", d3.select(".axis.y").node().getBBox().height);
+
+	focus.select(".axis.y-layer-lastval").append("g").classed("rect-group-lastval",true).attr("transform", "translate(0,-10)");
+	d3.select(".rect-group-lastval")
+			.append("rect")
+			.attr("id", "lastval-rect")
+			.attr("width", 35)
+			.attr("height",19)
+			.attr("transform", "translate(-35,0)")
+			.attr("y",y(data_prices[data_prices.length-1].close));
+	d3.select(".rect-group-lastval")
+			.append("text")
+			.attr("id", "lastval-text")
+			.attr("transform", "translate(-32,0)")
+			.attr("y",y(data_prices[data_prices.length-1].close)+12)
+			.text(function(){
+				return data_prices[data_prices.length-1].close.toFixed(3);
+			});
+	d3.select(".rect-group-lastval")
+			.append("line")
+			.attr("id", "lastval-line")
+			.attr("x1", 0).attr("x2", width) 
+			.attr("y1", y(data_prices[data_prices.length-1].close)+9).attr("y2", y(data_prices[data_prices.length-1].close)+9); 
+
+	this.append("g")
+		.classed("axis y-layer", true)
+		.attr("transform", "translate(0,0)")
+		.attr("width", d3.select(".axis.y").node().getBBox().width)
+		.attr("height", d3.select(".axis.y").node().getBBox().height);
+
+	focus.select(".axis.x-layer").append("g").classed("hover-rect-group-x", true).style("display", "none");
+
+	d3.select(".hover-rect-group-x")
+		 .append("rect")
+		 .attr("id", "hover-rect-x")
+		 .attr("width", 40)
+		 .attr("height",19);
+	d3.select(".hover-rect-group-x")
+		.append("text")
+		.attr("id", "hover-text-x")
+		.style("text-anchor", "middle");
+
+	focus.select(".axis.y-layer").append("g").classed("hover-rect-group-y",true).style("display", "none");
+
+	d3.select(".hover-rect-group-y")
+		 .append("rect")
+		 .attr("id", "hover-rect-y")
+		 .attr("width", 35)
+		 .attr("height",19)
+		 .attr("transform", "translate(-35,0)");
+	d3.select(".hover-rect-group-y")
+		.append("text")
+		.attr("id", "hover-text-y");
+}
+
+
 function drawStatic(params){
 	if(params.initialise){
 		this.append("g")
@@ -185,12 +246,6 @@ function drawStatic(params){
 			.classed("axis y", true)
 			.attr("transform", "translate(0,0)")
 			.call(params.axis.y);
-
-		this.append("g")
-			.classed("axis y-layer", true)
-			.attr("transform", "translate(0,0)")
-			.attr("width", d3.select(".axis.y").node().getBBox().width)
-			.attr("height", d3.select(".axis.y").node().getBBox().height);
 
 		this.append("g")
 			.classed("gridline x", true)
@@ -268,7 +323,7 @@ function drawStatic(params){
 		d3.select("#chart")
 			.append("text")
 			.classed("lastupdated", true)
-			.attr("transform", "translate("+width/9+",25)")
+			.attr("transform", "translate("+width/9+",55)")
 			.text(function(){
 				var lastUpdated = String(timeParser(data_prices[data_prices.length-1].timestamp)).slice(0,-15);
 				return "Last updated: "+lastUpdated;
@@ -598,31 +653,20 @@ function plot(params){
 		.attr("x", 9)
 		.attr("dy", ".35em");
 
-	focus.select(".axis.x-layer").append("g").classed("hover-rect-group-x", true).style("display", "none");
-
-	d3.select(".hover-rect-group-x")
-		 .append("rect")
-		 .attr("id", "hover-rect-x")
-		 .attr("width", 40)
-		 .attr("height",19);
-	d3.select(".hover-rect-group-x")
-		.append("text")
-		.attr("id", "hover-text-x")
-		.style("text-anchor", "middle");
-
-	focus.select(".axis.y-layer").append("g").classed("hover-rect-group-y",true).style("display", "none");
-
-	d3.select(".hover-rect-group-y")
-		 .append("rect")
-		 .attr("id", "hover-rect-y")
-		 .attr("width", 35)
-		 .attr("height",19)
-		 .attr("transform", "translate(-35,0)");
-	d3.select(".hover-rect-group-y")
-		.append("text")
-		.attr("id", "hover-text-y");
-
 	focus.append("g").classed("daterange-group", true).attr("transform", "translate("+(width-119)+",0)");
+
+	var dateRange = ['1d','1w', '1m', '3m', '6m', '1y']
+	for (var i = 0, l = dateRange.length; i < l; i ++) {
+		var txt = dateRange[i];
+		d3.select(".daterange-group")
+				.append('text')
+				.attr('class', 'daterange-select')
+				.text(txt)
+				.attr('transform', 'translate('+(20 * i)+', -10)')
+				.on('click', function(d) { rangeClip(this.textContent); });
+	}
+	drawRects.call(this, params);
+
 }
 plot.call(focus, {
 	data_prices: data_prices,
@@ -753,9 +797,9 @@ function mousemove() {
 
 	// multiFormat(timeParser(d.timestamp))
 	d3.select("#hover-rect-x").attr("x", xpos-24);
-	d3.select("#hover-text-x").attr("x", xpos-4).attr("y",12.5).text(d3.timeFormat('%H:%M')(x.invert(xpos)));
+	d3.select("#hover-text-x").attr("x", xpos-5).attr("y",12.5).text(d3.timeFormat('%H:%M')(x.invert(xpos)));
 	d3.select("#hover-rect-y").attr("y", ypos-12);
-	d3.select("#hover-text-y").attr("y", ypos).attr("x",-25).text(y.invert(ypos).toFixed(2));
+	d3.select("#hover-text-y").attr("y", ypos).attr("x",-31).text(y.invert(ypos).toFixed(3));
 
 
 
@@ -874,17 +918,6 @@ function mousemove() {
     }
 }
 
-var dateRange = ['1d','1w', '1m', '3m', '6m', '1y']
-for (var i = 0, l = dateRange.length; i < l; i ++) {
-	var txt = dateRange[i];
-	d3.select(".daterange-group")
-			.append('text')
-			.attr('class', 'daterange-select')
-			.text(txt)
-			.attr('transform', 'translate('+(20 * i)+', -10)')
-			.on('click', function(d) { rangeClip(this.textContent); });
-}
-
 function rangeClip(range) {
 	var today = new Date(timeParser(data_prices[data_prices.length - 1].timestamp));
 	var begin = new Date(timeParser(data_prices[data_prices.length - 1].timestamp));
@@ -942,6 +975,7 @@ function resetGraph() {
     d3.selectAll(".vol-tooltip").remove();
     d3.selectAll(".hover-rect-group-x").remove();
     d3.selectAll(".hover-rect-group-y").remove();
+    d3.selectAll(".daterange-group").remove();
     d3.select(".lastupdated").remove();
 
     x.domain([d3.min(data_prices, function(d){

@@ -58,12 +58,15 @@ body,html{
 	stroke: #ccc;
 	shape-rendering: crispEdges;
 }
-#hover-line-x, #hover-line-y { 
-  stroke: #585858;
+#hover-line-x, #hover-line-y, #lastval-line { 
+  stroke: #8c8c8c;
   stroke-dasharray: 5,5;  
   fill: none;
   stroke-width: 1px;
   shape-rendering: crispEdges;
+}
+#lastval-line {
+	stroke: #eb4d5c;
 }
 .trendline {
 	fill: none;
@@ -273,14 +276,14 @@ text.panel-tweet-header-text {
 	pointer-events: all;
 }
 .market {
-	font-weight: bold;
+	font-weight: none;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
 	fill: #84c283;
 	font-size:80%;
 }
 .market-labels {
 	font-size:100%;
-	font-weight: bold;
+	font-weight: none;
 }
 .market-by-val {
 	font-size:120%;
@@ -310,7 +313,7 @@ text.panel-tweet-header-text {
 .lineTrackA text{
 	fill: palevioletred;
 }
-#hover-text-x, #hover-text-y {
+#hover-text-x, #hover-text-y, #lastval-text {
 	fill: #ffffff !important;
 	font-size:75%;
 	-webkit-font-smoothing: antialiased;
@@ -318,6 +321,9 @@ text.panel-tweet-header-text {
 }
 #hover-rect-x, #hover-rect-y {
 	fill: #404040;
+}
+#lastval-rect {
+	fill: #eb4d5c;
 }
 .daterange-select {
 	font-size: 80%;
