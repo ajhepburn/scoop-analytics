@@ -278,6 +278,7 @@ function plot(params){
 		.append("rect")
 		.attr("clip-path", "url(#clip)")
 		.style("fill", "#0065fc")
+		.style("stroke", "blue")
 		.attr("x", function(d) { var time = timeParser(d.timestamp);return x(time); })
 		.attr("width", 4)
 		.attr("opacity", 0.25)
@@ -367,6 +368,7 @@ function plot(params){
 					.attr("x1", 0).attr("x2", width) 
 					.attr("y1", 10).attr("y2", 10); 
 	hoverLineY.style("opacity", 1e-6);
+
 
 	// update
 	this.selectAll(".price")
@@ -577,6 +579,29 @@ function plot(params){
 		.attr("x", 9)
 		.attr("dy", ".35em");
 
+	focus.select(".axis.x").append("g").classed("hover-rect-group-x", true);
+
+	d3.select(".hover-rect-group-x")
+		 .append("rect")
+		 .attr("id", "hover-rect-x")
+		 .attr("width", 40)
+		 .attr("height",19)
+	d3.select(".hover-rect-group-x")
+		.append("text")
+		.attr("id", "hover-text-x")
+		.style("text-anchor", "middle");
+
+	focus.select(".axis.y").append("g").classed("hover-rect-group-y",true);
+
+	d3.select(".hover-rect-group-y")
+		 .append("rect")
+		 .attr("id", "hover-rect-y")
+		 .attr("width", 35)
+		 .attr("height",19)
+		 .attr("transform", "translate(-35,0)");
+	d3.select(".hover-rect-group-y")
+		.append("text")
+		.attr("id", "hover-text-y");
 }
 plot.call(focus, {
 	data_prices: data_prices,
@@ -704,6 +729,13 @@ function mousemove() {
 	var ypos = d3.mouse(this)[1];
 	d3.select("#hover-line-x").attr("x1", xpos-4).attr("x2", xpos-4).style("opacity", 1);
 	d3.select("#hover-line-y").attr("y1", ypos-4).attr("y2", ypos-4).style("opacity", 1);
+
+	d3.select("#hover-rect-x").attr("x", xpos-24);
+	d3.select("#hover-text-x").attr("x", xpos-4).attr("y",12.5).text(multiFormat(timeParser(d.timestamp)));
+	d3.select("#hover-rect-y").attr("y", ypos-12);
+	d3.select("#hover-text-y").attr("y", ypos).attr("x",-10).text(y.invert(ypos).toFixed(2));
+
+
 
 	function fill(key){
 		var index = data_prices.findIndex(x => x.timestamp==d.timestamp);
@@ -838,8 +870,10 @@ function resetGraph() {
 
     d3.selectAll(".axis-label").remove();
     d3.selectAll(".gridline").remove();
-    d3.selectAll(".market").remove();
-    d3.selectAll(".market-labels").remove();
+    d3.selectAll(".m-data").remove();
+    d3.selectAll(".m-labels").remove();
+    d3.selectAll(".tooltip").remove();
+    d3.selectAll(".vol-tooltip").remove();
     d3.select(".lastupdated").remove();
 
     x.domain([d3.min(data_prices, function(d){
