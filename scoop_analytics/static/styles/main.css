@@ -312,9 +312,16 @@ text.panel-tweet-header-text {
 }
 #hover-text-x, #hover-text-y {
 	fill: #ffffff !important;
+	font-size:75%;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
 #hover-rect-x, #hover-rect-y {
 	fill: #404040;
+}
+.daterange-select {
+	font-size: 80%;
+	/*fill: #888a91;*/
+	fill: steelblue;
+	text-decoration: underline;
 }
