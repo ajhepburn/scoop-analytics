@@ -170,6 +170,12 @@ function drawStatic(params){
 			.attr("transform", "translate(" + 0 + "," + height + ")")
 			.call(params.axis.x);
 
+		this.append("g")
+			.classed("axis x-layer", true)
+			.attr("transform", "translate(" + 0 + "," + height + ")")
+			.attr("width", d3.select(".axis.x").node().getBBox().width)
+			.attr("height", d3.select(".axis.x").node().getBBox().height);
+
 		context.append("g")
 			.classed("axis x", true)
 			.attr("transform", "translate(" + 0 + "," + height2 + ")")
@@ -179,6 +185,12 @@ function drawStatic(params){
 			.classed("axis y", true)
 			.attr("transform", "translate(0,0)")
 			.call(params.axis.y);
+
+		this.append("g")
+			.classed("axis y-layer", true)
+			.attr("transform", "translate(0,0)")
+			.attr("width", d3.select(".axis.y").node().getBBox().width)
+			.attr("height", d3.select(".axis.y").node().getBBox().height);
 
 		this.append("g")
 			.classed("gridline x", true)
@@ -586,7 +598,7 @@ function plot(params){
 		.attr("x", 9)
 		.attr("dy", ".35em");
 
-	focus.select(".axis.x").append("g").classed("hover-rect-group-x", true).style("display", "none");
+	focus.select(".axis.x-layer").append("g").classed("hover-rect-group-x", true).style("display", "none");
 
 	d3.select(".hover-rect-group-x")
 		 .append("rect")
@@ -598,7 +610,7 @@ function plot(params){
 		.attr("id", "hover-text-x")
 		.style("text-anchor", "middle");
 
-	focus.select(".axis.y").append("g").classed("hover-rect-group-y",true).style("display", "none");
+	focus.select(".axis.y-layer").append("g").classed("hover-rect-group-y",true).style("display", "none");
 
 	d3.select(".hover-rect-group-y")
 		 .append("rect")
@@ -609,6 +621,8 @@ function plot(params){
 	d3.select(".hover-rect-group-y")
 		.append("text")
 		.attr("id", "hover-text-y");
+
+	focus.append("g").classed("daterange-group", true).attr("transform", "translate("+(width-119)+",0)");
 }
 plot.call(focus, {
 	data_prices: data_prices,
@@ -647,8 +661,8 @@ function brushed() {
 			else return d3.timeFormat("%b %d, %Y")(x.domain()[0])+" - "+d3.timeFormat("%b %d, %Y")(x.domain()[1]);
 		})
 		.attr("transform", function(){
-			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width+",75)";
-			else return "translate("+(width-70)+",75)";
+			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width+",60)";
+			else return "translate("+(width-70)+",60)";
 		});
 
 	focus.selectAll(".trendline")
@@ -684,8 +698,8 @@ function zoomed() {
 			else return d3.timeFormat("%b %d, %Y")(x.domain()[0])+" - "+d3.timeFormat("%b %d, %Y")(x.domain()[1]);
 		})
 		.attr("transform", function(){
-			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width+",75)";
-			else return "translate("+(width-70)+",75)";
+			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width+",60)";
+			else return "translate("+(width-70)+",60)";
 		});
 
 	volumes.selectAll(".bar")
@@ -737,10 +751,11 @@ function mousemove() {
 	d3.select("#hover-line-x").attr("x1", xpos-4).attr("x2", xpos-4).style("opacity", 1);
 	d3.select("#hover-line-y").attr("y1", ypos-4).attr("y2", ypos-4).style("opacity", 1);
 
+	// multiFormat(timeParser(d.timestamp))
 	d3.select("#hover-rect-x").attr("x", xpos-24);
-	d3.select("#hover-text-x").attr("x", xpos-4).attr("y",12.5).text(multiFormat(timeParser(d.timestamp)));
+	d3.select("#hover-text-x").attr("x", xpos-4).attr("y",12.5).text(d3.timeFormat('%H:%M')(x.invert(xpos)));
 	d3.select("#hover-rect-y").attr("y", ypos-12);
-	d3.select("#hover-text-y").attr("y", ypos).attr("x",-10).text(y.invert(ypos).toFixed(2));
+	d3.select("#hover-text-y").attr("y", ypos).attr("x",-25).text(y.invert(ypos).toFixed(2));
 
 
 
@@ -859,6 +874,50 @@ function mousemove() {
     }
 }
 
+var dateRange = ['1d','1w', '1m', '3m', '6m', '1y']
+for (var i = 0, l = dateRange.length; i < l; i ++) {
+	var txt = dateRange[i];
+	d3.select(".daterange-group")
+			.append('text')
+			.attr('class', 'daterange-select')
+			.text(txt)
+			.attr('transform', 'translate('+(20 * i)+', -10)')
+			.on('click', function(d) { rangeClip(this.textContent); });
+}
+
+function rangeClip(range) {
+	var today = new Date(timeParser(data_prices[data_prices.length - 1].timestamp));
+	var begin = new Date(timeParser(data_prices[data_prices.length - 1].timestamp));
+
+	if (range === '1d')
+	begin.setDate(begin.getDate() - 1);
+
+	if (range === '1m')
+	begin.setMonth(begin.getMonth() - 1);
+
+	if (range === '1w')
+	begin.setDate(begin.getDate() - 7);
+
+	if (range === '3m')
+	begin.setMonth(begin.getMonth() - 3);
+
+	if (range === '6m')
+	begin.setMonth(begin.getMonth() - 6);
+
+	if (range === '1y')
+	begin.setFullYear(begin.getFullYear() - 1);
+
+	if (range === '5y')
+	begin.setFullYear(begin.getFullYear() - 5);
+	
+	exists = data_prices.findIndex(x => x.timestamp==d3.timeFormat('%s')(begin));
+
+	if(exists==-1) begin = 0;
+	else begin = x2(begin);
+
+	d3.select(".brush").call(brush.move, [begin,x2(today)]);
+}
+
 $(".overlay").hover(function(){}, function(){
 var clearPanel = setInterval(function(){
 	var tweet_list = []
@@ -881,6 +940,8 @@ function resetGraph() {
     d3.selectAll(".m-labels").remove();
     d3.selectAll(".tooltip").remove();
     d3.selectAll(".vol-tooltip").remove();
+    d3.selectAll(".hover-rect-group-x").remove();
+    d3.selectAll(".hover-rect-group-y").remove();
     d3.select(".lastupdated").remove();
 
     x.domain([d3.min(data_prices, function(d){
