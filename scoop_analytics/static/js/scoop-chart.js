@@ -799,7 +799,7 @@ function mousemove() {
 	d3.select("#hover-rect-x").attr("x", xpos-24);
 	d3.select("#hover-text-x").attr("x", xpos-5).attr("y",12.5).text(d3.timeFormat('%H:%M')(x.invert(xpos)));
 	d3.select("#hover-rect-y").attr("y", ypos-12);
-	d3.select("#hover-text-y").attr("y", ypos).attr("x",-31).text(y.invert(ypos).toFixed(3));
+	d3.select("#hover-text-y").attr("y", ypos).attr("x",-32).text(y.invert(ypos).toFixed(3));
 
 
 
@@ -977,6 +977,7 @@ function resetGraph() {
     d3.selectAll(".hover-rect-group-y").remove();
     d3.selectAll(".daterange-group").remove();
     d3.select(".lastupdated").remove();
+    d3.select(".rect-group-lastval").remove();
 
     x.domain([d3.min(data_prices, function(d){
 		    	var time = timeParser(d.timestamp);
