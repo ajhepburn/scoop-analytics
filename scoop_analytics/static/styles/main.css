@@ -310,3 +310,11 @@ text.panel-tweet-header-text {
 .lineTrackA text{
 	fill: palevioletred;
 }
+#hover-text-x, #hover-text-y {
+	fill: #ffffff !important;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+#hover-rect-x, #hover-rect-y {
+	fill: #404040;
+}
