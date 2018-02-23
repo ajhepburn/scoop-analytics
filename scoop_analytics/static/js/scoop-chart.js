@@ -344,7 +344,12 @@ function plot(params){
 		      .attr("width", width)
 		      .attr("height", height)
 		      .attr("opacity", "0")
-		      .on("mouseover", function(){ lineTrackC.style("display", null); lineTrackA.style("display", null); })
+		      .on("mouseover", function(){ 
+		      	lineTrackC.style("display", null); 
+		      	lineTrackA.style("display", null);
+			  	d3.selectAll(".hover-rect-group-x").style("display", null);
+			  	d3.selectAll(".hover-rect-group-y").style("display", null);
+		      })
 			  .on("mouseout", function() { 
 			  	hoverLineX.style("opacity", 1e-6); 
 			  	hoverLineY.style("opacity", 1e-6); 
@@ -352,6 +357,8 @@ function plot(params){
 			  	d3.selectAll(".market").style("opacity", 0);
 			  	lineTrackC.style("display", "none");
 			  	lineTrackA.style("display", "none");
+			  	d3.selectAll(".hover-rect-group-x").style("display", "none");
+			  	d3.selectAll(".hover-rect-group-y").style("display", "none");
 			  })
 			  .on("mousemove", mousemove);
 
@@ -579,19 +586,19 @@ function plot(params){
 		.attr("x", 9)
 		.attr("dy", ".35em");
 
-	focus.select(".axis.x").append("g").classed("hover-rect-group-x", true);
+	focus.select(".axis.x").append("g").classed("hover-rect-group-x", true).style("display", "none");
 
 	d3.select(".hover-rect-group-x")
 		 .append("rect")
 		 .attr("id", "hover-rect-x")
 		 .attr("width", 40)
-		 .attr("height",19)
+		 .attr("height",19);
 	d3.select(".hover-rect-group-x")
 		.append("text")
 		.attr("id", "hover-text-x")
 		.style("text-anchor", "middle");
 
-	focus.select(".axis.y").append("g").classed("hover-rect-group-y",true);
+	focus.select(".axis.y").append("g").classed("hover-rect-group-y",true).style("display", "none");
 
 	d3.select(".hover-rect-group-y")
 		 .append("rect")
