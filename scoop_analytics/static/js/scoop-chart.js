@@ -7,16 +7,16 @@ setInterval(function(){
 }, 300000);
 
 var w = 900,
-	h = 700,
+	h = 800,
 	margin = {
 	  top: 88,
-	  bottom: 320,
+	  bottom: 400,
 	  left: 80,
 	  right: 100
 	},
 	margin2 = {
-		top: 400,
-		bottom: 215,
+		top: 420,
+		bottom: 315,
 		left: 80,
 		right: 20
 	},
@@ -25,11 +25,18 @@ var w = 900,
 		bottom: 215,
 		left: 80,
 		right: 20
+	},
+	margin4 = {
+		top:575,
+		bottom:200,
+		left:80,
+		right:20
 	}
 	width = w - margin.left - margin.right,
 	height = h - margin.top - margin.bottom,
 	height2 = h - margin2.top - margin2.bottom;
 	height3 = h - margin3.top - margin3.bottom;
+	height4 = h - margin4.top - margin4.bottom;
 
 var zoom = d3.zoom()
     .scaleExtent([1, Infinity])
@@ -60,6 +67,9 @@ var volumes = svg.append('g')
 var context = svg.append("g")
 				.classed("context", true)
 				.attr("transform", "translate(" + margin3.left + "," + margin3.top + ")");
+var analytics = svg.append("g")
+				.classed("analytics", true)
+				.attr("transform", "translate("+margin4.left+","+margin4.top+")")
 
 var timeParser = d3.timeParse("%s");
 
@@ -245,6 +255,128 @@ function drawXAxis(params){
 	xFake.append("text").attr("id", "x-fake-text0").text(d3.timeFormat("%H:%M")(x.domain()[0])).attr("x", -10).attr("y", 18);
 	xFake.append("text").attr("id", "x-fake-text1").text(d3.timeFormat("%H:%M")(x.domain()[1])).attr("x", width-10).attr("y", 18);
 	xFake.append("line").attr("x1", width).attr("x2", width).attr("y2", 6).attr("stroke", "#ccc");
+}
+
+function drawBottom(params){
+	function getLastWeek() {
+		var lastWeek=[];
+		var c = 0;
+		var lastEntry = data_prices[data_prices.length-1];
+		var topOfWeek = timeParser(lastEntry.timestamp).getDay();
+
+		for (var i = data_prices.length - 1; i >= 0; --i) {
+			if(timeParser(data_prices[i].timestamp).getDay()>=topOfWeek && timeParser(data_prices[i].timestamp).getDate()!=timeParser(lastEntry.timestamp).getDate()) break;
+			else lastWeek.push(data_prices[i]);
+		}
+		return lastWeek;
+	}
+
+	function getPercentageChange(oldNumber, newNumber){
+	    var decreaseValue = oldNumber - newNumber;
+	    if (oldNumber>newNumber) return "+"+((decreaseValue / oldNumber) * 100).toFixed(2)+"%";
+	    else if (oldNumber<newNumber) return "-"+((decreaseValue / oldNumber) * 100).toFixed(2)+"%";
+	    else return ((decreaseValue / oldNumber) * 100).toFixed(2)+"%";
+	}
+
+	function fill(str){
+		typeof(str);
+		if (str.includes("+")) return "#84c283";
+		else if (str.includes("-")) return "#ff7575";
+		else return "#888a91";
+	}
+
+	var lastWeek = getLastWeek();
+
+	function getAverages(key){
+		var total = 0;
+		for(var i=0; i < lastWeek.length; i++) {
+			total+=lastWeek[i][key]
+		}
+		return total/lastWeek.length;
+	}
+
+	this.append("text")
+		.attr("id", "analytics-header-text")
+		.text("Week In Review");
+
+	this.append("text")
+		.attr("id", "analytics-lastval-label")
+		.attr("transform", "translate(0,20)")
+		.text("Last:")
+		.classed("a-label", true);
+	this.append("text")
+		.attr("id", "analytics-lastval-data")
+		.attr("transform", "translate(30,20)")
+		.text(function(){
+			return lastWeek[0].close.toFixed(2);
+		})
+	this.append("text")
+		.attr("id", "analytics-change-label")
+		.attr("transform", "translate(75,20)")
+		.text("Change:")
+		.classed("a-label", true);
+	this.append("text")
+		.attr("id", "analytics-change-data")
+		.attr("transform", "translate(125,20)")
+		.text(function(){
+			return (lastWeek[lastWeek.length-1].close - lastWeek[0].close).toFixed(2);
+		})
+		.attr("fill", function(){
+			return fill(this.innerHTML);
+		});
+	this.append("text")
+		.attr("id", "analytics-change-percent-label")
+		.attr("transform", "translate(175,20)")
+		.text("Change (%):")
+		.classed("a-label", true);
+	this.append("text")
+		.attr("id", "analytics-change-percent-data")
+		.attr("transform", "translate(245,20)")
+		.text(function(){
+			return (getPercentageChange(lastWeek[0].close, lastWeek[lastWeek.length-1].close));
+		})
+		.attr("fill", function(){
+			return fill(this.innerHTML);
+		});
+
+	this.append("text")
+		.attr("id", "analytics-avg-close-label")
+		.attr("transform", "translate(0,40)")
+		.text("Avg. Close:")
+		.classed("a-label", true);
+	this.append("text")
+		.attr("id", "analytics-avg-close-data")
+		.attr("transform", "translate(65,40)")
+		.text(function(){
+			return getAverages('close').toFixed(2);
+		})
+
+	this.append("text")
+		.attr("id", "analytics-avg-high-label")
+		.attr("transform", "translate(100,40)")
+		.text("Avg. High:")
+		.classed("a-label", true);
+	this.append("text")
+		.attr("id", "analytics-avg-low-data")
+		.attr("transform", "translate(160,40)")
+		.text(function(){
+			return getAverages('high').toFixed(2);
+		})
+
+	this.append("text")
+		.attr("id", "analytics-avg-close-label")
+		.attr("transform", "translate(200,40)")
+		.text("Avg. Low:")
+		.classed("a-label", true);
+	this.append("text")
+		.attr("id", "analytics-avg-close-data")
+		.attr("transform", "translate(255,40)")
+		.text(function(){
+			return getAverages('low').toFixed(2);
+		})
+
+
+
 }
 
 
@@ -713,7 +845,7 @@ function plot(params){
 	}
 	drawXAxis.call(this, params);
 	drawRects.call(this, params);
-
+	drawBottom.call(analytics,params);
 }
 setTimeout(function(){
 	plot.call(focus, {
@@ -730,6 +862,40 @@ setTimeout(function(){
 		initialise: true
 	});
 },1000);
+
+var panelHeader = d3.select("#bs-right-div")
+	.append("div")
+	.attr("class", "panel-header")
+	.attr("height", 40)
+	.classed("panel-header", true);
+
+panelHeader.append("img")
+				.attr("id", "panel-header-img")
+				.attr("width", 15)
+				.attr("height", 15)
+				.attr("src", tweet_urls[2]);
+
+panelHeader.append("text")
+			.attr("id", "panel-header-text")
+			.text("Tweets that made an impact");
+
+var panelStreamHeader = d3.select("#bs-left-div")
+	.append("div")
+	.attr("class", "panelstream-header")
+	.attr("height", 40)
+	.classed("panelstream-header", true);
+
+
+panelStreamHeader.append("img")
+				.attr("id", "panelstream-header-img")
+				.attr("width", 15)
+				.attr("height", 15)
+				.attr("left", "50px")
+				.attr("src", tweet_urls[3]);
+
+panelStreamHeader.append("text")
+	.attr("id", "panelstream-header-text")
+	.text("What are people saying? (Live Feed)");
 
 d3.select("#bs-right-div")
 	.append("div")
@@ -797,8 +963,7 @@ function brushed() {
 	d3.select("#x-fake-text1").text(d3.timeFormat("%H:%M")(x.domain()[1]));
 
 	if (data_prices[data_prices.length-1].close > y.domain()[0] && data_prices[data_prices.length-1].close < y.domain()[1]) {
-		console.log(y.domain()[0]);
-		d3.select(".rect-group-lastval").attr("visibility", "visibile");
+		d3.select(".rect-group-lastval").attr("visibility", "visible");
 		d3.select("#lastval-rect").attr("y",y(data_prices[data_prices.length-1].close));
 		d3.select("#lastval-text").attr("y",y(data_prices[data_prices.length-1].close)+12);
 		d3.select("#lastval-line").attr("y1", y(data_prices[data_prices.length-1].close)+9).attr("y2", y(data_prices[data_prices.length-1].close)+9);
@@ -858,8 +1023,7 @@ function zoomed() {
 	d3.select("#x-fake-text1").text(d3.timeFormat("%H:%M")(x.domain()[1]));
 	
 	if (data_prices[data_prices.length-1].close > y.domain()[0] && data_prices[data_prices.length-1].close < y.domain()[1]) {
-		console.log(y.domain()[0]);
-		d3.select(".rect-group-lastval").attr("visibility", "visibile");
+		d3.select(".rect-group-lastval").attr("visibility", "visible");
 		d3.select("#lastval-rect").attr("y",y(data_prices[data_prices.length-1].close));
 		d3.select("#lastval-text").attr("y",y(data_prices[data_prices.length-1].close)+12);
 		d3.select("#lastval-line").attr("y1", y(data_prices[data_prices.length-1].close)+9).attr("y2", y(data_prices[data_prices.length-1].close)+9);
@@ -1025,11 +1189,11 @@ function rangeClip(range) {
 	if (range === '1d') 
 	begin.setDate(begin.getDate() - 1);
 
-	if (range === '1m')
-	begin.setMonth(begin.getMonth() - 1);
-
 	if (range === '1w')
 	begin.setDate(begin.getDate() - 7);
+
+	if (range === '1m')
+	begin.setMonth(begin.getMonth() - 1);
 
 	if (range === '3m')
 	begin.setMonth(begin.getMonth() - 3);

@@ -87,7 +87,7 @@ body,html{
 	fill: none;
 	stroke-width: 2px;
 	shape-rendering: geometricPrecision;
-	opacity: 0.75;
+	opacity: 0.5;
 	stroke: #ffb2b2 !important;
 }
 .area{
@@ -230,7 +230,41 @@ text.panelstream-tweet-header-text {
 	left: 5px;
 }
 
+/* Panel Headers */
+
+.panel-header, .panelstream-header {
+	background:rgba(0,101,252, 0.15);
+	position: absolute;
+	width: 100%;
+}
+#panelstream-header-img, #panel-header-img {
+	position: relative;
+}
+#panelstream-header-img {
+	left:115px;
+	bottom:1px;
+}
+#panel-header-img {
+	left:165px;
+	bottom:1px;
+}
+#panel-header-text, #panelstream-header-text {
+	color: #888a91 !important;
+	font-size:80%;
+	font-style: italic;
+	position: relative;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+#panelstream-header-text {
+	left:120px;
+}
+#panel-header-text {
+	left:170px;
+}
+
 /* Tweet Panel: Left */
+
 .panel {
 	margin-top: 5px;
 	overflow: hidden;
@@ -354,4 +388,16 @@ text.panel-tweet-header-text {
 	/*fill: #888a91;*/
 	fill: steelblue;
 	text-decoration: underline;
+}
+
+.analytics text {
+	font-size:75%;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+#analytics-header-text, .a-label{
+	fill: #888a91;
+}
+#analytics-header-text {
+	font-size: 90%;
 }
