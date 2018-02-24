@@ -753,6 +753,10 @@ function brushed() {
           d3.min(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.close : d3.max(data_prices.map(function(d) { return d.close; })); })),
           d3.max(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.close : d3.min(data_prices.map(function(d) { return d.close; })); }))
         ]);
+	y3.domain([
+          d3.min(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.volume : d3.max(data_prices.map(function(d) { return d.volume; })); })),
+          d3.max(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.volume : d3.min(data_prices.map(function(d) { return d.volume; })); }))
+        ]);
 	d3.select(".x.axis-label")
 		.text(function(){
 			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return d3.timeFormat("%b %d, %Y")(x.domain()[0]);
@@ -779,7 +783,11 @@ function brushed() {
 		.attr("x", function(d) { 
 			var time = timeParser(d.timestamp);
 			return x(time); 
-		});
+		})
+		.attr("y", function(d) { return y3(d.volume); })
+		.attr("height", function(d) { 
+			if((height2 - y3(d.volume))<0) return height2;
+			else return height2 - y3(d.volume); });
 	focus.select(".axis.x").call(xAxis);
 	focus.select(".axis.y").call(yAxis);
 	d3.select(".focus").call(zoom.transform, d3.zoomIdentity
@@ -788,7 +796,8 @@ function brushed() {
 	d3.select("#x-fake-text0").text(d3.timeFormat("%H:%M")(x.domain()[0]));
 	d3.select("#x-fake-text1").text(d3.timeFormat("%H:%M")(x.domain()[1]));
 
-	if(y.domain()[1] < y(data_prices[data_prices.length-1].close)) {
+	if (data_prices[data_prices.length-1].close > y.domain()[0] && data_prices[data_prices.length-1].close < y.domain()[1]) {
+		console.log(y.domain()[0]);
 		d3.select(".rect-group-lastval").attr("visibility", "visibile");
 		d3.select("#lastval-rect").attr("y",y(data_prices[data_prices.length-1].close));
 		d3.select("#lastval-text").attr("y",y(data_prices[data_prices.length-1].close)+12);
@@ -805,6 +814,10 @@ function zoomed() {
           d3.min(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.close : d3.max(data_prices.map(function(d) { return d.close; })); })),
           d3.max(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.close : d3.min(data_prices.map(function(d) { return d.close; })); }))
         ]);
+	y3.domain([
+          d3.min(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.volume : d3.max(data_prices.map(function(d) { return d.volume; })); })),
+          d3.max(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.volume : d3.min(data_prices.map(function(d) { return d.volume; })); }))
+        ]);
 	d3.select(".x.axis-label")
 		.text(function(){
 			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return d3.timeFormat("%b %d, %Y")(x.domain()[0]);
@@ -816,10 +829,14 @@ function zoomed() {
 		});
 
 	volumes.selectAll(".bar")
-	.attr("x", function(d) { 
-		var time = timeParser(d.timestamp);
-		return x(time); 
-	});
+		.attr("x", function(d) { 
+			var time = timeParser(d.timestamp);
+			return x(time); 
+		})
+		.attr("y", function(d) { return y3(d.volume); })
+		.attr("height", function(d) { 
+			if((height2 - y3(d.volume))<0) return height2;
+			else return height2 - y3(d.volume); });
 	focus.selectAll(".trendline")
 		.attr("d", function(d){
 			return line(d);
@@ -840,7 +857,8 @@ function zoomed() {
 	d3.select("#x-fake-text0").text(d3.timeFormat("%H:%M")(x.domain()[0]));
 	d3.select("#x-fake-text1").text(d3.timeFormat("%H:%M")(x.domain()[1]));
 	
-	if(y.domain()[1] < y(data_prices[data_prices.length-1].close)) {
+	if (data_prices[data_prices.length-1].close > y.domain()[0] && data_prices[data_prices.length-1].close < y.domain()[1]) {
+		console.log(y.domain()[0]);
 		d3.select(".rect-group-lastval").attr("visibility", "visibile");
 		d3.select("#lastval-rect").attr("y",y(data_prices[data_prices.length-1].close));
 		d3.select("#lastval-text").attr("y",y(data_prices[data_prices.length-1].close)+12);
