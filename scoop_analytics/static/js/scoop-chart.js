@@ -338,6 +338,21 @@ function drawBottom(params){
 		.attr("fill", function(){
 			return fill(this.innerHTML);
 		});
+	this.append("text")
+		.attr("id", "analytics-volume-label")
+		.attr("transform", "translate(300,20)")
+		.text("Volume:")
+		.classed("a-label", true);
+	this.append("text")
+		.attr("id", "analytics-volume-data")
+		.attr("transform", "translate(345,20)")
+		.text(function(){
+			var total = 0;
+			for(item in lastWeek) {
+				total+=lastWeek[item].volume;
+			}
+			return String(total).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+		});
 
 	this.append("text")
 		.attr("id", "analytics-avg-close-label")
