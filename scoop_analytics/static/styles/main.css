@@ -103,6 +103,21 @@ body,html{
 	fill: #888a91;
 	font-size:75%;
 }
+.legend line{
+	fill: none;
+	stroke-width: 1px;
+	shape-rendering: crispEdges;
+}
+._average.legend line {
+	stroke: #ffb2b2;
+}
+._close.legend line {
+	stroke: #0065fc;
+}
+._last.value.legend line {
+	stroke: #eb4d5c;
+	stroke-dasharray: 2,2;  
+}
 .tooltip {
 	pointer-events: none;
 	position: absolute;

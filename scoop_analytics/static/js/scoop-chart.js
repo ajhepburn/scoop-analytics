@@ -406,19 +406,28 @@ function plot(params){
 				return "_"+d;
 			})
 			.classed("legend", true);
-	this.selectAll(".legend")
+/*	this.selectAll(".legend")
 		.append("rect")
 		.attr("x", width+20)
 		.attr("y", function(d,i){
 			return i*20;
 		})
 		.attr("width", 10)
-		.attr("height", 10);
+		.attr("height", 10);*/
+	this.selectAll(".legend")
+		.append("line")
+		.attr("x1", width+10).attr("x2", width+30) 
+		.attr("y1", function(d,i){
+			return i*24;
+		}).attr("y2", function(d,i){
+			if(d=="last value") return (i*24)-1;
+			return (i*24)+1;
+		}); 
   	this.selectAll(".legend")
   		.append("text")
 		.attr("x", width+38)
 		.attr("y", function(d,i){
-			return (i*20)+9;
+			return (i*22)+6;
 		})
 		.text(function(d){
 			return d.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
@@ -504,13 +513,13 @@ function plot(params){
 			return "#0065fc";
 		});
 
-	this.selectAll(".legend")
+/*	this.selectAll(".legend")
 		.style("fill", function(d, i){
 			// return colorScale(prices.indexOf(d));
 			if(d=="average") return '#ffb2b2';
 			else if(d=="close") return "#0065fc";
 			if(d=="last value") return "#eb4d5c";
-		})
+		})*/
 
 	prices.forEach(function(price){		
 		var g = self.selectAll("g."+price);
