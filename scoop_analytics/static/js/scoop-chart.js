@@ -354,6 +354,10 @@ function plot(params){
 	var prices = d3.keys(params.data_prices[0]).filter(function(d){
 		return d == "close" || d == "high" || d == "low" || d=="average";
 	});
+	var legendData = d3.keys(params.data_prices[0]).filter(function(d){
+		return d == "close" || d=="average";
+	});
+	legendData.push("last value");
 	
 	// enter()
 	volumes.selectAll(".bar")
@@ -397,14 +401,13 @@ function plot(params){
 			})
 			.classed("priceContext", true);
 	this.selectAll(".legend")
-		.data(prices)
-		.enter()
-		.append("g")
-		.filter(function(d){return d=="close" || d=="average";})
-		.attr("class", function(d){
-			return "_"+d;
-		})
-		.classed("legend", true);
+		.data(legendData)
+			.enter()
+			.append("g")
+			.attr("class", function(d){
+				return "_"+d;
+			})
+			.classed("legend", true);
 	this.selectAll(".legend")
 		.append("rect")
 		.attr("x", width+20)
@@ -420,7 +423,8 @@ function plot(params){
 			return (i*20)+9;
 		})
 		.text(function(d){
-			return d.charAt(0).toUpperCase() + d.slice(1);
+			return d.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+			// return d.charAt(0).toUpperCase() + d.slice(1);
 		});
 
 	var overlay = focus.append("rect")
@@ -507,6 +511,7 @@ function plot(params){
 			// return colorScale(prices.indexOf(d));
 			if(d=="average") return '#ffb2b2';
 			else if(d=="close") return "#0065fc";
+			if(d=="last value") return "#eb4d5c";
 		})
 
 	prices.forEach(function(price){		
