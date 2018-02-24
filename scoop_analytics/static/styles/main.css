@@ -39,6 +39,15 @@ body,html{
 	stroke: #b9bbbf;
 	shape-rendering: crispEdges;
 }
+.axis.x {
+	opacity: 0;
+}
+#x-fake-text0, #x-fake-text1 {
+	fill: #888a91;
+	font-size: 65%;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
 .axis text{
 	fill: #888a91;
 }
@@ -47,7 +56,7 @@ body,html{
 	fill: #888a91;
 	font-size:90%;
 }
-#text-open, #text-high, #text-low, #text-average, .axis-label.x, .lastupdated {
+#text-open, #text-high, #text-low, #text-average, .axis-label.x, .axis-curr-label.x, .lastupdated {
 	fill: #888a91;
 	font-size:75%;
 	font-weight: none;
