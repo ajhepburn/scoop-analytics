@@ -97,24 +97,24 @@ var googleapi = {
                             data_prices.push(item);
                         }
                     }
-                }
 
-                resetGraph();
-                setDiscontinuities();
-			    
-			    plot.call(focus, {
-					data_prices: data_prices,
-					axis: {
-						x: xAxis,
-						y: yAxis,
-						x2: xAxis2
-					},
-					gridlines: {
-						x: xGridlines,
-						y: yGridlines,
-					},
-					initialise: true
-				});
+	                resetGraph();
+	                setDiscontinuities();
+				    
+				    plot.call(focus, {
+						data_prices: data_prices,
+						axis: {
+							x: xAxis,
+							y: yAxis,
+							x2: xAxis2
+						},
+						gridlines: {
+							x: xGridlines,
+							y: yGridlines,
+						},
+						initialise: true
+					});
+                }
             })
 				.fail(function() {
 					console.log( "error" );

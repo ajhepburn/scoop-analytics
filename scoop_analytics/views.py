@@ -3,7 +3,7 @@ from flask import render_template, json, jsonify, request, redirect, url_for, Re
 from flask_dance.contrib.twitter import twitter
 from TwitterAPI import TwitterAPI
 from scoop_analytics import app
-from scoop_analytics.models import db, BaseModel, Documents, SharePrices, GooglePrices
+from scoop_analytics.models import db, BaseModel, Documents, SharePrices, GooglePrices, StreamPrices
 from sqlalchemy import *
 from flask_socketio import SocketIO, send, emit
 from lxml import html
@@ -13,6 +13,8 @@ import eventlet
 socketio = SocketIO(app, async_mode="threading")
 api = TwitterAPI('7u1DrWrcqlRb3shnmSV271YAC', 'BjP4LEUDaDp7oSg7H5P1i9jRPtDAnGWxN7dZCfPpqel2n7P4Mc', '2837005903-xUCqnbARCn25DbXTaRtUBLhS2r9wFLywoMoaiGc', '8QrgDtohRvv3tiP0hWWCYnvJensFMNcLMcGqEu72FSCCI')
 
+# scrape_ticks must be in multiples of 1,5 or 10.
+scrape_ticks = 10
 # @app.route("/twitter")
 # def twitter_login():
 # 	if not twitter.authorized:
@@ -41,6 +43,7 @@ def scraper(*args):
 	page = requests.get('https://finance.google.com/finance/getprices?f=d,o,h,l,c,v&df=cpct&x='+market+'&q='+cashtag+'&i=60s&p=10d')
 	content = [c.decode() for c in page.content.splitlines()]
 	content = content[7:]
+	output = []
 
 	for i, c in enumerate(content):
 		content[i] = c.split(",")
@@ -49,46 +52,49 @@ def scraper(*args):
 			current_epoch = int(content[i][0][1:])
 			content[i][0] = current_epoch
 			content[i][1:] = [float(x) for x in content[i][1:]]
+			output.append(content[i])
 		else:
 			count+=1
 			content[i][0] = current_epoch + (count*60)
 			content[i][1:] = [float(x) for x in content[i][1:]]
+			if not count % scrape_ticks:
+				output.append(content[i])
 
 	def db_insert():
 		new_points = []
-		obj = db.session.query(GooglePrices).order_by(GooglePrices.timestamp.desc()).first()
-		isempty = db.session.query(GooglePrices).first()
+		obj = db.session.query(StreamPrices).order_by(StreamPrices.timestamp.desc()).first()
+		isEmpty = db.session.query(StreamPrices).first()
 		index_check = False
-		if isempty is not None:
-			for i, c in enumerate(content):
+		if isEmpty is not None:
+			for i, c in enumerate(output):
 				if c[0]==obj.timestamp:
 					try:
-						index_check = True
 						next_pos = i+1
+						index_check = True
 					except IndexError:
 						index_check = False
 			if index_check:
-				for c in content[next_pos:len(content)]:
-					line = GooglePrices(symbol=''+cashtag+'',timestamp=c[0],close=c[1],high=c[2],low=c[3],open=c[4],volume=c[5],average=((c[1]+c[2]+c[3]+c[4])/4))
+				for c in output[next_pos:len(output)]:
+					line = StreamPrices(symbol=''+cashtag+'',timestamp=c[0],close=c[1],high=c[2],low=c[3],open=c[4],volume=c[5],average=((c[1]+c[2]+c[3]+c[4])/4))
 					db.session.add(line)
 					db.session.commit()
 			if not on_init:
 				index_check = False
-				for i,c in enumerate(content):
+				for i,c in enumerate(output):
 					if c[0]==last_el['timestamp']:
 						try:
-							index_check = True
 							next_pos = i+1
+							index_check = True
 						except IndexError:
 							index_check = False
 				if index_check:
-					for c in content[next_pos:len(content)]:
+					for c in output[next_pos:len(output)]:
 						c.append((c[1]+c[2]+c[3]+c[4])/4)
 						new_points.append(c)
 
 		else:
-			for c in content:
-				line = GooglePrices(symbol=''+cashtag+'',timestamp=c[0],close=c[1],high=c[2],low=c[3],open=c[4],volume=c[5],average=((c[1]+c[2]+c[3]+c[4])/4))
+			for c in output:
+				line = StreamPrices(symbol=''+cashtag+'',timestamp=c[0],close=c[1],high=c[2],low=c[3],open=c[4],volume=c[5],average=((c[1]+c[2]+c[3]+c[4])/4))
 				db.session.add(line)
 				db.session.commit()
 		
@@ -114,7 +120,7 @@ def main():
 	scraper('NASDAQ', 'HMNY')
 	prices_result = db.engine.execute("SELECT symbol, timestamp, open, close, high, low, volume FROM share_prices WHERE (close >= 1.025 * open) AND volume <> 0 AND symbol LIKE 'HMNY';")
 	docs_result = db.engine.execute("SELECT * FROM documents, jsonb_array_elements(data->'entities'->'symbols') where value->>'text' in ('HMNY');")
-	gprices_result = db.engine.execute("SELECT * FROM google_prices ORDER BY timestamp desc LIMIT 1000;")
+	gprices_result = db.engine.execute("SELECT * FROM stream_prices ORDER BY timestamp desc;")
 	# docs_result = db.engine.execute("SELECT DISTINCT data->'id' as tweet_id, data->'text' as tweet_text, data->'timestamp_s' as tweet_created, value as cashtag FROM documents, jsonb_array_elements(data->'entities'->'symbols') where value->>'text' in ('HMNY');")
 	
 	docs = json.dumps([dict(r) for r in docs_result])
