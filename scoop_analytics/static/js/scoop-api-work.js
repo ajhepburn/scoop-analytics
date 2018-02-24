@@ -97,7 +97,7 @@ var googleapi = {
                             data_prices.push(item);
                         }
                     }
-
+                }
 	                resetGraph();
 	                setDiscontinuities();
 				    
@@ -114,7 +114,6 @@ var googleapi = {
 						},
 						initialise: true
 					});
-                }
             })
 				.fail(function() {
 					console.log( "error" );

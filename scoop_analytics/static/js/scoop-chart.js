@@ -746,8 +746,13 @@ d3.select("#bs-left-div")
 function brushed() {
 	if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return;
 	var selection = d3.event.selection;
+	var ext = selection.map(x2.invert, x2);
 	init_brush = selection;
 	x.domain(selection.map(x2.invert, x2));
+	y.domain([
+          d3.min(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.close : d3.max(data_prices.map(function(d) { return d.close; })); })),
+          d3.max(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.close : d3.min(data_prices.map(function(d) { return d.close; })); }))
+        ]);
 	d3.select(".x.axis-label")
 		.text(function(){
 			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return d3.timeFormat("%b %d, %Y")(x.domain()[0]);
@@ -776,17 +781,30 @@ function brushed() {
 			return x(time); 
 		});
 	focus.select(".axis.x").call(xAxis);
+	focus.select(".axis.y").call(yAxis);
 	d3.select(".focus").call(zoom.transform, d3.zoomIdentity
 	 	.scale(width / (selection[1] - selection[0]))
 	 	.translate(-selection[0], 0));
 	d3.select("#x-fake-text0").text(d3.timeFormat("%H:%M")(x.domain()[0]));
 	d3.select("#x-fake-text1").text(d3.timeFormat("%H:%M")(x.domain()[1]));
+
+	if(y.domain()[1] < y(data_prices[data_prices.length-1].close)) {
+		d3.select(".rect-group-lastval").attr("visibility", "visibile");
+		d3.select("#lastval-rect").attr("y",y(data_prices[data_prices.length-1].close));
+		d3.select("#lastval-text").attr("y",y(data_prices[data_prices.length-1].close)+12);
+		d3.select("#lastval-line").attr("y1", y(data_prices[data_prices.length-1].close)+9).attr("y2", y(data_prices[data_prices.length-1].close)+9);
+	} else d3.select(".rect-group-lastval").attr("visibility", "hidden");
 }
 
 function zoomed() {
 	if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return;
 	var t = d3.event.transform;
+	var ext = t.rescaleX(x2).domain();
 	x.domain(t.rescaleX(x2).domain());
+	y.domain([
+          d3.min(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.close : d3.max(data_prices.map(function(d) { return d.close; })); })),
+          d3.max(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.close : d3.min(data_prices.map(function(d) { return d.close; })); }))
+        ]);
 	d3.select(".x.axis-label")
 		.text(function(){
 			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return d3.timeFormat("%b %d, %Y")(x.domain()[0]);
@@ -817,9 +835,17 @@ function zoomed() {
 		
 	init_brush = x.range().map(t.invertX, t);
 	focus.select(".axis.x").call(xAxis);
+	focus.select(".axis.y").call(yAxis);
 	context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
 	d3.select("#x-fake-text0").text(d3.timeFormat("%H:%M")(x.domain()[0]));
 	d3.select("#x-fake-text1").text(d3.timeFormat("%H:%M")(x.domain()[1]));
+	
+	if(y.domain()[1] < y(data_prices[data_prices.length-1].close)) {
+		d3.select(".rect-group-lastval").attr("visibility", "visibile");
+		d3.select("#lastval-rect").attr("y",y(data_prices[data_prices.length-1].close));
+		d3.select("#lastval-text").attr("y",y(data_prices[data_prices.length-1].close)+12);
+		d3.select("#lastval-line").attr("y1", y(data_prices[data_prices.length-1].close)+9).attr("y2", y(data_prices[data_prices.length-1].close)+9);
+	} else d3.select(".rect-group-lastval").attr("visibility", "hidden");
 }
 
 var lastGet = 0;
