@@ -213,7 +213,7 @@ function drawRects(params){
 		.attr("width", d3.select(".axis.y").node().getBBox().width)
 		.attr("height", d3.select(".axis.y").node().getBBox().height);
 
-	focus.select(".axis.x-layer").append("g").classed("hover-rect-group-x", true).style("display", "none");
+	focus.select(".axis.x-layer2").append("g").classed("hover-rect-group-x", true).style("display", "none");
 
 	d3.select(".hover-rect-group-x")
 		 .append("rect")
@@ -238,6 +238,15 @@ function drawRects(params){
 		.attr("id", "hover-text-y");
 }
 
+function drawXAxis(params){
+	var xFake = d3.select(".axis.x-fake");
+
+	xFake.append("line").attr("y2", 6).attr("stroke", "#ccc");
+	xFake.append("text").attr("id", "x-fake-text0").text(d3.timeFormat("%H:%M")(x.domain()[0])).attr("x", -10).attr("y", 18);
+	xFake.append("text").attr("id", "x-fake-text1").text(d3.timeFormat("%H:%M")(x.domain()[1])).attr("x", width-10).attr("y", 18);
+	xFake.append("line").attr("x1", width).attr("x2", width).attr("y2", 6).attr("stroke", "#ccc");
+}
+
 
 function drawStatic(params){
 	if(params.initialise){
@@ -247,7 +256,11 @@ function drawStatic(params){
 			.call(params.axis.x);
 
 		this.append("g")
-			.classed("axis x-layer", true)
+			.classed("axis x-fake", true)
+			.attr("transform", "translate(" + 0 + "," + height + ")");
+
+		this.append("g")
+			.classed("axis x-layer2", true)
 			.attr("transform", "translate(" + 0 + "," + height + ")")
 			.attr("width", d3.select(".axis.x").node().getBBox().width)
 			.attr("height", d3.select(".axis.x").node().getBBox().height);
@@ -281,6 +294,10 @@ function drawStatic(params){
 		d3.select("#chart")
 			.append("text")
 			.classed("x axis-label",true);
+		d3.select("#chart")
+			.append("text")
+			.classed("x axis-curr-label",true)
+			.attr("transform", "translate("+width/9+",55)");
 		d3.select("#chart")
 			.append("text")
 			.classed("market market-by-val", true)
@@ -338,7 +355,7 @@ function drawStatic(params){
 		d3.select("#chart")
 			.append("text")
 			.classed("lastupdated", true)
-			.attr("transform", "translate("+width/9+",55)")
+			.attr("transform", "translate("+width/1.21+",25)")
 			.text(function(){
 				var lastUpdated = String(timeParser(data_prices[data_prices.length-1].timestamp)).slice(0,-15);
 				return "Last updated: "+lastUpdated;
@@ -694,6 +711,7 @@ function plot(params){
 				.attr('transform', 'translate('+(20 * i)+', -10)')
 				.on('click', function(d) { rangeClip(this.textContent); });
 	}
+	drawXAxis.call(this, params);
 	drawRects.call(this, params);
 
 }
@@ -761,6 +779,8 @@ function brushed() {
 	d3.select(".focus").call(zoom.transform, d3.zoomIdentity
 	 	.scale(width / (selection[1] - selection[0]))
 	 	.translate(-selection[0], 0));
+	d3.select("#x-fake-text0").text(d3.timeFormat("%H:%M")(x.domain()[0]));
+	d3.select("#x-fake-text1").text(d3.timeFormat("%H:%M")(x.domain()[1]));
 }
 
 function zoomed() {
@@ -798,6 +818,8 @@ function zoomed() {
 	init_brush = x.range().map(t.invertX, t);
 	focus.select(".axis.x").call(xAxis);
 	context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
+	d3.select("#x-fake-text0").text(d3.timeFormat("%H:%M")(x.domain()[0]));
+	d3.select("#x-fake-text1").text(d3.timeFormat("%H:%M")(x.domain()[1]));
 }
 
 var lastGet = 0;
@@ -831,6 +853,9 @@ function mousemove() {
 	d3.select("#hover-text-x").attr("x", xpos-5).attr("y",12.5).text(d3.timeFormat('%H:%M')(x.invert(xpos)));
 	d3.select("#hover-rect-y").attr("y", ypos-12);
 	d3.select("#hover-text-y").attr("y", ypos).attr("x",-32).text(y.invert(ypos).toFixed(3));
+	d3.select(".x.axis-curr-label").text(function(){
+		return d3.timeFormat('%b %d %Y, %a %H:%M')(timeParser(d.timestamp));
+	});
 
 
 
@@ -953,7 +978,7 @@ function rangeClip(range) {
 	var today = new Date(timeParser(data_prices[data_prices.length - 1].timestamp));
 	var begin = new Date(timeParser(data_prices[data_prices.length - 1].timestamp));
 
-	if (range === '1d')
+	if (range === '1d') 
 	begin.setDate(begin.getDate() - 1);
 
 	if (range === '1m')
@@ -980,6 +1005,8 @@ function rangeClip(range) {
 	else begin = x2(begin);
 
 	d3.select(".brush").call(brush.move, [begin,x2(today)]);
+	d3.select("#x-fake-text0").text(d3.timeFormat("%H:%M")(x.domain()[0]));
+	d3.select("#x-fake-text1").text(d3.timeFormat("%H:%M")(x.domain()[1]));
 }
 
 $(".overlay").hover(function(){}, function(){
@@ -999,6 +1026,7 @@ function resetGraph() {
     d3.select(".volume").selectAll("*").remove();
 
     d3.selectAll(".axis-label").remove();
+    d3.selectAll(".axis-curr-label").remove();
     d3.selectAll(".gridline").remove();
     d3.selectAll(".m-data").remove();
     d3.selectAll(".m-labels").remove();
