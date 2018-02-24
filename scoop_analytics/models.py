@@ -77,3 +77,27 @@ class GooglePrices(BaseModel, db.Model):
 
     def __repr__(self):
         return '<GooglePrices %r>' % (self.symbol)
+
+class StreamPrices(BaseModel, db.Model):
+    __tablename__ = 'stream_prices'
+    symbol = db.Column(db.String)
+    timestamp = db.Column(db.Integer, primary_key=True)
+    close = db.Column(db.Float)
+    high = db.Column(db.Float)
+    low = db.Column(db.Float)
+    open = db.Column(db.Float)
+    volume = db.Column(db.Integer)
+    average = db.Column(db.Float)
+
+    def __init__(self, symbol, timestamp, close, high, low, open, volume, average):
+        self.symbol = symbol
+        self.timestamp = timestamp
+        self.close = close
+        self.high = high
+        self.low = low
+        self.open = open
+        self.volume = volume
+        self.average = average
+
+    def __repr__(self):
+        return '<StreamPrices %r>' % (self.symbol)
