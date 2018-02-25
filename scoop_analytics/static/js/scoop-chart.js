@@ -322,8 +322,17 @@ function drawBottom(params){
 		var c = 0;
 		var lastEntry = data_prices[data_prices.length-1];
 		var topOfWeek = timeParser(lastEntry.timestamp).getDay();
+		
+		if(topOfWeek==1) {
+			for(var i=data_prices.length-1; i>=0; --i){
+				if(timeParser(data_prices[i].timestamp).getDay()>topOfWeek) {
+					topOfWeek = timeParser(data_prices[i].timestamp).getDay();
+					break;
+				}
+			}
+		}
 
-		for (var i = data_prices.length - 1; i >= 0; --i) {
+		for (var i=data_prices.length-1; i >= 0; --i) {
 			if(timeParser(data_prices[i].timestamp).getDay()>=topOfWeek && timeParser(data_prices[i].timestamp).getDate()!=timeParser(lastEntry.timestamp).getDate()) break;
 			else lastWeek.push(data_prices[i]);
 		}
@@ -447,6 +456,11 @@ function drawBottom(params){
 	}
 
 	function drawArc(params) {
+		function colorise(key){
+			if(key<0) return "#d62728";
+			else return "#1f77b4";
+		}
+
 		var circ = 2 * Math.PI;
 		var decimalPct = parseFloat(params.changePct) / 100.0;
 
@@ -463,8 +477,7 @@ function drawBottom(params){
 		var foreground = params.group.append("path")
 		    .datum({endAngle:decimalPct*circ})
 		    .style("fill", function(d){
-		    	if(d.endAngle<0) return "#d62728";
-		    	else return "#2ca02c";
+		    	return colorise(d.endAngle);
 		    })
 		    .attr("d", arc);
 
@@ -473,7 +486,7 @@ function drawBottom(params){
 			.attr("transform", "translate(-30,-10)")
 			.text(params.change)
 			.attr("fill", function(){
-				return foreground.attr("style").slice(6,-1);
+				return colorise(decimalPct);
 			});
 
 		params.group.append("text")
@@ -481,14 +494,14 @@ function drawBottom(params){
 					.attr("transform", "translate(-37,15)")
 					.text(params.changePct)
 					.attr("fill", function(){
-						return foreground.attr("style").slice(6,-1);
+				    	return colorise(decimalPct);
 					});
 	}
 
 	this.append("text")
 		.attr("id", "analytics-header-text")
 		.text(function(){
-			return market+":"+cashtag+" (Weekly Summary)";
+			return market+":"+cashtag+" Weekly Summary";
 		});
 
 	this.append("text")
@@ -657,7 +670,7 @@ function drawStatic(params){
 		d3.select("#chart")
 			.append("text")
 			.classed("x axis-curr-label",true)
-			.attr("transform", "translate("+width/9+",55)");
+			.attr("transform", "translate("+width/1.95+",75)");
 		d3.select("#chart")
 			.append("text")
 			.classed("market market-by-val", true)
@@ -783,7 +796,8 @@ function plot(params){
 			.attr("class", function(d){
 				return "_"+d;
 			})
-			.classed("legend", true);
+			.classed("legend", true)
+			.attr("transform", "translate(5,10)");
 /*	this.selectAll(".legend")
 		.append("rect")
 		.attr("x", width+20)
@@ -1159,7 +1173,7 @@ function brushed() {
 			else return d3.timeFormat("%b %d, %Y")(x.domain()[0])+" - "+d3.timeFormat("%b %d, %Y")(x.domain()[1]);
 		})
 		.attr("transform", function(){
-			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width+",60)";
+			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width+",120)";
 			else return "translate("+(width-70)+",60)";
 		});
 
@@ -1464,6 +1478,7 @@ function resetGraph() {
     d3.select(".focus").selectAll("*").remove();
     d3.select(".context").selectAll("*").remove();
     d3.select(".volume").selectAll("*").remove();
+    d3.select(".analytics").selectAll("*").remove();
 
     d3.selectAll(".axis-label").remove();
     d3.selectAll(".axis-curr-label").remove();
