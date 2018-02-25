@@ -401,8 +401,10 @@ text.panel-tweet-header-text {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
-#analytics-header-text {
+#chart-header-text, #analytics-header-text {
 	font-size: 90%;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 .axis-daily-y text, .axis-daily-x text {
 	fill: #4d4d4d;
