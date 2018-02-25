@@ -73,11 +73,11 @@ var areaGradientCtx = svg.append("defs")
 
 areaGradientCtx.append("stop")
 	.attr("offset", "0%")
-	.attr("stop-color", "#e6f0ff")
-	.attr("stop-opacity", 0.5);
+	.attr("stop-color", "#003d99")
+	.attr("stop-opacity", 0.15);
 areaGradientCtx.append("stop")
 	.attr("offset", "100%")
-	.attr("stop-color", "#003d99")
+	.attr("stop-color", "white")
 	.attr("stop-opacity", 0);
 
 svg.append("defs").append("clipPath")
