@@ -29,7 +29,7 @@ var w = 900,
 	},
 	margin4 = {
 		top:575,
-		bottom:200,
+		bottom:150,
 		left:80,
 		right:20
 	}
@@ -37,7 +37,17 @@ var w = 900,
 	height = h - margin.top - margin.bottom,
 	height2 = h - margin2.top - margin2.bottom;
 	height3 = h - margin3.top - margin3.bottom;
-	height4 = h - margin4.top - margin4.bottom;
+	// Analytics
+	height4 = h - margin4.top - margin4.bottom; // Analytics "div"	
+
+	// Analytics heights, margins
+	marginDailyClose = {
+		top: 590,
+		bottom: 75,
+		left: 80,
+		right: 20
+	}
+	heightDailyClose = h - marginDailyClose.top - marginDailyClose.bottom;
 
 var zoom = d3.zoom()
     .scaleExtent([1, Infinity])
@@ -326,6 +336,84 @@ function drawBottom(params){
 		return total/lastWeek.length;
 	}
 
+	function getDailyData(key) {
+		var days = [...new Set(lastWeek.map(item => timeParser(item.timestamp).getDay()))];
+		var indexes=[];
+		var result=[];
+		days.forEach((val)=>{indexes.push(lastWeek.findIndex(x=>timeParser(x.timestamp).getDay() === val));});
+		indexes.forEach((val)=>{
+			var day = String(d3.timeFormat('%a')(timeParser(lastWeek[val].timestamp)));
+			var dict = {};
+			dict[day]= lastWeek[val][key];
+			result.push(dict);
+		});
+		return result;
+	}
+
+	var dailyCloseGroup = this.append("g")
+						.classed("daily-close-group", true)
+						.attr("transform", "translate(20,"+marginDailyClose.bottom+")");
+
+	dailyCloseGroup.append("text")
+						.text("Daily Close Values")
+						.attr("transform", "translate(55,-10)");
+
+	var dailyVolGroup = this.append("g")
+					.classed("daily-vol-group", true)
+					.attr("transform", "translate(300,"+marginDailyClose.bottom+")");
+
+	dailyVolGroup.append("text")
+						.text("Daily Volume")
+						.attr("transform", "translate(85,-10)");
+
+	function drawDailyGraph(params) {
+		var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+		var xBar = d3.scaleBand()
+          .range([0, width/3.5])
+          .padding(0.1);
+		var yBar = d3.scaleLinear()
+          .range([heightDailyClose,0])
+
+		xBar.domain(params.data.map(function(d) { return Object.keys(d)[0]; }));
+  		yBar.domain([0, d3.max(params.data, function(d) { return Object.values(d)[0]; })]).nice();
+
+  		params.group.selectAll(".bar")
+						.data(params.data)
+						.enter()
+							.append("rect")
+							.attr("class", "bar")
+							.attr("x", function(d) { return xBar(Object.keys(d)[0]); })
+							.attr("width", xBar.bandwidth())
+							.attr("y", function(d) { return yBar(Object.values(d)[0]); })
+							.style("fill", function(d,i) { console.log(color(i)); return color(i); })
+							.attr("height", function(d) { return heightDailyClose - yBar(Object.values(d)[0]); });
+		
+		params.group.selectAll("text.bar")
+						.data(params.data)
+						.enter()
+							.append("text")
+							.attr("class", "bar-text")
+							.attr("text-anchor", "middle")
+							.attr("x", function(d) { return xBar(Object.keys(d)[0])+22; })
+							.attr("y", function(d) { return yBar(Object.values(d)[0]) + 10; })
+							.text(function(d) { 
+								if(params.group == dailyVolGroup) return String(Object.values(d)[0]).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+								return Object.values(d)[0]; 
+							})
+							.attr("fill", "#fff");
+
+	  	params.group.append("g")
+	     	.call(d3.axisLeft(yBar))
+	     	.classed("axis axis-daily-y", true);
+
+	  	params.group.append("g")
+		     .attr("transform", "translate(0," + heightDailyClose + ")")
+		     .call(d3.axisBottom(xBar))
+		     .classed("axis axis-daily-x", true);
+
+	}
+
 	this.append("text")
 		.attr("id", "analytics-header-text")
 		.text("Week In Review");
@@ -421,8 +509,17 @@ function drawBottom(params){
 			return getAverages('low').toFixed(2);
 		})
 
-
-
+	var dailyCloseData = getDailyData('close');
+	var dailyVolData = getDailyData('volume');
+	
+	drawDailyGraph.call(this, {
+		group: dailyCloseGroup,
+		data: dailyCloseData.reverse()
+	});
+	drawDailyGraph.call(this, {
+		group: dailyVolGroup,
+		data: dailyVolData.reverse()
+	});
 }
 
 
