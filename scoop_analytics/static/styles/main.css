@@ -235,7 +235,9 @@ text.panelstream-tweet-header-text {
 .panel-header, .panelstream-header {
 	background:rgba(0,101,252, 0.15);
 	position: absolute;
-	width: 100%;
+    width: -webkit-calc(100% - 10px);
+    width:    -moz-calc(100% - 10px);
+    width:         calc(100% - 10px);
 }
 #panelstream-header-img, #panel-header-img {
 	position: relative;
