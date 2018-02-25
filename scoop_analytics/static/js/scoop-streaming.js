@@ -77,7 +77,7 @@ $(document).ready(function() {
 	}
 
 	socket.on('my response', function(data){
-		if(q.size()<8) 
+		if(q.size()<10) 
 		{
 			q.enqueue(data['data']);
 			addStreamPanel(q.contents());
