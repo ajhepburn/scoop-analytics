@@ -87,7 +87,7 @@ body,html{
 	fill: none;
 	stroke-width: 2px;
 	shape-rendering: geometricPrecision;
-	opacity: 0.8;
+	opacity: 1;
 	stroke: #ffb2b2 !important;
 }
 .area{
@@ -395,12 +395,21 @@ text.panel-tweet-header-text {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
-#analytics-header-text, .a-label{
-	fill: #888a91;
+.a-label, .a-data{
+	fill: #000;
+	opacity: 0.65;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 #analytics-header-text {
 	font-size: 90%;
 }
 .axis-daily-y text, .axis-daily-x text {
 	fill: #4d4d4d;
+}
+#arc-change-pct, #arc-change {
+	font-size: 150%;
+	font-weight: bold;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }

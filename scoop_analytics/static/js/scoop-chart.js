@@ -3,9 +3,9 @@ var cashtag = "HMNY"
 var init_brush = null;
 
 
-setInterval(function(){ 
+/*setInterval(function(){ 
 	googleapi.fetch().scrapePage(market, cashtag, data_prices[data_prices.length-1]);
-}, 300000);
+}, 300000);*/
 
 var w = 900,
 	h = 800,
@@ -60,20 +60,38 @@ var svg = d3.select("#bs-center-div").append("svg")
 			.attr("width", w)
 			.attr("height", h);
 
+/*#3182bd
+#6baed6
+ #9ecae1
+ #c6dbef*/
+
 var areaGradient = svg.append("defs")
 	.append("linearGradient")
 	.attr("id","areaGradient")
 	.attr("x1", "0%").attr("y1", "0%")
 	.attr("x2", "0%").attr("y2", "100%");
 
+// areaGradient.append("stop")
+// 	.attr("offset", "0%")
+// 	.attr("stop-color", "#3182bd")
+// 	.attr("stop-opacity", 1);
+// areaGradient.append("stop")
+// 	.attr("offset", "25%")
+// 	.attr("stop-color", "#6baed6")
+// 	.attr("stop-opacity", 1);
 areaGradient.append("stop")
 	.attr("offset", "0%")
-	.attr("stop-color", "#e6f0ff")
+	.attr("stop-color", "#93cae1")
+	.attr("stop-opacity", 1);
+areaGradient.append("stop")
+	.attr("offset", "50%")
+	.attr("stop-color", "#c6dbef")
 	.attr("stop-opacity", 1);
 areaGradient.append("stop")
 	.attr("offset", "100%")
-	.attr("stop-color", "#003d99")
-	.attr("stop-opacity", 0);
+	.attr("stop-color", "white")
+	.attr("stop-opacity", 1);
+
 
 var areaGradientCtx = svg.append("defs")
 	.append("linearGradient")
@@ -182,7 +200,7 @@ var brush = d3.brushX()
     .extent([[0, 0], [width, height2]])
     .on("brush", brushed);
 
-var colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+var colorScale = d3.scaleOrdinal(d3.schemeCategory20);
 
 var xGridlines = d3.axisBottom(x)
 				.tickSize(-height,-height)
@@ -336,8 +354,8 @@ function drawBottom(params){
 		return total/lastWeek.length;
 	}
 
+	var days = [...new Set(lastWeek.map(item => timeParser(item.timestamp).getDay()))];
 	function getDailyData(key) {
-		var days = [...new Set(lastWeek.map(item => timeParser(item.timestamp).getDay()))];
 		var indexes=[];
 		var result=[];
 		days.forEach((val)=>{indexes.push(lastWeek.findIndex(x=>timeParser(x.timestamp).getDay() === val));});
@@ -350,44 +368,56 @@ function drawBottom(params){
 		return result;
 	}
 
+	var color = d3.scaleOrdinal(d3.schemeCategory10).domain(d3.range(0,4));
+
 	var dailyCloseGroup = this.append("g")
 						.classed("daily-close-group", true)
 						.attr("transform", "translate(20,"+marginDailyClose.bottom+")");
 
-	dailyCloseGroup.append("text")
-						.text("Daily Close Values")
-						.attr("transform", "translate(55,-10)");
-
 	var dailyVolGroup = this.append("g")
-					.classed("daily-vol-group", true)
-					.attr("transform", "translate(300,"+marginDailyClose.bottom+")");
+						.classed("daily-vol-group", true)
+						.attr("transform", "translate(300,"+marginDailyClose.bottom+")");
+
+	var arcGroup = this.append("g")
+						.classed("arc-group", true)
+						.attr("transform", "translate(650,"+(marginDailyClose.bottom+75)+")");
+
+	dailyCloseGroup.append("text")
+					.text("Daily Close Values")
+					.attr("transform", "translate(55,-10)");
 
 	dailyVolGroup.append("text")
-						.text("Daily Volume")
-						.attr("transform", "translate(85,-10)");
+					.text("Daily Volume")
+					.attr("transform", "translate(85,-10)");
+
+	arcGroup.append("text")
+					.text(function(){
+						return days.length+"-Day Change";
+					})
+					.attr("transform", "translate(-33,-87)");
 
 	function drawDailyGraph(params) {
-		var color = d3.scaleOrdinal(d3.schemeCategory10);
-
-		var xBar = d3.scaleBand()
+		var x = d3.scaleBand()
           .range([0, width/3.5])
           .padding(0.1);
-		var yBar = d3.scaleLinear()
+		var y = d3.scaleLinear()
           .range([heightDailyClose,0])
 
-		xBar.domain(params.data.map(function(d) { return Object.keys(d)[0]; }));
-  		yBar.domain([0, d3.max(params.data, function(d) { return Object.values(d)[0]; })]).nice();
+		x.domain(params.data.map(function(d) { return Object.keys(d)[0]; }));
+  		y.domain([0, d3.max(params.data, function(d) { return Object.values(d)[0]; })]).nice();
 
   		params.group.selectAll(".bar")
 						.data(params.data)
 						.enter()
 							.append("rect")
 							.attr("class", "bar")
-							.attr("x", function(d) { return xBar(Object.keys(d)[0]); })
-							.attr("width", xBar.bandwidth())
-							.attr("y", function(d) { return yBar(Object.values(d)[0]); })
-							.style("fill", function(d,i) { console.log(color(i)); return color(i); })
-							.attr("height", function(d) { return heightDailyClose - yBar(Object.values(d)[0]); });
+							.attr("x", function(d) { return x(Object.keys(d)[0]); })
+							.attr("width", x.bandwidth())
+							.attr("y", function(d) { return y(Object.values(d)[0]); })
+							.style("fill", function(d,i) {
+								return color(i); 
+							})
+							.attr("height", function(d) { return heightDailyClose - y(Object.values(d)[0]); });
 		
 		params.group.selectAll("text.bar")
 						.data(params.data)
@@ -395,28 +425,71 @@ function drawBottom(params){
 							.append("text")
 							.attr("class", "bar-text")
 							.attr("text-anchor", "middle")
-							.attr("x", function(d) { return xBar(Object.keys(d)[0])+22; })
-							.attr("y", function(d) { return yBar(Object.values(d)[0]) + 10; })
+							.attr("x", function(d) { return x(Object.keys(d)[0])+22; })
+							.attr("y", function(d) { return y(Object.values(d)[0]) + 10; })
 							.text(function(d) { 
 								if(params.group == dailyVolGroup) return String(Object.values(d)[0]).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 								return Object.values(d)[0]; 
 							})
-							.attr("fill", "#fff");
+							.attr("fill", function(d,i){
+								return "#fff"
+							});
 
 	  	params.group.append("g")
-	     	.call(d3.axisLeft(yBar))
+	     	.call(d3.axisLeft(y))
 	     	.classed("axis axis-daily-y", true);
 
 	  	params.group.append("g")
 		     .attr("transform", "translate(0," + heightDailyClose + ")")
-		     .call(d3.axisBottom(xBar))
+		     .call(d3.axisBottom(x))
 		     .classed("axis axis-daily-x", true);
 
 	}
 
+	function drawArc(params) {
+		var circ = 2 * Math.PI;
+		var decimalPct = parseFloat(params.changePct) / 100.0;
+
+		var arc = d3.arc()
+		    .innerRadius(55)
+		    .outerRadius(70)
+		    .startAngle(0);
+
+		var background = params.group.append("path")
+		    .datum({endAngle: circ})
+		    .style("fill", "#ddd")
+		    .attr("d", arc);
+
+		var foreground = params.group.append("path")
+		    .datum({endAngle:decimalPct*circ})
+		    .style("fill", function(d){
+		    	if(d.endAngle<0) return "#d62728";
+		    	else return "#2ca02c";
+		    })
+		    .attr("d", arc);
+
+		params.group.append("text")
+			.attr("id", "arc-change")
+			.attr("transform", "translate(-30,-10)")
+			.text(params.change)
+			.attr("fill", function(){
+				return foreground.attr("style").slice(6,-1);
+			});
+
+		params.group.append("text")
+					.attr("id", "arc-change-pct")
+					.attr("transform", "translate(-37,15)")
+					.text(params.changePct)
+					.attr("fill", function(){
+						return foreground.attr("style").slice(6,-1);
+					});
+	}
+
 	this.append("text")
 		.attr("id", "analytics-header-text")
-		.text("Week In Review");
+		.text(function(){
+			return market+":"+cashtag+" (Weekly Summary)";
+		});
 
 	this.append("text")
 		.attr("id", "analytics-lastval-label")
@@ -429,6 +502,7 @@ function drawBottom(params){
 		.text(function(){
 			return lastWeek[0].close.toFixed(2);
 		})
+		.classed("a-data", true);
 	this.append("text")
 		.attr("id", "analytics-change-label")
 		.attr("transform", "translate(75,20)")
@@ -443,6 +517,7 @@ function drawBottom(params){
 		.attr("fill", function(){
 			return fill(this.innerHTML);
 		});
+
 	this.append("text")
 		.attr("id", "analytics-change-percent-label")
 		.attr("transform", "translate(175,20)")
@@ -457,6 +532,7 @@ function drawBottom(params){
 		.attr("fill", function(){
 			return fill(this.innerHTML);
 		});
+
 	this.append("text")
 		.attr("id", "analytics-volume-label")
 		.attr("transform", "translate(300,20)")
@@ -471,7 +547,8 @@ function drawBottom(params){
 				total+=lastWeek[item].volume;
 			}
 			return String(total).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-		});
+		})
+		.classed("a-data", true);
 
 	this.append("text")
 		.attr("id", "analytics-avg-close-label")
@@ -484,6 +561,7 @@ function drawBottom(params){
 		.text(function(){
 			return getAverages('close').toFixed(2);
 		})
+		.classed("a-data", true);
 
 	this.append("text")
 		.attr("id", "analytics-avg-high-label")
@@ -496,6 +574,7 @@ function drawBottom(params){
 		.text(function(){
 			return getAverages('high').toFixed(2);
 		})
+		.classed("a-data", true);
 
 	this.append("text")
 		.attr("id", "analytics-avg-close-label")
@@ -508,6 +587,7 @@ function drawBottom(params){
 		.text(function(){
 			return getAverages('low').toFixed(2);
 		})
+		.classed("a-data", true);
 
 	var dailyCloseData = getDailyData('close');
 	var dailyVolData = getDailyData('volume');
@@ -519,6 +599,11 @@ function drawBottom(params){
 	drawDailyGraph.call(this, {
 		group: dailyVolGroup,
 		data: dailyVolData.reverse()
+	});
+	drawArc.call(this, {
+		group: arcGroup,
+		change: (lastWeek[lastWeek.length-1].close - lastWeek[0].close).toFixed(2),
+		changePct: getPercentageChange(lastWeek[0].close, lastWeek[lastWeek.length-1].close)
 	});
 }
 
@@ -834,7 +919,7 @@ function plot(params){
 			.enter()
 				.append("path")
 				.attr("clip-path", "url(#clip)")
-				.attr("fill", "url(#areaGradientCtx)")
+				.attr("fill", "url(#areaGradient)")
 				.classed("area",true)
 
 		g.selectAll(".trendline")
@@ -1089,7 +1174,8 @@ function brushed() {
 	focus.selectAll(".area")
 		.attr("d", function(d){
 			return area(d);
-		});
+		})
+		.attr("fill", "url(#areaGradient)");
 	volumes.selectAll(".bar")
 		.attr("x", function(d) { 
 			var time = timeParser(d.timestamp);
@@ -1158,7 +1244,8 @@ function zoomed() {
 	focus.selectAll(".area")
 		.attr("d", function(d){
 			return area(d);
-		});
+		})
+		.attr("fill", "url(#areaGradient)");
 		
 	init_brush = x.range().map(t.invertX, t);
 	focus.select(".axis.x").call(xAxis);
