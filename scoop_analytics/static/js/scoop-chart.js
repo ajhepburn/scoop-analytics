@@ -516,7 +516,7 @@ function drawBottom(params){
 			return lastWeek[0].close.toFixed(2);
 		})
 		.classed("a-data", true);
-	this.append("text")
+/*	this.append("text")
 		.attr("id", "analytics-change-label")
 		.attr("transform", "translate(75,20)")
 		.text("Change:")
@@ -544,16 +544,16 @@ function drawBottom(params){
 		})
 		.attr("fill", function(){
 			return fill(this.innerHTML);
-		});
+		});*/
 
 	this.append("text")
 		.attr("id", "analytics-volume-label")
-		.attr("transform", "translate(300,20)")
-		.text("Volume:")
+		.attr("transform", "translate(70,20)")
+		.text("Volume (Week):")
 		.classed("a-label", true);
 	this.append("text")
 		.attr("id", "analytics-volume-data")
-		.attr("transform", "translate(345,20)")
+		.attr("transform", "translate(160,20)")
 		.text(function(){
 			var total = 0;
 			for(item in lastWeek) {
@@ -659,6 +659,15 @@ function drawStatic(params){
 
 		d3.select("#chart")
 			.append("text")
+			.attr("id", "chart-header-text")
+			.attr("transform", "translate("+margin.left+",25)")
+			.attr("fill", "#000")
+			.text(function(){
+				return market+":"+cashtag;
+			});
+
+		d3.select("#chart")
+			.append("text")
 			.classed("y axis-label",true)
 			.attr("transform", "translate(30,"+height/1.25+") rotate(-90)")
 			.text(function(){
@@ -670,7 +679,7 @@ function drawStatic(params){
 		d3.select("#chart")
 			.append("text")
 			.classed("x axis-curr-label",true)
-			.attr("transform", "translate("+width/1.95+",75)");
+			.attr("transform", "translate("+width/1.87+",75)");
 		d3.select("#chart")
 			.append("text")
 			.classed("market market-by-val", true)
@@ -838,6 +847,7 @@ function plot(params){
 			  	d3.selectAll(".hover-rect-group-y").style("display", null);
 		      })
 			  .on("mouseout", function() { 
+			  	d3.select(".x.axis-curr-label").style("opacity", 0);
 			  	hoverLineX.style("opacity", 1e-6); 
 			  	hoverLineY.style("opacity", 1e-6); 
 			  	d3.selectAll(".market-labels").style("opacity", 0);
@@ -1307,9 +1317,11 @@ function mousemove() {
 	d3.select("#hover-text-x").attr("x", xpos-5).attr("y",12.5).text(d3.timeFormat('%H:%M')(x.invert(xpos)));
 	d3.select("#hover-rect-y").attr("y", ypos-12);
 	d3.select("#hover-text-y").attr("y", ypos).attr("x",-32).text(y.invert(ypos).toFixed(3));
-	d3.select(".x.axis-curr-label").text(function(){
-		return d3.timeFormat('%b %d %Y, %a %H:%M')(timeParser(d.timestamp));
-	});
+	d3.select(".x.axis-curr-label")
+		.style("opacity", 1)
+		.text(function(){
+			return d3.timeFormat('%b %d %Y, %a %H:%M')(timeParser(d.timestamp));
+		});
 
 
 
@@ -1480,6 +1492,7 @@ function resetGraph() {
     d3.select(".volume").selectAll("*").remove();
     d3.select(".analytics").selectAll("*").remove();
 
+    d3.selectAll("#chart-header-text").remove();
     d3.selectAll(".axis-label").remove();
     d3.selectAll(".axis-curr-label").remove();
     d3.selectAll(".gridline").remove();
