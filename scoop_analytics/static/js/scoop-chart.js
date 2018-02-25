@@ -2,6 +2,7 @@ var market = "NASDAQ";
 var cashtag = "HMNY"
 var init_brush = null;
 
+
 setInterval(function(){ 
 	googleapi.fetch().scrapePage(market, cashtag, data_prices[data_prices.length-1]);
 }, 300000);
@@ -48,6 +49,36 @@ var svg = d3.select("#bs-center-div").append("svg")
         	.attr("id", "chart")
 			.attr("width", w)
 			.attr("height", h);
+
+var areaGradient = svg.append("defs")
+	.append("linearGradient")
+	.attr("id","areaGradient")
+	.attr("x1", "0%").attr("y1", "0%")
+	.attr("x2", "0%").attr("y2", "100%");
+
+areaGradient.append("stop")
+	.attr("offset", "0%")
+	.attr("stop-color", "#e6f0ff")
+	.attr("stop-opacity", 1);
+areaGradient.append("stop")
+	.attr("offset", "100%")
+	.attr("stop-color", "#003d99")
+	.attr("stop-opacity", 0);
+
+var areaGradientCtx = svg.append("defs")
+	.append("linearGradient")
+	.attr("id","areaGradientCtx")
+	.attr("x1", "0%").attr("y1", "0%")
+	.attr("x2", "0%").attr("y2", "100%");
+
+areaGradientCtx.append("stop")
+	.attr("offset", "0%")
+	.attr("stop-color", "#e6f0ff")
+	.attr("stop-opacity", 0.5);
+areaGradientCtx.append("stop")
+	.attr("offset", "100%")
+	.attr("stop-color", "#003d99")
+	.attr("stop-opacity", 0);
 
 svg.append("defs").append("clipPath")
     .attr("id", "clip")
@@ -541,6 +572,7 @@ function plot(params){
 		.enter()
 			.append("path")
 			.attr("clip-path", "url(#clip)")
+			.attr("fill", "url(#areaGradient)")
 			.classed("area",true);
 
 	this.selectAll(".price")
@@ -705,6 +737,7 @@ function plot(params){
 			.enter()
 				.append("path")
 				.attr("clip-path", "url(#clip)")
+				.attr("fill", "url(#areaGradientCtx)")
 				.classed("area",true)
 
 		g.selectAll(".trendline")
