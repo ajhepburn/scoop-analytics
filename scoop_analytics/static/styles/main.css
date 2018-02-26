@@ -413,7 +413,7 @@ text.panel-tweet-header-text {
 }
 #arc-change-pct, #arc-change {
 	font-size: 150%;
-	font-weight: bold;
+	font-weight: none;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
