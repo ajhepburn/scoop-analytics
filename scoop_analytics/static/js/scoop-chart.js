@@ -3,9 +3,9 @@ var cashtag = "HMNY"
 var init_brush = null;
 
 
-/*setInterval(function(){ 
+setInterval(function(){ 
 	googleapi.fetch().scrapePage(market, cashtag, data_prices[data_prices.length-1]);
-}, 300000);*/
+}, 300000);
 
 var w = 900,
 	h = 800,
@@ -491,7 +491,7 @@ function drawBottom(params){
 
 		params.group.append("text")
 					.attr("id", "arc-change-pct")
-					.attr("transform", "translate(-37,15)")
+					.attr("transform", "translate(-39,15)")
 					.text(params.changePct)
 					.attr("fill", function(){
 				    	return colorise(decimalPct);

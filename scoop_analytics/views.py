@@ -117,7 +117,7 @@ def worker():
 
 @app.route("/")
 def main():
-	# scraper('NASDAQ', 'HMNY')
+	scraper('NASDAQ', 'HMNY')
 	prices_result = db.engine.execute("SELECT symbol, timestamp, open, close, high, low, volume FROM share_prices WHERE (close >= 1.025 * open) AND volume <> 0 AND symbol LIKE 'HMNY';")
 	docs_result = db.engine.execute("SELECT * FROM documents, jsonb_array_elements(data->'entities'->'symbols') where value->>'text' in ('HMNY');")
 	gprices_result = db.engine.execute("SELECT * FROM stream_prices ORDER BY timestamp desc;")
