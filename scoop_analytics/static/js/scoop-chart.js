@@ -7,6 +7,20 @@ var init_brush = null;
 	googleapi.fetch().scrapePage(market, cashtag, data_prices[data_prices.length-1]);
 }, 120000);*/
 
+$("#market-dropdown  a").click(function(){
+	d3.select("#confirm-change-text").text("Confirm");
+	var selText = $(this).text();
+	d3.select("#market-btn").text(selText);
+  // $(this).parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
+});
+
+$("#stock-dropdown  a").click(function(){
+	d3.select("#confirm-change-text").text("Confirm");
+	var selText = $(this).text();
+	d3.select("#stock-btn").text(selText);
+  // $(this).parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
+});
+
 var w = 900,
 	h = 800,
 	margin = {
@@ -657,14 +671,34 @@ function drawStatic(params){
 			.attr("transform", "translate(0,0)")
 			.call(params.gridlines.y);
 
-		d3.select("#chart")
+/*		d3.select("#chart")
 			.append("text")
 			.attr("id", "chart-header-text")
 			.attr("transform", "translate("+margin.left+",25)")
 			.attr("fill", "#000")
 			.text(function(){
 				return market+":"+cashtag;
+			});*/
+		d3.select(".buttons")
+			.append("text")
+			.attr("id", "confirm-change-text")
+			.text("")
+			.on("click", function(){
+				console.log(d3.select("#market-btn").text(),d3.select("#stock-btn").text())
+				var jqxhr = $.getJSON("change-mkt-stock", {"data": JSON.stringify([d3.select("#market-btn").text(),d3.select("#stock-btn").text()])})
+				  .done(function(data) {
+
+				  })
+				  .fail(function() {
+				    console.log( "error" );
+				  })
+				  .always(function() {
+				    console.log( "complete" );
+				  });
 			});
+
+		d3.select("#market-btn").text(function(){return market;});
+		d3.select("#stock-btn").text(function(){return cashtag;});
 
 		d3.select("#chart")
 			.append("text")

@@ -15,6 +15,14 @@ body,html{
 	font-size: 0.95em;
 	text-align: center;
 }
+.buttons{
+	margin-left:80px;
+}
+#confirm-change-text {
+	font-size: 75%;
+	color: steelblue !important;
+	text-decoration: underline;
+}
 #chart{
 	background-color: #FFFFFF;
 	/*border: 1px solid #CCC;*/

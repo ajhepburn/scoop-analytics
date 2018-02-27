@@ -25,6 +25,14 @@ scrape_ticks = 10
 # 		return '<h1>Your twitter name is @{}'.format(account_info_json['screen_name'])
 # 	return '<h1>Request failed!</h1>'
 
+@app.route('/change-mkt-stock', methods=['GET'])
+def changer(*args):
+	data = request.args.get('data')
+	print(data)
+	result = ''
+	return jsonify(result)
+
+
 @app.route('/google-get', methods=['GET'])
 def scraper(*args):
 	data = request.args.get('data')
