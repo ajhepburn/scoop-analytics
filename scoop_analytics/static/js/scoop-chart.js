@@ -1,5 +1,5 @@
-var market = "NASDAQ";
-var cashtag = "HMNY"
+var market = data_prices[data_prices.length-1]['market'];
+var cashtag = data_prices[data_prices.length-1]['symbol'];
 var init_brush = null;
 
 
@@ -355,9 +355,7 @@ function drawBottom(params){
 
 	function getPercentageChange(oldNumber, newNumber){
 	    var decreaseValue = oldNumber - newNumber;
-	    if (oldNumber>newNumber) return "+"+((decreaseValue / oldNumber) * 100).toFixed(2)+"%";
-	    else if (oldNumber<newNumber) return "-"+((decreaseValue / oldNumber) * 100).toFixed(2)+"%";
-	    else return ((decreaseValue / oldNumber) * 100).toFixed(2)+"%";
+	    return ((decreaseValue / oldNumber) * 100).toFixed(2);
 	}
 
 	function fill(str){
@@ -498,7 +496,10 @@ function drawBottom(params){
 		params.group.append("text")
 			.attr("id", "arc-change")
 			.attr("transform", "translate(-30,-10)")
-			.text(params.change)
+			.text(function(){
+						if(params.change<0) return params.change;
+						else return "+"+params.change;
+					})
 			.attr("fill", function(){
 				return colorise(decimalPct);
 			});
@@ -506,7 +507,10 @@ function drawBottom(params){
 		params.group.append("text")
 					.attr("id", "arc-change-pct")
 					.attr("transform", "translate(-39,15)")
-					.text(params.changePct)
+					.text(function(){
+						if(params.changePct<0) return params.changePct+"%";
+						else return "+"+params.changePct+"%";
+					})
 					.attr("fill", function(){
 				    	return colorise(decimalPct);
 					});
@@ -629,8 +633,8 @@ function drawBottom(params){
 	});
 	drawArc.call(this, {
 		group: arcGroup,
-		change: (lastWeek[lastWeek.length-1].close - lastWeek[0].close).toFixed(2),
-		changePct: getPercentageChange(lastWeek[0].close, lastWeek[lastWeek.length-1].close)
+		change: (lastWeek[0].close - lastWeek[lastWeek.length-1].close).toFixed(2),
+		changePct: getPercentageChange(lastWeek[lastWeek.length-1].close,lastWeek[0].close)
 	});
 }
 
@@ -684,10 +688,26 @@ function drawStatic(params){
 			.attr("id", "confirm-change-text")
 			.text("")
 			.on("click", function(){
-				console.log(d3.select("#market-btn").text(),d3.select("#stock-btn").text())
+				d3.select("#confirm-change-text").text("")
 				var jqxhr = $.getJSON("change-mkt-stock", {"data": JSON.stringify([d3.select("#market-btn").text(),d3.select("#stock-btn").text()])})
 				  .done(function(data) {
-
+				  	data_prices = parseData.parseFlaskJSON().parsePrices(data);
+	              	resetGraph();
+	                setDiscontinuities();
+				    
+				    plot.call(focus, {
+						data_prices: data_prices,
+						axis: {
+							x: xAxis,
+							y: yAxis,
+							x2: xAxis2
+						},
+						gridlines: {
+							x: xGridlines,
+							y: yGridlines,
+						},
+						initialise: true
+					});
 				  })
 				  .fail(function() {
 				    console.log( "error" );
@@ -732,7 +752,7 @@ function drawStatic(params){
 			var txt = dataRange[i];
 			marketData.append("text")
 						.classed("market market-"+dataRange[i],true)
-						.attr("transform", "translate("+(45*i)+",0)");
+						.attr("transform", "translate("+(55*i)+",0)");
 		}
 		/*marketData.append("text")
 				.classed("market market-current", true)
@@ -761,7 +781,7 @@ function drawStatic(params){
 			var txt = labelRange[i];
 			marketLabels.append("text")
 						.classed("market-labels market-"+labelRange[i],true)
-						.attr("transform", "translate("+(45*i)+",0)")
+						.attr("transform", "translate("+(55*i)+",0)")
 						.text(txt);
 		}
 		/*d3.select(".market-C").attr("transform", "translate(0,0)");
@@ -1539,6 +1559,9 @@ function resetGraph() {
     d3.selectAll(".daterange-group").remove();
     d3.select(".lastupdated").remove();
     d3.select(".rect-group-lastval").remove();
+
+    market = data_prices[data_prices.length-1]['market'];
+	cashtag = data_prices[data_prices.length-1]['symbol'];
 
     x.domain([d3.min(data_prices, function(d){
 		    	var time = timeParser(d.timestamp);

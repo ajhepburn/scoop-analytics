@@ -80,7 +80,8 @@ class GooglePrices(BaseModel, db.Model):
 
 class StreamPrices(BaseModel, db.Model):
     __tablename__ = 'stream_prices'
-    symbol = db.Column(db.String)
+    market = db.Column(db.String,primary_key=True)
+    symbol = db.Column(db.String,primary_key=True)
     timestamp = db.Column(db.Integer, primary_key=True)
     close = db.Column(db.Float)
     high = db.Column(db.Float)
@@ -89,7 +90,8 @@ class StreamPrices(BaseModel, db.Model):
     volume = db.Column(db.Integer)
     average = db.Column(db.Float)
 
-    def __init__(self, symbol, timestamp, close, high, low, open, volume, average):
+    def __init__(self, market, symbol, timestamp, close, high, low, open, volume, average):
+        self.market = market
         self.symbol = symbol
         self.timestamp = timestamp
         self.close = close
