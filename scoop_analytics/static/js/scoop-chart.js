@@ -5,7 +5,7 @@ var init_brush = null;
 
 setInterval(function(){ 
 	googleapi.fetch().scrapePage(market, cashtag, data_prices[data_prices.length-1]);
-}, 300000);
+}, 120000);
 
 var w = 900,
 	h = 800,

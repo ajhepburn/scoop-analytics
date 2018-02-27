@@ -63,13 +63,14 @@ def scraper(*args):
 	def db_insert():
 		new_points = []
 		obj = db.session.query(StreamPrices).order_by(StreamPrices.timestamp.desc()).first()
-		isEmpty = db.session.query(StreamPrices).first()
+		# isEmpty = db.session.query(StreamPrices).first()
+		isEmpty = db.session.query(exists().where(StreamPrices.symbol==cashtag))
 		index_check = False
 		if isEmpty is not None:
 			for i, c in enumerate(output):
 				if c[0]==obj.timestamp:
 					try:
-						next_pos = i+1
+						next_pos = i+scrape_ticks
 						index_check = True
 					except IndexError:
 						index_check = False
@@ -83,7 +84,7 @@ def scraper(*args):
 				for i,c in enumerate(output):
 					if c[0]==last_el['timestamp']:
 						try:
-							next_pos = i+1
+							next_pos = i+scrape_ticks
 							index_check = True
 						except IndexError:
 							index_check = False
@@ -137,7 +138,7 @@ def main():
 
 @socketio.on('my event')
 def handle_my_custom_event(json):
-	json['track'] = 'vodka'
+	json['track'] = 'pizza'
 	r = api.request('statuses/filter', json)
 	for item in r.get_iterator():
 		if 'text' in item:
