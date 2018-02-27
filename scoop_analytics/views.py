@@ -41,8 +41,8 @@ def scraper(*args):
 		on_init = False
 
 	page = requests.get('https://finance.google.com/finance/getprices?f=d,o,h,l,c,v&df=cpct&x='+market+'&q='+cashtag+'&i=60s&p=10d')
-	content = [c.decode() for c in page.content.splitlines()]
-	content = content[7:]
+	raw_content = [c.decode() for c in page.content.splitlines()]
+	content = raw_content[7:]
 	output = []
 
 	for i, c in enumerate(content):
@@ -71,7 +71,7 @@ def scraper(*args):
 			for i, c in enumerate(output):
 				if c[0]==obj.timestamp:
 					try:
-						next_pos = i+scrape_ticks
+						next_pos = i+1
 						index_check = True
 					except IndexError:
 						index_check = False
@@ -85,7 +85,7 @@ def scraper(*args):
 				for i,c in enumerate(output):
 					if c[0]==last_el['timestamp']:
 						try:
-							next_pos = i+scrape_ticks
+							next_pos = i+1
 							index_check = True
 						except IndexError:
 							index_check = False
