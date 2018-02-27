@@ -377,19 +377,30 @@ function drawBottom(params){
 
 	var days = [...new Set(lastWeek.map(item => timeParser(item.timestamp).getDay()))];
 	function getDailyData(key) {
-		var indexes=[];
+		const reducer = (acc, val) => acc + val;
 		var result=[];
-		days.forEach((val)=>{indexes.push(lastWeek.findIndex(x=>timeParser(x.timestamp).getDay() === val));});
-		indexes.forEach((val)=>{
-			var day = String(d3.timeFormat('%a')(timeParser(lastWeek[val].timestamp)));
-			var dict = {};
-			dict[day]= lastWeek[val][key];
-			result.push(dict);
-		});
+		
+		if(key=='close') {
+			var indexes=[];
+			days.forEach((val)=>{indexes.push(lastWeek.findIndex(x=>timeParser(x.timestamp).getDay() == val));});
+			indexes.forEach((val)=>{
+				var day = String(d3.timeFormat('%a')(timeParser(lastWeek[val].timestamp)));
+				var dict = {};
+				dict[day]= lastWeek[val][key];
+				result.push(dict);
+			});
+		} else {
+			var volByDay = d3.nest().key(function(d){return d3.timeFormat('%a')(timeParser(d.timestamp));}).entries(lastWeek);
+			volByDay.forEach((val)=>{
+				var dict = {};
+				dict[val.key] = val.values.map(item => item.volume).reduce((prev, next) => prev + next);
+				result.push(dict);
+			});
+		}
 		return result;
 	}
 
-	var color = d3.scaleOrdinal(d3.schemeCategory10).domain(d3.range(0,4));
+	var color = d3.scaleOrdinal(d3.schemeCategory10);
 
 	var dailyCloseGroup = this.append("g")
 						.classed("daily-close-group", true)
@@ -449,7 +460,9 @@ function drawBottom(params){
 							.attr("x", function(d) { return x(Object.keys(d)[0])+22; })
 							.attr("y", function(d) { return y(Object.values(d)[0]) + 10; })
 							.text(function(d) { 
-								if(params.group == dailyVolGroup) return String(Object.values(d)[0]).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+								if(params.group == dailyVolGroup) {
+									return String(Object.values(d)[0]).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+								}
 								return Object.values(d)[0]; 
 							})
 							.attr("fill", function(d,i){
