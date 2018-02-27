@@ -48,25 +48,25 @@ def scraper(*args):
 	for i, c in enumerate(content):
 		content[i] = c.split(",")
 		if content[i][0].startswith('a'):
-			count = 0
+			# count = 0
 			current_epoch = int(content[i][0][1:])
 			content[i][0] = current_epoch
 			content[i][1:] = [float(x) for x in content[i][1:]]
 			output.append(content[i])
 		else:
-			count+=1
+			count = int(content[i][0])
 			content[i][0] = current_epoch + (count*60)
 			content[i][1:] = [float(x) for x in content[i][1:]]
-			if not count % scrape_ticks:
+			if count % scrape_ticks == 0:
 				output.append(content[i])
 
 	def db_insert():
 		new_points = []
 		obj = db.session.query(StreamPrices).order_by(StreamPrices.timestamp.desc()).first()
 		# isEmpty = db.session.query(StreamPrices).first()
-		isEmpty = db.session.query(exists().where(StreamPrices.symbol==cashtag))
+		stockExists = db.session.query(exists().where(StreamPrices.symbol==cashtag)).scalar()
 		index_check = False
-		if isEmpty is not None:
+		if stockExists:
 			for i, c in enumerate(output):
 				if c[0]==obj.timestamp:
 					try:
