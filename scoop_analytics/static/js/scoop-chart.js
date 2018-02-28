@@ -3,9 +3,9 @@ var cashtag = data_prices[data_prices.length-1]['symbol'];
 var init_brush = null;
 
 
-/*setInterval(function(){ 
-	googleapi.fetch().scrapePage(market, cashtag, data_prices[data_prices.length-1], false);
-}, 120000);*/
+setInterval(function(){ 
+	googleapi.fetch().scrapePage(market, cashtag, data_prices[data_prices.length-1]);
+}, 120000);
 
 $("#market-dropdown  a").click(function(){
 	d3.select("#confirm-change-text").text("Confirm");

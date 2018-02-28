@@ -33,20 +33,14 @@ def scraper(*args):
 		market = args[0]
 		cashtag = args[1]
 		on_init = True
-		page = requests.get('https://finance.google.com/finance/getprices?f=d,o,h,l,c,v&df=cpct&x='+market+'&q='+cashtag+'&i=60s&p=10d')
 	elif data is not None:
 		data = json.loads(data)
-		if len(args) == 4:
-			market = data[0]
-			cashtag = data[1]
-			last_el = data[2]
-			on_init = False
-			page = requests.get('https://finance.google.com/finance/getprices?f=d,o,h,l,c,v&df=cpct&x='+market+'&q='+cashtag+'&i=60s&p=10d')
-		else:
-			market = data[0]
-			cashtag = data[1]
-			page = data[2]
+		market = data[0]
+		cashtag = data[1]
+		last_el = data[2]
+		on_init = False
 
+	page = requests.get('https://finance.google.com/finance/getprices?f=d,o,h,l,c,v&df=cpct&x='+market+'&q='+cashtag+'&i=60s&p=10d')
 	raw_content = [c.decode() for c in page.content.splitlines()]
 	content = raw_content[7:]
 	output = []
@@ -99,6 +93,8 @@ def scraper(*args):
 				if index_check:
 					for c in output[next_pos:len(output)]:
 						c.append((c[1]+c[2]+c[3]+c[4])/4)
+						c.append(market)
+						c.append(cashtag)
 						new_points.append(c)
 
 		else:
@@ -106,7 +102,8 @@ def scraper(*args):
 				line = StreamPrices(market=''+market+'',symbol=''+cashtag+'',timestamp=c[0],close=c[1],high=c[2],low=c[3],open=c[4],volume=c[5],average=((c[1]+c[2]+c[3]+c[4])/4))
 				db.session.add(line)
 				db.session.commit()
-		
+
+		print(new_points)
 		if new_points!=[]:
 			return new_points
 
