@@ -284,6 +284,21 @@ text.panelstream-tweet-header-text {
 	box-sizing: border-box;
 }
 
+.panel-change-panel {
+	margin-top:40px;
+	width: -webkit-calc(100% - 10px);
+    width:    -moz-calc(100% - 10px);
+    width:         calc(100% - 10px);
+}
+
+#panel-change-text {
+	color: #888a91 !important;
+	font-style: italic;
+	font-size: 80%;
+	position: relative;
+	left: 150px;
+}
+
 .panel-body {
 	background:rgba(248,248,248, .05);
 	position: relative;
