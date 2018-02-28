@@ -92,7 +92,9 @@ var googleapi = {
                                          'low':data['pagedata'][result][3], 
                                          'open':data['pagedata'][result][4], 
                                          'volume':data['pagedata'][result][5], 
-                                         'average':data['pagedata'][result][6]}
+                                         'average':data['pagedata'][result][6],
+                                     	 'market':data['pagedata'][result][7],
+                                     	 'symbol':data['pagedata'][result][8]}
                         if(!data_prices.includes(item)) {
                             data_prices.push(item);
                         }
