@@ -1592,6 +1592,17 @@ function mousemove() {
 }
 
 function rangeClip(range) {
+	function nearestDate(date) {
+		var begin = 0;
+		for(var i=data_prices.length-1; i>=0; --i){
+			if(d3.timeFormat('%a %b %d %Y')(date) == d3.timeFormat('%a %b %d %Y')(timeParser(data_prices[i].timestamp))) {
+				begin = timeParser(data_prices[i].timestamp).getDate();
+				break;
+			}
+		}
+		return begin;
+	}
+
 	var today = new Date(timeParser(data_prices[data_prices.length - 1].timestamp));
 	var begin = new Date(timeParser(data_prices[data_prices.length - 1].timestamp));
 
@@ -1618,8 +1629,11 @@ function rangeClip(range) {
 	
 	exists = data_prices.findIndex(x => x.timestamp==d3.timeFormat('%s')(begin));
 
-	if(exists==-1) begin = 0;
-	else begin = x2(begin);
+	if(exists==-1) {
+		begin = nearestDate(begin);
+	} else {
+		begin = x2(begin);
+	}
 
 	d3.select(".brush").call(brush.move, [begin,x2(today)]);
 	d3.select("#x-fake-text0").text(d3.timeFormat("%H:%M")(x.domain()[0]));
