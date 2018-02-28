@@ -33,14 +33,20 @@ def scraper(*args):
 		market = args[0]
 		cashtag = args[1]
 		on_init = True
+		page = requests.get('https://finance.google.com/finance/getprices?f=d,o,h,l,c,v&df=cpct&x='+market+'&q='+cashtag+'&i=60s&p=10d')
 	elif data is not None:
 		data = json.loads(data)
-		market = data[0]
-		cashtag = data[1]
-		last_el = data[2]
-		on_init = False
+		if len(args) == 4:
+			market = data[0]
+			cashtag = data[1]
+			last_el = data[2]
+			on_init = False
+			page = requests.get('https://finance.google.com/finance/getprices?f=d,o,h,l,c,v&df=cpct&x='+market+'&q='+cashtag+'&i=60s&p=10d')
+		else:
+			market = data[0]
+			cashtag = data[1]
+			page = data[2]
 
-	page = requests.get('https://finance.google.com/finance/getprices?f=d,o,h,l,c,v&df=cpct&x='+market+'&q='+cashtag+'&i=60s&p=10d')
 	raw_content = [c.decode() for c in page.content.splitlines()]
 	content = raw_content[7:]
 	output = []
@@ -58,16 +64,17 @@ def scraper(*args):
 			content[i][0] = current_epoch + (count*60)
 			content[i][1:] = [float(x) for x in content[i][1:]]
 			if count % scrape_ticks == 0:
+				print(count, content[i])
 				output.append(content[i])
 
 	def db_insert():
 		new_points = []
-		obj = db.session.query(StreamPrices).order_by(StreamPrices.timestamp.desc()).first()
 		# isEmpty = db.session.query(StreamPrices).first()
 		marketExists = db.session.query(exists().where(StreamPrices.market==market)).scalar()
 		stockExists = db.session.query(exists().where(StreamPrices.symbol==cashtag)).scalar()
 		index_check = False
 		if marketExists and stockExists:
+			obj = db.session.query(StreamPrices).filter(StreamPrices.market.like(market),StreamPrices.symbol.like(cashtag)).order_by(StreamPrices.timestamp.desc()).first()
 			for i, c in enumerate(output):
 				if c[0]==obj.timestamp:
 					try:

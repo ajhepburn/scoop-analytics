@@ -4,7 +4,7 @@ var init_brush = null;
 
 
 /*setInterval(function(){ 
-	googleapi.fetch().scrapePage(market, cashtag, data_prices[data_prices.length-1]);
+	googleapi.fetch().scrapePage(market, cashtag, data_prices[data_prices.length-1], false);
 }, 120000);*/
 
 $("#market-dropdown  a").click(function(){
@@ -433,7 +433,7 @@ function drawBottom(params){
           .range([0, width/3.5])
           .padding(0.1);
 		var y = d3.scaleLinear()
-          .range([heightDailyClose,0])
+          .range([heightDailyClose,0]);
 
 		x.domain(params.data.map(function(d) { return Object.keys(d)[0]; }));
   		y.domain([0, d3.max(params.data, function(d) { return Object.values(d)[0]; })]).nice();
