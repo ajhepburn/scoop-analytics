@@ -285,20 +285,27 @@ text.panelstream-tweet-header-text {
 }
 
 .panel-change-panel {
-	margin-top:40px;
+	margin-top:20px;
 	width: -webkit-calc(100% - 10px);
     width:    -moz-calc(100% - 10px);
     width:         calc(100% - 10px);
 }
 
-#panel-change-text {
-	color: #888a91 !important;
+#panel-placeholder-text {
+	fill: #888a91 !important;
 	font-style: italic;
 	font-size: 80%;
 	position: relative;
 	left: 150px;
 }
 
+#panel-change-percentage-text, #panel-change-value-text {
+	font-size: 125%;
+}
+#panel-change-real-text{
+	font-size: 80%;
+	font-style: italic;
+}
 .panel-body {
 	background:rgba(248,248,248, .05);
 	position: relative;

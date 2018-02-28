@@ -8,6 +8,10 @@ var twitterapi = {
 			if(tweet_arr.length!=0){
 				var jqxhr = $.getJSON("tweet-get", {"data": JSON.stringify(tweet_arr)})
 				  .done(function(data) {
+				  	d3.select("#panel-placeholder-text").text(" ");
+  					d3.select("#panel-change-percentage-text").attr("opacity", 1);
+					d3.select("#panel-change-value-text").attr("opacity", 1);
+
 				    var tweet_list = data['tweets'];
 				    var tweetDivs = d3.select(".panel").selectAll("div.panel-body")
 				    					.data(tweet_list)
