@@ -3,9 +3,9 @@ var cashtag = data_prices[data_prices.length-1]['symbol'];
 var init_brush = null;
 
 
-setInterval(function(){ 
+/*setInterval(function(){ 
 	googleapi.fetch().scrapePage(market, cashtag, data_prices[data_prices.length-1]);
-}, 120000);
+}, 120000);*/
 
 $("#market-dropdown  a").click(function(){
 	d3.select("#confirm-change-text").text("Confirm");
@@ -261,6 +261,17 @@ var areaCtx = d3.area()
 			})
 			.curve(d3.curveLinear);
 
+function getPercentageChange(oldNumber, newNumber){
+    var value = newNumber - oldNumber;
+    return ((value / oldNumber) * 100).toFixed(2);
+}
+
+function colorise(key){
+	if(key<0) return "#d62728";
+	// else return "#1f77b4";
+	else return "#2ca02c";
+}
+
 function drawRects(params){
 	this.append("g")
 		.classed("axis y-layer-lastval", true)
@@ -351,11 +362,6 @@ function drawBottom(params){
 			else lastWeek.push(data_prices[i]);
 		}
 		return lastWeek;
-	}
-
-	function getPercentageChange(oldNumber, newNumber){
-	    var decreaseValue = oldNumber - newNumber;
-	    return ((decreaseValue / oldNumber) * 100).toFixed(2);
 	}
 
 	function fill(str){
@@ -481,11 +487,6 @@ function drawBottom(params){
 	}
 
 	function drawArc(params) {
-		function colorise(key){
-			if(key<0) return "#d62728";
-			else return "#1f77b4";
-		}
-
 		var circ = 2 * Math.PI;
 		var decimalPct = parseFloat(params.changePct) / 100.0;
 
@@ -914,6 +915,9 @@ function plot(params){
 			  	d3.selectAll(".hover-rect-group-y").style("display", null);
 		      })
 			  .on("mouseout", function() { 
+			  	d3.select("#panel-placeholder-text").text("No tweets available");
+			  	d3.select("#panel-change-percentage-text").text("");
+			  	d3.select("#panel-change-value-text").text("");
 			  	d3.select(".x.axis-curr-label").style("opacity", 0);
 			  	hoverLineX.style("opacity", 1e-6); 
 			  	hoverLineY.style("opacity", 1e-6); 
@@ -1206,9 +1210,27 @@ var panelChange = d3.select("#bs-right-div")
 	.attr("height", 40)
 	.classed("panel-change-panel", true);
 
-panelChange.append("text")
-			.attr("id", "panel-change-text")
-			.text("Hover over the graph to reveal tweets")
+d3.select(".panel-change-panel").append("svg").classed("panel-change-panel-svg", true).attr("height", 50).attr("width", 450);
+var pChangeGrp = d3.select(".panel-change-panel-svg").append("g").classed("panel-change-panel-group", true);
+
+pChangeGrp.append("text")
+			.attr("id", "panel-placeholder-text")
+			.attr("transform", "translate(200,35)")
+			.text("No tweets available");
+pChangeGrp.append("text")
+			.attr("id", "panel-change-percentage-text")
+			.attr("transform", "translate(150,35)")
+			.attr("opacity", 0);
+
+pChangeGrp.append("text")
+			.attr("id", "panel-change-value-text")
+			.attr("transform", "translate(280,35)")
+			.attr("opacity", 0);
+
+/*pChangeGrp.append("text")
+			.attr("id", "panel-change-real-text")
+			.attr("transform", "translate(260,32)");*/
+
 
 var panelStreamHeader = d3.select("#bs-left-div")
 	.append("div")
@@ -1379,10 +1401,58 @@ function mousemove() {
 	    d1 = data_prices[i],
 	    d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0;
 
+	function checkPrev(key){
+		var prev = data_prices[data_prices.indexOf(key)-1].close;
+		var curr = key.close;
+
+		var change = (curr-prev).toFixed(2);
+		var changePct = getPercentageChange(prev, curr);
+		return [change,changePct];
+	}
+
+	d3.select("#panel-change-percentage-text").text(function(){
+		if((data_prices.indexOf(d)-1)>=0) {
+			var changePct = checkPrev(d)[1];
+
+			if(changePct>0) return "▲ +"+changePct+"%";
+			else if(changePct==0) return changePct+"%";
+			else return "▼ "+changePct+"%";
+		}
+	}).style("fill", function(){
+		var changePct = checkPrev(d)[1];
+		return colorise(changePct);
+	});
+
+	d3.select("#panel-change-value-text").text(function(){
+		if((data_prices.indexOf(d)-1)>=0) {
+			var change = checkPrev(d)[0];
+
+			if(change>0) return "+"+change;
+			else if(change==0) return change;
+			else if(change<0) return change;
+		}
+	}).style("fill", function(){
+		var change = checkPrev(d)[0];
+		return colorise(change);
+	});
+
+/*	d3.select("#panel-change-real-text").text(function(){
+		if((data_prices.indexOf(d)-1)>=0) {
+			var change = checkPrev(d)[0];
+
+			if(change>0) return "increase in "+cashtag+" share price";
+			else if(change==0) return "change in "+cashtag+" share price";
+			else return "decrease in "+cashtag+" share price";
+		}
+	}).style("fill", function(){
+		var change = checkPrev(d)[0];
+		return colorise(change);
+	});*/
+
 	d3.select(".lineTrackC").attr("transform", "translate(" + x(timeParser(d.timestamp)) + "," + y(d.close) + ")");
-	d3.select(".lineTrackA").attr("transform", "translate(" + x(timeParser(d.timestamp)) + "," + y(d.average) + ")");
+	// d3.select(".lineTrackA").attr("transform", "translate(" + x(timeParser(d.timestamp)) + "," + y(d.average) + ")");
     d3.select(".lineTrackC").select("text").text(formatCurrency(d.close));
-    d3.select(".lineTrackA").select("text").text(formatCurrency(d.average));
+    // d3.select(".lineTrackA").select("text").text(formatCurrency(d.average));
 
 	var xpos = d3.mouse(this)[0];
 	var ypos = d3.mouse(this)[1];
@@ -1437,14 +1507,14 @@ function mousemove() {
 			return d.low.toFixed(2);
 		})
 		.style("fill", fill('low'));
-	d3.selectAll(".market-avg")
+/*	d3.selectAll(".market-avg")
 		.style("opacity", 1)
 		.text(function(){
 			if(market=="NASDAQ") return "$"+d.average.toFixed(2);
 			if(market=="LON") return "£"+d.average.toFixed(2);
 			return d.average.toFixed(2);
 		})
-		.style("fill", fill('average'));
+		.style("fill", fill('average'));*/
 	d3.selectAll(".market-vol")
 		.style("opacity", 1)
 		.text(function(){
@@ -1501,6 +1571,10 @@ function mousemove() {
 			tweet_arr.push(data_tweets[j]);
 		} else {
 			if(Date.now() - lastRemove>1000) {
+				d3.select("#panel-placeholder-text").text("No tweets available")
+				d3.select("#panel-change-percentage-text").attr("opacity", 0);
+				d3.select("#panel-change-value-text").attr("opacity", 0);
+
 				var tweet_list = []
 				d3.selectAll(".panel-body")
 					.data(tweet_list)
@@ -1553,15 +1627,31 @@ function rangeClip(range) {
 }
 
 $(".overlay").hover(function(){}, function(){
-var clearPanel = setInterval(function(){
-	var tweet_list = []
-	d3.selectAll(".panel-body")
-		.data(tweet_list)
-		.exit()
-		.remove();
-	},100);
-setTimeout(function(){clearInterval(clearPanel);},1000);
+	var clearPanel = setInterval(function(){
+		var tweet_list = []
+		d3.selectAll(".panel-body")
+			.data(tweet_list)
+			.exit()
+			.remove();
+		},100);
+	setTimeout(function(){clearInterval(clearPanel);},1000);
+	d3.select("#panel-placeholder-text").text("No tweets available");
+  	d3.select("#panel-change-percentage-text").text("");
+  	d3.select("#panel-change-value-text").text("");
 });
+$("#bs-left-div").hover(function(){
+	var clearPanel = setInterval(function(){
+		var tweet_list = []
+		d3.selectAll(".panel-body")
+			.data(tweet_list)
+			.exit()
+			.remove();
+		},100);
+	setTimeout(function(){clearInterval(clearPanel);},1000);
+	d3.select("#panel-placeholder-text").text("No tweets available");
+  	d3.select("#panel-change-percentage-text").text("");
+  	d3.select("#panel-change-value-text").text("");
+}, function(){});
 
 function resetGraph() {
     d3.select(".focus").selectAll("*").remove();
