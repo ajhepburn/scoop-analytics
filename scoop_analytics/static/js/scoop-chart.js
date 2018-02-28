@@ -1200,6 +1200,16 @@ panelHeader.append("text")
 			.attr("id", "panel-header-text")
 			.text("Tweets that made an impact");
 
+var panelChange = d3.select("#bs-right-div")
+	.append("div")
+	.attr("class", "panel-change-panel")
+	.attr("height", 40)
+	.classed("panel-change-panel", true);
+
+panelChange.append("text")
+			.attr("id", "panel-change-text")
+			.text("Hover over the graph to reveal tweets")
+
 var panelStreamHeader = d3.select("#bs-left-div")
 	.append("div")
 	.attr("class", "panelstream-header")
