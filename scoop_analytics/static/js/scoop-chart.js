@@ -1202,7 +1202,7 @@ panelHeader.append("img")
 
 panelHeader.append("text")
 			.attr("id", "panel-header-text")
-			.text("Tweets that made an impact");
+			.text("Tweets that have made an impact");
 
 var panelChange = d3.select("#bs-right-div")
 	.append("div")
@@ -1596,11 +1596,21 @@ function rangeClip(range) {
 		var begin = 0;
 		for(var i=data_prices.length-1; i>=0; --i){
 			if(d3.timeFormat('%a %b %d %Y')(date) == d3.timeFormat('%a %b %d %Y')(timeParser(data_prices[i].timestamp))) {
-				begin = timeParser(data_prices[i].timestamp).getDate();
+				begin = timeParser(data_prices[i].timestamp)
 				break;
 			}
 		}
 		return begin;
+	}
+
+	function nearestTimestamp(ts){
+		var times_struct={};
+		for(var i=data_prices.length-1; i>0; --i){
+			var check = data_prices[i].timestamp - ts;
+			if(check>0) times_struct[i] = data_prices[i].timestamp - ts;
+		}
+		var smallest=Object.keys(times_struct).reduce(function(a, b){ return times_struct[a] < times_struct[b] ? a : b });
+		return timeParser(data_prices[smallest].timestamp);
 	}
 
 	var today = new Date(timeParser(data_prices[data_prices.length - 1].timestamp));
@@ -1630,7 +1640,8 @@ function rangeClip(range) {
 	exists = data_prices.findIndex(x => x.timestamp==d3.timeFormat('%s')(begin));
 
 	if(exists==-1) {
-		begin = nearestDate(begin);
+		begin = nearestTimestamp(d3.timeFormat('%s')(begin));
+		begin = x2(begin);
 	} else {
 		begin = x2(begin);
 	}
