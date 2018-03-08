@@ -2,6 +2,13 @@ var market = data_prices[data_prices.length-1]['market'];
 var cashtag = data_prices[data_prices.length-1]['symbol'];
 var init_brush = null;
 
+function getPercentageChange(oldNumber, newNumber){
+    var value = newNumber - oldNumber;
+    return ((value / oldNumber) * 100).toFixed(2);
+}
+
+twitterapi.fetch([], tweet_urls[0], tweet_urls[1]).getLiveTweets();
+
 
 /*setInterval(function(){ 
 	googleapi.fetch().scrapePage(market, cashtag, data_prices[data_prices.length-1]);
@@ -261,10 +268,10 @@ var areaCtx = d3.area()
 			})
 			.curve(d3.curveLinear);
 
-function getPercentageChange(oldNumber, newNumber){
+/*function getPercentageChange(oldNumber, newNumber){
     var value = newNumber - oldNumber;
     return ((value / oldNumber) * 100).toFixed(2);
-}
+}*/
 
 function colorise(key){
 	if(key<0) return "#d62728";
@@ -436,7 +443,7 @@ function drawBottom(params){
 
 	function drawDailyGraph(params) {
 		var x = d3.scaleBand()
-          .range([0, width/3.5])
+          .range([0, width/3])
           .padding(0.1);
 		var y = d3.scaleLinear()
           .range([heightDailyClose,0]);
@@ -1450,9 +1457,9 @@ function mousemove() {
 	});*/
 
 	d3.select(".lineTrackC").attr("transform", "translate(" + x(timeParser(d.timestamp)) + "," + y(d.close) + ")");
-	// d3.select(".lineTrackA").attr("transform", "translate(" + x(timeParser(d.timestamp)) + "," + y(d.average) + ")");
+	d3.select(".lineTrackA").attr("transform", "translate(" + x(timeParser(d.timestamp)) + "," + y(d.average) + ")");
     d3.select(".lineTrackC").select("text").text(formatCurrency(d.close));
-    // d3.select(".lineTrackA").select("text").text(formatCurrency(d.average));
+    d3.select(".lineTrackA").select("text").text(formatCurrency(d.average));
 
 	var xpos = d3.mouse(this)[0];
 	var ypos = d3.mouse(this)[1];
@@ -1507,14 +1514,14 @@ function mousemove() {
 			return d.low.toFixed(2);
 		})
 		.style("fill", fill('low'));
-/*	d3.selectAll(".market-avg")
+	d3.selectAll(".market-avg")
 		.style("opacity", 1)
 		.text(function(){
 			if(market=="NASDAQ") return "$"+d.average.toFixed(2);
 			if(market=="LON") return "£"+d.average.toFixed(2);
 			return d.average.toFixed(2);
 		})
-		.style("fill", fill('average'));*/
+		.style("fill", fill('average'));
 	d3.selectAll(".market-vol")
 		.style("opacity", 1)
 		.text(function(){

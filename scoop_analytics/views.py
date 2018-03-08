@@ -136,6 +136,15 @@ def worker():
 
 	return jsonify({"tweets": tweet_arr})
 
+@app.route('/tweet-get-new', methods=['GET'])
+def fetch_tweets():
+	data = json.loads(request.args.get('data'))
+	tweet_arr = []
+	for item in data:
+		tweet_arr.append(item)
+
+	return jsonify({"tweets": tweet_arr})
+
 @app.route("/")
 def main():
 	scraper('NASDAQ', 'HMNY')

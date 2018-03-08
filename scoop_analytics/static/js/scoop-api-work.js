@@ -74,8 +74,41 @@ var twitterapi = {
 				  });
 			}
 		}
+
+		function getLiveTweets(){
+			function getTwitterRanges(range) {
+				var result=[];
+				for(var i=data_prices.length-1; i>=0; --i){
+				  if(i==0) break;
+				  if(getPercentageChange(data_prices[i-1].close, data_prices[i].close)<-range || getPercentageChange(data_prices[i-1].close, data_prices[i].close)>range) {
+				  	result.push([data_prices[i-1].timestamp, data_prices[i].timestamp]);
+				  }
+				}
+				return result;
+			}
+
+			var tweet_ranges = getTwitterRanges(3.5);
+
+			function fetchNew(tweet_ranges){
+				if(tweet_ranges.length!=0) {
+					var jqxhr = $.getJSON("tweet-get-new", {"data": JSON.stringify(tweet_ranges)})
+								  .done(function(data) {
+								  	console.log(data);
+								  })
+								  .fail(function() {
+								    console.log( "error" );
+								  })
+								  .always(function() {
+								    console.log( "complete" );
+								  });
+				}
+			}
+
+			fetchNew(tweet_ranges);
+		}
 		return {
 			getTweets: getTweets,
+			getLiveTweets: getLiveTweets
 		}
 	}
 }

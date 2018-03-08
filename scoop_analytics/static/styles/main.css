@@ -447,3 +447,6 @@ text.panel-tweet-header-text {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
+.bar-text {
+	font-size:65% !important;
+}
