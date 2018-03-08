@@ -58,7 +58,6 @@ def scraper(*args):
 			content[i][0] = current_epoch + (count*60)
 			content[i][1:] = [float(x) for x in content[i][1:]]
 			if count % scrape_ticks == 0:
-				print(count, content[i])
 				output.append(content[i])
 
 	def db_insert():
@@ -103,7 +102,6 @@ def scraper(*args):
 				db.session.add(line)
 				db.session.commit()
 
-		print(new_points)
 		if new_points!=[]:
 			return new_points
 
@@ -138,12 +136,25 @@ def worker():
 
 @app.route('/tweet-get-new', methods=['GET'])
 def fetch_tweets():
+	result=[]
 	data = json.loads(request.args.get('data'))
-	tweet_arr = []
-	for item in data:
-		tweet_arr.append(item)
+	cashtag = request.args.get('cashtag')
 
-	return jsonify({"tweets": tweet_arr})
+	def utc2snowflake(stamp):
+		return (int(round(stamp * 1000)) - 1288834974657) << 22
+
+	for t_range in data:
+		tweet_arr=[]
+		range_from = t_range[0]
+		range_to = t_range[1]
+
+		r = api.request('search/tweets', {'q':cashtag, 'since_id': utc2snowflake(range_from), 'max_id': utc2snowflake(range_to), 'count':10, 'result_type':'mixed'})
+		for item in r:
+			tweet_arr.insert(0,item)
+		for item in tweet_arr:
+			result.append(item)
+
+	return jsonify({"tweets": result})
 
 @app.route("/")
 def main():

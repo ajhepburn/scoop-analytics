@@ -7,8 +7,6 @@ function getPercentageChange(oldNumber, newNumber){
     return ((value / oldNumber) * 100).toFixed(2);
 }
 
-twitterapi.fetch([], tweet_urls[0], tweet_urls[1]).getLiveTweets();
-
 
 /*setInterval(function(){ 
 	googleapi.fetch().scrapePage(market, cashtag, data_prices[data_prices.length-1]);
@@ -729,6 +727,7 @@ function drawStatic(params){
 						},
 						initialise: true
 					});
+					twitterapi.fetch([], tweet_urls[0], tweet_urls[1]).getLiveTweets();
 				  })
 				  .fail(function() {
 				    console.log( "error" );

@@ -78,20 +78,23 @@ var twitterapi = {
 		function getLiveTweets(){
 			function getTwitterRanges(range) {
 				var result=[];
-				for(var i=data_prices.length-1; i>=0; --i){
-				  if(i==0) break;
-				  if(getPercentageChange(data_prices[i-1].close, data_prices[i].close)<-range || getPercentageChange(data_prices[i-1].close, data_prices[i].close)>range) {
-				  	result.push([data_prices[i-1].timestamp, data_prices[i].timestamp]);
-				  }
+				for(var i=0; i<data_prices.length; i++) {
+					if(i==data_prices.length-1) break;
+					if(getPercentageChange(data_prices[i].close, data_prices[i+1].close)<-range || getPercentageChange(data_prices[i].close, data_prices[i+1].close)>range) {
+					  	result.push([data_prices[i].timestamp, data_prices[i+1].timestamp]);
+					}
 				}
 				return result;
 			}
 
-			var tweet_ranges = getTwitterRanges(3.5);
+			var tweet_ranges = getTwitterRanges(0.7);
+			for(var i=0; i<tweet_ranges.length; i++) {
+				console.log(timeParser(tweet_ranges[i][0]), timeParser(tweet_ranges[i][1]))
+			}
 
 			function fetchNew(tweet_ranges){
 				if(tweet_ranges.length!=0) {
-					var jqxhr = $.getJSON("tweet-get-new", {"data": JSON.stringify(tweet_ranges)})
+					var jqxhr = $.getJSON("tweet-get-new", {"data": JSON.stringify(tweet_ranges), "cashtag": cashtag})
 								  .done(function(data) {
 								  	console.log(data);
 								  })
