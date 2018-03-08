@@ -148,7 +148,7 @@ def fetch_tweets():
 		range_from = t_range[0]
 		range_to = t_range[1]
 
-		r = api.request('search/tweets', {'q':cashtag, 'since_id': utc2snowflake(range_from), 'max_id': utc2snowflake(range_to), 'count':10, 'result_type':'mixed'})
+		r = api.request('search/tweets', {'q':cashtag, 'since_id': utc2snowflake(range_from), 'max_id': utc2snowflake(range_to), 'count':7, 'result_type':'mixed'})
 		for item in r:
 			tweet_arr.insert(0,item)
 		for item in tweet_arr:

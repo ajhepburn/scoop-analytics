@@ -1570,7 +1570,7 @@ function mousemove() {
 	// PANEL
 	var tweet_arr = [];
 	for(j in data_tweets){
-		var tweet_time = timeParser(data_tweets[j]['timestamp_s']);
+		var tweet_time = d3.timeParse('%a %b %d %H:%M:%S %Z %Y')(data_tweets[j]['created_at']);
 		var point_time = timeParser(d.timestamp);
 		var diff = point_time.getTime() - tweet_time.getTime();
 		if(diff<=1800000 && diff>=-1800000) {
