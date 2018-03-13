@@ -1,12 +1,16 @@
 var market = data_prices[data_prices.length-1]['market'];
 var cashtag = data_prices[data_prices.length-1]['symbol'];
 var init_brush = null;
+var tweet_ranges=[];
+var data_tweets=[];
+var tweet_fetch_pct = 0.7;
 
 function getPercentageChange(oldNumber, newNumber){
     var value = newNumber - oldNumber;
     return ((value / oldNumber) * 100).toFixed(2);
 }
 
+// twitterapi.fetch([], tweet_urls[0], tweet_urls[1]).getLiveTweets(true);
 
 /*setInterval(function(){ 
 	googleapi.fetch().scrapePage(market, cashtag, data_prices[data_prices.length-1]);
@@ -298,7 +302,7 @@ function drawRects(params){
 			.attr("transform", "translate(-32,0)")
 			.attr("y",y(data_prices[data_prices.length-1].close)+12)
 			.text(function(){
-				return data_prices[data_prices.length-1].close.toFixed(3);
+				return data_prices[data_prices.length-1].close.toFixed(2);
 			});
 	d3.select(".rect-group-lastval")
 			.append("line")
@@ -727,7 +731,21 @@ function drawStatic(params){
 						},
 						initialise: true
 					});
-					twitterapi.fetch([], tweet_urls[0], tweet_urls[1]).getLiveTweets();
+					twitterapi.fetch([], tweet_urls[0], tweet_urls[1]).getLiveTweets(true);
+
+					socket.disconnect();
+
+					d3.selectAll(".panelstream-body")
+						.data([])
+						.exit()
+						.remove();
+
+					sentMyData = false;
+					socket.connect();
+/*					socket.on('connect', function() {
+						console.log('Connected (Twitter Stream). Streaming Keyword "'+data_prices[0]['symbol'].toString()+'"...');
+					    socket.emit('stream', {'track': data_prices[0]['symbol'].toString()});
+					});*/
 				  })
 				  .fail(function() {
 				    console.log( "error" );
@@ -1469,7 +1487,7 @@ function mousemove() {
 	d3.select("#hover-rect-x").attr("x", xpos-24);
 	d3.select("#hover-text-x").attr("x", xpos-5).attr("y",12.5).text(d3.timeFormat('%H:%M')(x.invert(xpos)));
 	d3.select("#hover-rect-y").attr("y", ypos-12);
-	d3.select("#hover-text-y").attr("y", ypos).attr("x",-32).text(y.invert(ypos).toFixed(3));
+	d3.select("#hover-text-y").attr("y", ypos).attr("x",-32).text(y.invert(ypos).toFixed(2));
 	d3.select(".x.axis-curr-label")
 		.style("opacity", 1)
 		.text(function(){
@@ -1568,33 +1586,35 @@ function mousemove() {
 			else return "#ff7575";
 		});
 	// PANEL
-	var tweet_arr = [];
-	for(j in data_tweets){
-		var tweet_time = d3.timeParse('%a %b %d %H:%M:%S %Z %Y')(data_tweets[j]['created_at']);
-		var point_time = timeParser(d.timestamp);
-		var diff = point_time.getTime() - tweet_time.getTime();
-		if(diff<=1800000 && diff>=-1800000) {
-			tweet_arr.push(data_tweets[j]);
-		} else {
-			if(Date.now() - lastRemove>1000) {
-				d3.select("#panel-placeholder-text").text("No tweets available")
-				d3.select("#panel-change-percentage-text").attr("opacity", 0);
-				d3.select("#panel-change-value-text").attr("opacity", 0);
+	if(data_tweets.length!=0) {
+		var tweet_arr = [];
+		for(var c=0; c<data_tweets.length; c++){
+			var tweet_time = d3.timeParse('%a %b %d %H:%M:%S %Z %Y')(data_tweets[c]['created_at']);
+			var point_time = timeParser(d.timestamp);
+			var diff = point_time.getTime() - tweet_time.getTime();
+			if(diff<=1800000 && diff>=-1800000) {
+				console.log(diff, "check");
+				tweet_arr.push(data_tweets[c]);
+			} else {
+				if(Date.now() - lastRemove>1000) {
+					d3.select("#panel-placeholder-text").text("No tweets available")
+					d3.select("#panel-change-percentage-text").attr("opacity", 0);
+					d3.select("#panel-change-value-text").attr("opacity", 0);
 
-				var tweet_list = []
-				d3.selectAll(".panel-body")
-					.data(tweet_list)
-					.exit()
-					.remove();
-				lastRemove = Date.now()
+					d3.selectAll(".panel-body")
+						.data([])
+						.exit()
+						.remove();
+					lastRemove = Date.now()
+				}
 			}
 		}
-	}
 
-	if(Date.now() - lastGet > 1000) {
-		twitterapi.fetch().getTweets(tweet_arr, tweet_urls[0], tweet_urls[1])
-        lastGet = Date.now();
-    }
+		if(Date.now() - lastGet > 1000) {
+			twitterapi.fetch().displayTweets(tweet_arr, tweet_urls[0], tweet_urls[1])
+	        lastGet = Date.now();
+	    }
+	}
 }
 
 function rangeClip(range) {
@@ -1706,6 +1726,8 @@ function resetGraph() {
 
     market = data_prices[data_prices.length-1]['market'];
 	cashtag = data_prices[data_prices.length-1]['symbol'];
+
+	data_tweets=[];
 
     x.domain([d3.min(data_prices, function(d){
 		    	var time = timeParser(d.timestamp);

@@ -1,6 +1,6 @@
 var twitterapi = {
 	fetch: function() {
-		function getTweets(arr, imgRetweet, imgFav) {
+		function displayTweets(arr, imgRetweet, imgFav) {
 			if(arr.length!=0){
 				console.log(arr);
 			  	d3.select("#panel-placeholder-text").text(" ");
@@ -61,7 +61,7 @@ var twitterapi = {
 			}
 		}
 
-		function getLiveTweets(){
+		function getLiveTweets(init){
 			function getTwitterRanges(range) {
 				var result=[];
 				for(var i=0; i<data_prices.length; i++) {
@@ -73,16 +73,34 @@ var twitterapi = {
 				return result;
 			}
 
-			var tweet_ranges = getTwitterRanges(0.7);
-			for(var i=0; i<tweet_ranges.length; i++) {
-				console.log(timeParser(tweet_ranges[i][0]), timeParser(tweet_ranges[i][1]))
+			if(init) {
+				tweet_ranges = getTwitterRanges(tweet_fetch_pct);
+				fetchNew(tweet_ranges);
+			} else {
+				var difference=[];
+				temp_ranges = getTwitterRanges(tweet_fetch_pct);
+				jQuery.grep(temp_ranges, function(el) {
+				        if (jQuery.inArray(el, tweet_ranges) == -1) difference.push(el);
+				});
+				tweet_ranges = temp_ranges;
+				fetchNew(difference);
 			}
+/*			for(var i=0; i<tweet_ranges.length; i++) {
+				console.log(timeParser(tweet_ranges[i][0]), timeParser(tweet_ranges[i][1]))
+			}*/
 
-			function fetchNew(tweet_ranges){
-				if(tweet_ranges.length!=0) {
-					var jqxhr = $.getJSON("tweet-get-new", {"data": JSON.stringify(tweet_ranges), "cashtag": cashtag})
+			function fetchNew(ranges){
+				if(ranges.length!=0) {
+					var jqxhr = $.getJSON("tweet-get-new", {"data": JSON.stringify(ranges), "cashtag": cashtag})
 								  .done(function(data) {
-								  	data_tweets = data['tweets'];
+								  	if(data==429) {
+								  		console.log("Error (429): Rate Limited");
+								  		data_tweets=[];
+								  	} else {
+								  		console.log("Update success");
+								  		if(init) data_tweets = data['tweets'];
+								  		else data_tweets.push(data['tweets']);
+								  	}
 								  })
 								  .fail(function() {
 								    console.log( "error" );
@@ -92,12 +110,10 @@ var twitterapi = {
 								  });
 				}
 			}
-
-			fetchNew(tweet_ranges);
 		}
 		return {
-			getTweets: getTweets,
-			getLiveTweets: getLiveTweets
+			getLiveTweets: getLiveTweets,
+			displayTweets: displayTweets
 		}
 	}
 }
@@ -125,6 +141,7 @@ var googleapi = {
                             data_prices.push(item);
                         }
                     }
+                    twitterapi.fetch([], tweet_urls[0], tweet_urls[1]).getLiveTweets(false);
                 }
 	                resetGraph();
 	                setDiscontinuities();
