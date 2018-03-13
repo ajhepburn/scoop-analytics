@@ -53,7 +53,7 @@
 <script>
 var data_prices_old = parseData.parseFlaskJSON().parsePrices({{ share_prices | tojson | safe}});
 var data_prices = parseData.parseFlaskJSON().parsePrices({{ google_prices | tojson | safe}});
-var data_tweets = parseData.parseFlaskJSON().parseTweets({{ documents | tojson | safe}});
+// var data_tweets = parseData.parseFlaskJSON().parseTweets({{ documents | tojson | safe}});
 var tweet_urls = ["{{ url_for('static', filename = 'img/twitter-retweet.svg') }}", "{{ url_for('static', filename = 'img/twitter-like.svg') }}", "{{ url_for('static', filename = 'img/twitter-reply.png') }}","{{ url_for('static', filename = 'img/twitter-promoted.png') }}"];
 </script>
 <script src="{{ url_for('static', filename = 'js/scoop-streaming.js') }}"></script>  

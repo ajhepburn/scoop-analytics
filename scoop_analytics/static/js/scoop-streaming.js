@@ -1,4 +1,7 @@
-/*function fifoQueue(){
+var socket;
+var sentMyData = false;
+
+function fifoQueue(){
 	collection = [];
 	this.print = function() {
 	    console.log(collection);
@@ -26,11 +29,13 @@
 var q = new fifoQueue();
 
 $(document).ready(function() {
-	var socket = io.connect('http://' + document.domain + ':' + location.port);
+	socket = io.connect('http://' + document.domain + ':' + location.port + '/tweets');
+	// socket = io.connect(null, {port: location.port, transports: ['websocket'], upgrade: false});
 	socket.on('connect', function() {
-	    socket.emit('my event', {'track': data_prices[0]['symbol'].toString()}, function(data){
-	    	console.log(data);
-	    });
+		console.log(sentMyData);
+		console.log('Connected (Twitter Stream). Streaming Keyword "'+data_prices[0]['symbol'].toString()+'"...');
+	    if(!sentMyData) socket.emit('stream', {'track': data_prices[0]['symbol'].toString()});
+	    sentMyData = true;
 	});
 
 	function addStreamPanel(queue) {
@@ -76,7 +81,8 @@ $(document).ready(function() {
 					.remove();
 	}
 
-	socket.on('my response', function(data){
+	socket.on('stream-response', function(data){
+		console.log("Response!");
 		if(q.size()<10) 
 		{
 			q.enqueue(data['data']);
@@ -90,4 +96,4 @@ $(document).ready(function() {
 			addStreamPanel(q.contents());
 		}
 	});
-});*/
+});

@@ -1,20 +1,25 @@
 from __future__ import print_function
+import eventlet
+eventlet.monkey_patch()
 from flask import render_template, json, jsonify, request, redirect, url_for, Response
-from flask_dance.contrib.twitter import twitter
+# from flask_dance.contrib.twitter import twitter
 from TwitterAPI import TwitterAPI
-from scoop_analytics import app
+# from __init__ import socketio
 from scoop_analytics.models import db, BaseModel, Documents, SharePrices, GooglePrices, StreamPrices
 from sqlalchemy import *
 from flask_socketio import SocketIO, send, emit
+from threading import Lock
 from lxml import html
+from scoop_analytics.app import app, socketio
 import requests
-import eventlet
+import time
 
-socketio = SocketIO(app, async_mode="threading")
+# socketio = SocketIO(app, async_mode="threading")
 api = TwitterAPI('7u1DrWrcqlRb3shnmSV271YAC', 'BjP4LEUDaDp7oSg7H5P1i9jRPtDAnGWxN7dZCfPpqel2n7P4Mc', '2837005903-xUCqnbARCn25DbXTaRtUBLhS2r9wFLywoMoaiGc', '8QrgDtohRvv3tiP0hWWCYnvJensFMNcLMcGqEu72FSCCI')
 
 # scrape_ticks must be in multiples of 1,5 or 10.
 scrape_ticks = 10
+stream_json = {}
 # @app.route("/twitter")
 # def twitter_login():
 # 	if not twitter.authorized:
@@ -24,6 +29,11 @@ scrape_ticks = 10
 # 		account_info_json = account_info.json()
 # 		return '<h1>Your twitter name is @{}'.format(account_info_json['screen_name'])
 # 	return '<h1>Request failed!</h1>'
+
+# thread = None
+# thread_lock = Lock()
+
+worker = None
 
 @app.route('/google-get', methods=['GET'])
 def scraper(*args):
@@ -54,6 +64,8 @@ def scraper(*args):
 			content[i][1:] = [float(x) for x in content[i][1:]]
 			output.append(content[i])
 		else:
+			if content[i][0].startswith('TIMEZONE'):
+				continue
 			count = int(content[i][0])
 			content[i][0] = current_epoch + (count*60)
 			content[i][1:] = [float(x) for x in content[i][1:]]
@@ -123,16 +135,16 @@ def changer(*args):
 		result = json.dumps([dict(r) for r in prices_result])
 		return jsonify(result)
 
-@app.route('/tweet-get', methods=['GET'])
-def worker():
-	data = json.loads(request.args.get('data'))
-	tweet_arr = []
-	for item in data:
-		tweet_info = twitter.get('statuses/show/'+str(item)+'.json')
-		print(tweet_info.text)
-		tweet_arr.append(json.loads(tweet_info.text))
+# @app.route('/tweet-get', methods=['GET'])
+# def worker():
+# 	data = json.loads(request.args.get('data'))
+# 	tweet_arr = []
+# 	for item in data:
+# 		tweet_info = twitter.get('statuses/show/'+str(item)+'.json')
+# 		print(tweet_info.text)
+# 		tweet_arr.append(json.loads(tweet_info.text))
 
-	return jsonify({"tweets": tweet_arr})
+# 	return jsonify({"tweets": tweet_arr})
 
 @app.route('/tweet-get-new', methods=['GET'])
 def fetch_tweets():
@@ -149,6 +161,8 @@ def fetch_tweets():
 		range_to = t_range[1]
 
 		r = api.request('search/tweets', {'q':cashtag, 'since_id': utc2snowflake(range_from), 'max_id': utc2snowflake(range_to), 'count':7, 'result_type':'mixed'})
+		if r.status_code == 429:
+			return "429"
 		for item in r:
 			tweet_arr.insert(0,item)
 		for item in tweet_arr:
@@ -168,23 +182,55 @@ def main():
 	prices = json.dumps([dict(r) for r in prices_result])
 	gprices = json.dumps([dict(r) for r in gprices_result])
 
-	if not twitter.authorized:
-		return redirect(url_for('twitter.login'))
+	# if not twitter.authorized:
+	# 	return redirect(url_for('twitter.login'))
 	# account_info = twitter.get('account/settings.json')
 	# if account_info.ok:
 	# 	account_info_json = account_info.json()
 	return render_template('index.html', documents=docs, share_prices=prices, google_prices=gprices)
 
-@socketio.on('my event')
-def handle_my_custom_event(json):
-	json['track'] = 'pizza'
-	r = api.request('statuses/filter', json)
-	for item in r.get_iterator():
-		if 'text' in item:
-			json_data = {'data': item}
-			emit('my response',json_data)
-		elif 'limit' in item:
-			print ('%d tweets missed') % item['limit'].get('track')
-		elif 'disconnect' in item:
-			print ('disconnecting because %s') % item['disconnect'].get('reason')
-			break
+class WorkerThread(object):
+	switch = False
+
+	def __init__(self, socketio):
+		self.socketio = socketio
+		self.switch = True
+
+	def do_work(self, args):
+
+		while self.switch:
+			self.socketio.sleep(5)
+			r = api.request('statuses/filter', args)
+			print(args)
+			if r.status_code == 420:
+				print("Error (420): Rate Limited")
+				time.sleep(60*15)
+			else:
+				for item in r.get_iterator():
+					if 'text' in item:
+						json_data = {'data': item}
+						with app.test_request_context('/'):
+							self.socketio.emit('stream-response',json_data, namespace='/tweets')
+					elif 'limit' in item:
+						print ('%d tweets missed') % item['limit'].get('track')
+					elif 'disconnect' in item:
+						print ('disconnecting because %s') % item['disconnect'].get('reason')
+						break
+
+			eventlet.sleep(2)
+
+	def stop(self):
+		print("Terminating thread...")
+		self.switch = False
+
+@socketio.on('stream', namespace='/tweets')
+def handle_stream(json):
+	global worker
+	worker = WorkerThread(socketio)
+
+	socketio.start_background_task(target=worker.do_work, args=json)
+
+@socketio.on('disconnect', namespace='/tweets')
+def handle_disconnect():
+	print("Client disconnected")
+	worker.stop()
