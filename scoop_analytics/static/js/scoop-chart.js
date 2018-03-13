@@ -281,6 +281,112 @@ function colorise(key){
 	else return "#2ca02c";
 }
 
+function drawTweetIndicators(params){
+	var point_arr = [];
+	var g = this.selectAll("g.close");
+	var ctx = context.selectAll("g.close");
+
+	var tweet_times=[];
+	data_tweets.forEach((val)=>{tweet_times.push(d3.timeFormat('%s')(d3.timeParse("%a %b %d %H:%M:%S %Z %Y")(val['created_at'])));});
+
+	var temp_arr=[];
+	tweet_ranges.forEach((val)=>{temp_arr.push(data_prices.find(x=>x.timestamp == val[1]));});
+
+	temp_arr.forEach((val)=>{
+		for(var i=0; i < tweet_times.length; i++) {
+			var diff = val.timestamp - tweet_times[i];
+			if(diff<=1800 && diff>=-1800) {
+				if(!point_arr.includes(val)) point_arr.push(val);
+			}
+		}
+	});
+
+	// enter()
+	this.selectAll(".pointLine")
+	.data(point_arr)
+		.enter()
+		.append("line")
+		.classed("pointLine", true)
+		.attr("clip-path", "url(#clip)");
+
+	this.selectAll(".point")
+	.data(point_arr)
+	.enter()
+		.append("circle")
+		.classed("point", true)
+		.attr("clip-path", "url(#clip)")
+		.attr("r", 4)
+		.style("fill", "#fff");
+
+	context.selectAll(".pointLineCtx")
+	.data(point_arr)
+		.enter()
+		.append("line")
+		.classed("pointLineCtx", true)
+		.attr("clip-path", "url(#clip)");
+
+	context.selectAll(".pointCtx")
+	.data(point_arr)
+	.enter()
+		.append("circle")
+		.classed("pointCtx", true)
+		.attr("clip-path", "url(#clip)")
+		.attr("r", 2)
+		.style("fill", "#fff");
+
+	// update
+
+	this.selectAll(".pointLine")
+	.attr("x1", function(d){
+		var time = timeParser(d.timestamp);
+		return x(time);	
+	})
+	.attr("x2", function(d){
+		var time = timeParser(d.timestamp);
+		return x(time);	
+	})
+	.attr("y1", function(d){
+		return y(d.close);
+	})
+	.attr("y2", function(d){
+		return y(d3.min(data_prices, function(d) { return d.close; }));
+	});
+
+	this.selectAll(".point")
+	.attr("cx", function(d){
+		var time = timeParser(d.timestamp);
+		return x(time);
+	})
+	.attr("cy", function(d){
+		return y(d.close);
+	});
+
+	context.selectAll(".pointLineCtx")
+	.attr("x1", function(d){
+		var time = timeParser(d.timestamp);
+		return x2(time);	
+	})
+	.attr("x2", function(d){
+		var time = timeParser(d.timestamp);
+		return x2(time);	
+	})
+	.attr("y1", function(d){
+		return y2(d.close);
+	})
+	.attr("y2", function(d){
+		return y2(d3.min(data_prices, function(d) { return d.close; }));
+	});
+
+	context.selectAll(".pointCtx")
+	.attr("cx", function(d){
+		var time = timeParser(d.timestamp);
+		return x2(time);
+	})
+	.attr("cy", function(d){
+		return y2(d.close);
+	});
+}
+
 function drawRects(params){
 	this.append("g")
 		.classed("axis y-layer-lastval", true)
@@ -321,7 +427,7 @@ function drawRects(params){
 	d3.select(".hover-rect-group-x")
 		 .append("rect")
 		 .attr("id", "hover-rect-x")
-		 .attr("width", 40)
+		 .attr("width", 85)
 		 .attr("height",19);
 	d3.select(".hover-rect-group-x")
 		.append("text")
@@ -733,7 +839,7 @@ function drawStatic(params){
 					});
 					twitterapi.fetch([], tweet_urls[0], tweet_urls[1]).getLiveTweets(true);
 
-					socket.disconnect();
+/*					socket.disconnect();
 
 					d3.selectAll(".panelstream-body")
 						.data([])
@@ -741,11 +847,7 @@ function drawStatic(params){
 						.remove();
 
 					sentMyData = false;
-					socket.connect();
-/*					socket.on('connect', function() {
-						console.log('Connected (Twitter Stream). Streaming Keyword "'+data_prices[0]['symbol'].toString()+'"...');
-					    socket.emit('stream', {'track': data_prices[0]['symbol'].toString()});
-					});*/
+					socket.connect();*/
 				  })
 				  .fail(function() {
 				    console.log( "error" );
@@ -768,10 +870,10 @@ function drawStatic(params){
 		d3.select("#chart")
 			.append("text")
 			.classed("x axis-label",true);
-		d3.select("#chart")
+/*		d3.select("#chart")
 			.append("text")
 			.classed("x axis-curr-label",true)
-			.attr("transform", "translate("+width/1.87+",75)");
+			.attr("transform", "translate("+width/1.87+",75)");*/
 		d3.select("#chart")
 			.append("text")
 			.classed("market market-by-val", true)
@@ -841,12 +943,13 @@ function plot(params){
 	drawStatic.call(this, params);
 	var self = this;
 	var prices = d3.keys(params.data_prices[0]).filter(function(d){
-		return d == "close" || d == "high" || d == "low" || d=="average";
+		return d == "close" || d=="average";
 	});
 	var legendData = d3.keys(params.data_prices[0]).filter(function(d){
 		return d == "close" || d=="average";
 	});
 	legendData.push("last value");
+	legendData.push("tweets");
 	
 	// enter()
 	volumes.selectAll(".bar")
@@ -870,6 +973,14 @@ function plot(params){
 			.attr("clip-path", "url(#clip)")
 			.attr("fill", "url(#areaGradient)")
 			.classed("area",true);
+
+	context.selectAll(".area")
+			.data([params.data_prices])
+			.enter()
+				.append("path")
+				.attr("clip-path", "url(#clip)")
+				.attr("fill", "url(#areaGradient)")
+				.classed("area",true)
 
 	this.selectAll(".price")
 		.data(prices)
@@ -899,23 +1010,29 @@ function plot(params){
 			})
 			.classed("legend", true)
 			.attr("transform", "translate(5,10)");
-/*	this.selectAll(".legend")
-		.append("rect")
-		.attr("x", width+20)
-		.attr("y", function(d,i){
-			return i*20;
-		})
-		.attr("width", 10)
-		.attr("height", 10);*/
+
 	this.selectAll(".legend")
 		.append("line")
 		.attr("x1", width+10).attr("x2", width+30) 
 		.attr("y1", function(d,i){
+			if(d=="last value") return (i*24)-1;
+			if(d=="tweets") return (i*24)-4;
 			return i*24;
 		}).attr("y2", function(d,i){
 			if(d=="last value") return (i*24)-1;
+			if(d=="tweets") return (i*24)-4;
 			return (i*24)+1;
 		}); 
+/*
+	this.selectAll(".legend")
+		.append("circle")
+		.attr("cx", width+10)
+		.attr("cy", 68.5)
+		.attr("r", 4)
+		.attr("stroke", "#dc3545")
+		.attr("stroke-width", "2px")
+		.attr("fill", "white");*/
+
   	this.selectAll(".legend")
   		.append("text")
 		.attr("x", width+38)
@@ -942,7 +1059,7 @@ function plot(params){
 			  	d3.select("#panel-placeholder-text").text("No tweets available");
 			  	d3.select("#panel-change-percentage-text").text("");
 			  	d3.select("#panel-change-value-text").text("");
-			  	d3.select(".x.axis-curr-label").style("opacity", 0);
+			  	// d3.select(".x.axis-curr-label").style("opacity", 0);
 			  	hoverLineX.style("opacity", 1e-6); 
 			  	hoverLineY.style("opacity", 1e-6); 
 			  	d3.selectAll(".market-labels").style("opacity", 0);
@@ -1033,14 +1150,6 @@ function plot(params){
 		});
 
 		// enter()
-		ctx.selectAll(".area")
-			.data([params.data_prices])
-			.enter()
-				.append("path")
-				.attr("clip-path", "url(#clip)")
-				.attr("fill", "url(#areaGradient)")
-				.classed("area",true)
-
 		g.selectAll(".trendline")
 			.data([arr])
 			.enter()
@@ -1070,11 +1179,6 @@ function plot(params){
 				.classed("avgLine", true);
 
 		//update
-		ctx.selectAll(".area")
-			.attr("d", function(d){
-				return areaCtx(d);
-			});
-
 		ctx.selectAll(".trendline")
 			.attr("d", function(d){
 				return lineCtx(d);
@@ -1142,8 +1246,18 @@ function plot(params){
 			return area(d);
 		});
 
+	context.selectAll(".area")
+		.attr("d", function(d){
+			return areaCtx(d);
+		});
+
 	// exit
 	this.selectAll(".area")
+		.data([params.data_prices])
+		.exit()
+		.remove();
+
+	context.selectAll(".area")
 		.data([params.data_prices])
 		.exit()
 		.remove();
@@ -1310,6 +1424,31 @@ function brushed() {
 			else return "translate("+(width-70)+",60)";
 		});
 
+	focus.selectAll(".pointLine")
+	.attr("x1", function(d){
+		var time = timeParser(d.timestamp);
+		return x(time);	
+	})
+	.attr("x2", function(d){
+		var time = timeParser(d.timestamp);
+		return x(time);	
+	})
+	.attr("y1", function(d){
+		return y(d.close);
+	})
+	.attr("y2", function(d){
+		return y(d3.min(data_prices, function(d) { return d.close; }));
+	});
+
+	focus.selectAll(".point")
+	.attr("cx", function(d){
+		var time = timeParser(d.timestamp);
+		return x(time);
+	})
+	.attr("cy", function(d){
+		return y(d.close);
+	});
+
 	focus.selectAll(".trendline")
 		.attr("d", function(d){
 			return line(d);
@@ -1370,6 +1509,32 @@ function zoomed() {
 			if(d3.timeFormat("%b %d, %Y")(x.domain()[0]) == d3.timeFormat("%b %d, %Y")(x.domain()[1])) return "translate("+width+",60)";
 			else return "translate("+(width-70)+",60)";
 		});
+
+	focus.selectAll(".pointLine")
+	.attr("x1", function(d){
+		var time = timeParser(d.timestamp);
+		return x(time);	
+	})
+	.attr("x2", function(d){
+		var time = timeParser(d.timestamp);
+		return x(time);	
+	})
+	.attr("y1", function(d){
+		return y(d.close);
+	})
+	.attr("y2", function(d){
+		return y(d3.min(data_prices, function(d) { return d.close; }));
+	});
+
+
+	focus.selectAll(".point")
+	.attr("cx", function(d){
+		var time = timeParser(d.timestamp);
+		return x(time);
+	})
+	.attr("cy", function(d){
+		return y(d.close);
+	});
 
 	volumes.selectAll(".bar")
 		.attr("x", function(d) { 
@@ -1485,14 +1650,14 @@ function mousemove() {
 
 	// multiFormat(timeParser(d.timestamp))
 	d3.select("#hover-rect-x").attr("x", xpos-24);
-	d3.select("#hover-text-x").attr("x", xpos-5).attr("y",12.5).text(d3.timeFormat('%H:%M')(x.invert(xpos)));
+	d3.select("#hover-text-x").attr("x", xpos+19).attr("y",12.5).text(d3.timeFormat('%d-%m-%y %H:%M')(x.invert(xpos)));
 	d3.select("#hover-rect-y").attr("y", ypos-12);
 	d3.select("#hover-text-y").attr("y", ypos).attr("x",-32).text(y.invert(ypos).toFixed(2));
-	d3.select(".x.axis-curr-label")
-		.style("opacity", 1)
-		.text(function(){
-			return d3.timeFormat('%b %d %Y, %a %H:%M')(timeParser(d.timestamp));
-		});
+	// d3.select(".x.axis-curr-label")
+	// 	.style("opacity", 1)
+	// 	.text(function(){
+	// 		return d3.timeFormat('%b %d %Y, %a %H:%M')(timeParser(d.timestamp));
+	// 	});
 
 
 
@@ -1592,8 +1757,7 @@ function mousemove() {
 			var tweet_time = d3.timeParse('%a %b %d %H:%M:%S %Z %Y')(data_tweets[c]['created_at']);
 			var point_time = timeParser(d.timestamp);
 			var diff = point_time.getTime() - tweet_time.getTime();
-			if(diff<=1800000 && diff>=-1800000) {
-				console.log(diff, "check");
+			if(diff<=3600000 && diff>=-3600000) {
 				tweet_arr.push(data_tweets[c]);
 			} else {
 				if(Date.now() - lastRemove>1000) {
@@ -1712,7 +1876,7 @@ function resetGraph() {
 
     d3.selectAll("#chart-header-text").remove();
     d3.selectAll(".axis-label").remove();
-    d3.selectAll(".axis-curr-label").remove();
+    // d3.selectAll(".axis-curr-label").remove();
     d3.selectAll(".gridline").remove();
     d3.selectAll(".m-data").remove();
     d3.selectAll(".m-labels").remove();
