@@ -85,6 +85,19 @@ body,html{
 #lastval-line {
 	stroke: #eb4d5c;
 }
+.point, .pointCtx {
+	stroke: #003d99;
+	fill: white;
+	stroke-width: 2px;
+	opacity: 0.90;
+}
+.pointLine, .pointLineCtx {
+	stroke: #003d99;
+	stroke-width: 1px;
+	stroke-dasharray: 2,2;
+	shape-rendering: crispEdges;
+	opacity: 0.90;
+}
 .trendline {
 	fill: none;
 	stroke-width: 2px;
@@ -133,6 +146,10 @@ body,html{
 }
 ._last.value.legend line {
 	stroke: #eb4d5c;
+	stroke-dasharray: 2,2;  
+}
+._tweets.legend line {
+	stroke: #003d99;
 	stroke-dasharray: 2,2;  
 }
 .tooltip {

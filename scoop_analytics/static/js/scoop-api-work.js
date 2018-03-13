@@ -2,7 +2,6 @@ var twitterapi = {
 	fetch: function() {
 		function displayTweets(arr, imgRetweet, imgFav) {
 			if(arr.length!=0){
-				console.log(arr);
 			  	d3.select("#panel-placeholder-text").text(" ");
 					d3.select("#panel-change-percentage-text").attr("opacity", 1);
 				d3.select("#panel-change-value-text").attr("opacity", 1);
@@ -61,18 +60,18 @@ var twitterapi = {
 			}
 		}
 
-		function getLiveTweets(init){
-			function getTwitterRanges(range) {
-				var result=[];
-				for(var i=0; i<data_prices.length; i++) {
-					if(i==data_prices.length-1) break;
-					if(getPercentageChange(data_prices[i].close, data_prices[i+1].close)<-range || getPercentageChange(data_prices[i].close, data_prices[i+1].close)>range) {
-					  	result.push([data_prices[i].timestamp, data_prices[i+1].timestamp]);
-					}
+		function getTwitterRanges(range){
+			var result=[];
+			for(var i=0; i<data_prices.length; i++) {
+				if(i==data_prices.length-1) break;
+				if(getPercentageChange(data_prices[i].close, data_prices[i+1].close)<-range || getPercentageChange(data_prices[i].close, data_prices[i+1].close)>range) {
+				  	result.push([data_prices[i].timestamp, data_prices[i+1].timestamp]);
 				}
-				return result;
 			}
+			return result;
+		}
 
+		function getLiveTweets(init){
 			if(init) {
 				tweet_ranges = getTwitterRanges(tweet_fetch_pct);
 				fetchNew(tweet_ranges);
@@ -100,6 +99,20 @@ var twitterapi = {
 								  		console.log("Update success");
 								  		if(init) data_tweets = data['tweets'];
 								  		else data_tweets.push(data['tweets']);
+
+								  		drawTweetIndicators.call(focus, {
+											data_prices: data_prices,
+											axis: {
+												x: xAxis,
+												y: yAxis,
+												x2: xAxis2
+											},
+											gridlines: {
+												x: xGridlines,
+												y: yGridlines,
+											},
+											initialise: true
+										});
 								  	}
 								  })
 								  .fail(function() {
