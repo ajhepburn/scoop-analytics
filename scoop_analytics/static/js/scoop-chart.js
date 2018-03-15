@@ -839,15 +839,15 @@ function drawStatic(params){
 					});
 					twitterapi.fetch([], tweet_urls[0], tweet_urls[1]).getLiveTweets(true);
 
-/*					socket.disconnect();
-
-					d3.selectAll(".panelstream-body")
+					socket.disconnect();
+					
+					/*d3.selectAll(".panelstream-body")
 						.data([])
 						.exit()
-						.remove();
+						.remove();*/
 
 					sentMyData = false;
-					socket.connect();*/
+					socket.connect();
 				  })
 				  .fail(function() {
 				    console.log( "error" );

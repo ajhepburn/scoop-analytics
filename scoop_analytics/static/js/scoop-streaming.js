@@ -1,4 +1,4 @@
-/*var socket;
+var socket;
 var sentMyData = false;
 
 function fifoQueue(){
@@ -96,4 +96,4 @@ $(document).ready(function() {
 			addStreamPanel(q.contents());
 		}
 	});
-});*/
+});
