@@ -48,7 +48,10 @@ body,html{
 	shape-rendering: crispEdges;
 }
 .axis.x {
-	opacity: 0;
+	opacity: 1;
+}
+.axis.x .tick {
+  display: none;
 }
 #x-fake-text0, #x-fake-text1 {
 	fill: #888a91;
@@ -72,7 +75,7 @@ body,html{
 .gridline path,
 .gridline line{
 	fill: none;
-	stroke: #ccc;
+	stroke: none;
 	shape-rendering: crispEdges;
 }
 #hover-line-x, #hover-line-y, #lastval-line { 
@@ -86,17 +89,19 @@ body,html{
 	stroke: #eb4d5c;
 }
 .point, .pointCtx {
-	stroke: #003d99;
+	stroke: #0065fc;
 	fill: white;
 	stroke-width: 2px;
-	opacity: 0.90;
+	opacity: 0.80;
+	pointer-events: none;
 }
 .pointLine, .pointLineCtx {
-	stroke: #003d99;
+	stroke: #0065fc;
 	stroke-width: 1px;
 	stroke-dasharray: 2,2;
 	shape-rendering: crispEdges;
-	opacity: 0.90;
+	opacity: 0.80;
+	pointer-events: none;
 }
 .trendline {
 	fill: none;
