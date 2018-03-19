@@ -20,18 +20,6 @@ api = TwitterAPI('7u1DrWrcqlRb3shnmSV271YAC', 'BjP4LEUDaDp7oSg7H5P1i9jRPtDAnGWxN
 # scrape_ticks must be in multiples of 1,5 or 10.
 scrape_ticks = 10
 stream_json = {}
-# @app.route("/twitter")
-# def twitter_login():
-# 	if not twitter.authorized:
-# 		return redirect(url_for('twitter.login'))
-# 	account_info = twitter.get('account/settings.json')
-# 	if account_info.ok:
-# 		account_info_json = account_info.json()
-# 		return '<h1>Your twitter name is @{}'.format(account_info_json['screen_name'])
-# 	return '<h1>Request failed!</h1>'
-
-# thread = None
-# thread_lock = Lock()
 
 worker = None
 
@@ -58,7 +46,6 @@ def scraper(*args):
 	for i, c in enumerate(content):
 		content[i] = c.split(",")
 		if content[i][0].startswith('a'):
-			# count = 0
 			current_epoch = int(content[i][0][1:])
 			content[i][0] = current_epoch
 			content[i][1:] = [float(x) for x in content[i][1:]]
@@ -74,7 +61,6 @@ def scraper(*args):
 
 	def db_insert():
 		new_points = []
-		# isEmpty = db.session.query(StreamPrices).first()
 		marketExists = db.session.query(exists().where(StreamPrices.market==market)).scalar()
 		stockExists = db.session.query(exists().where(StreamPrices.symbol==cashtag)).scalar()
 		index_check = False
@@ -135,19 +121,8 @@ def changer(*args):
 		result = json.dumps([dict(r) for r in prices_result])
 		return jsonify(result)
 
-# @app.route('/tweet-get', methods=['GET'])
-# def worker():
-# 	data = json.loads(request.args.get('data'))
-# 	tweet_arr = []
-# 	for item in data:
-# 		tweet_info = twitter.get('statuses/show/'+str(item)+'.json')
-# 		print(tweet_info.text)
-# 		tweet_arr.append(json.loads(tweet_info.text))
-
-# 	return jsonify({"tweets": tweet_arr})
-
-@app.route('/tweet-get-new', methods=['GET'])
-def fetch_tweets():
+@app.route('/tweet-search', methods=['GET'])
+def tweet_search():
 	result=[]
 	data = json.loads(request.args.get('data'))
 	cashtag = request.args.get('cashtag')
@@ -173,21 +148,15 @@ def fetch_tweets():
 @app.route("/")
 def main():
 	scraper('NASDAQ', 'HMNY')
-	prices_result = db.engine.execute("SELECT symbol, timestamp, open, close, high, low, volume FROM share_prices WHERE (close >= 1.025 * open) AND volume <> 0 AND symbol LIKE 'HMNY';")
-	docs_result = db.engine.execute("SELECT * FROM documents, jsonb_array_elements(data->'entities'->'symbols') where value->>'text' in ('HMNY');")
+	# prices_result = db.engine.execute("SELECT symbol, timestamp, open, close, high, low, volume FROM share_prices WHERE (close >= 1.025 * open) AND volume <> 0 AND symbol LIKE 'HMNY';")
+	# docs_result = db.engine.execute("SELECT * FROM documents, jsonb_array_elements(data->'entities'->'symbols') where value->>'text' in ('HMNY');")
 	gprices_result = db.engine.execute("SELECT * FROM stream_prices WHERE symbol like 'HMNY' ORDER BY timestamp desc;")
-	# docs_result = db.engine.execute("SELECT DISTINCT data->'id' as tweet_id, data->'text' as tweet_text, data->'timestamp_s' as tweet_created, value as cashtag FROM documents, jsonb_array_elements(data->'entities'->'symbols') where value->>'text' in ('HMNY');")
 	
-	docs = json.dumps([dict(r) for r in docs_result])
-	prices = json.dumps([dict(r) for r in prices_result])
+	# docs = json.dumps([dict(r) for r in docs_result])
+	# prices = json.dumps([dict(r) for r in prices_result])
 	gprices = json.dumps([dict(r) for r in gprices_result])
 
-	# if not twitter.authorized:
-	# 	return redirect(url_for('twitter.login'))
-	# account_info = twitter.get('account/settings.json')
-	# if account_info.ok:
-	# 	account_info_json = account_info.json()
-	return render_template('index.html', documents=docs, share_prices=prices, google_prices=gprices)
+	return render_template('index.html', google_prices=gprices)
 
 class WorkerThread(object):
 	switch = False
@@ -201,7 +170,7 @@ class WorkerThread(object):
 
 		while self.switch:
 			self.socketio.sleep(5)
-			self.r = api.request('statuses/filter', args)
+			self.r = api.request('user', args)
 			print(args)
 			if self.r.status_code == 420:
 				print("Error (420): Rate Limited")

@@ -30,7 +30,6 @@ var q = new fifoQueue();
 
 $(document).ready(function() {
 	socket = io.connect('http://' + document.domain + ':' + location.port + '/tweets');
-	// socket = io.connect(null, {port: location.port, transports: ['websocket'], upgrade: false});
 	socket.on('connect', function() {
 		console.log(sentMyData);
 		console.log('Connected (Twitter Stream). Streaming Keyword "'+data_prices[0]['symbol'].toString()+'"...');
