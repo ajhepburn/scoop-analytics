@@ -15,9 +15,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static', filename = 'js/lodash.js') }}"></script>
   <!-- Custom JS includes -->
-  <script src="{{ url_for('static', filename = 'js/nasdaq-close.js') }}"></script>  
-  <script src="{{ url_for('static', filename = 'js/scoop-parse.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'js/scoop-functions.js') }}"></script>  
   <script src="{{ url_for('static', filename = 'js/scoop-api-work.js') }}"></script>  
 </head>
 <body>
@@ -52,9 +52,7 @@
   </div>
 </div>
 <script>
-var data_prices_old = parseData.parseFlaskJSON().parsePrices({{ share_prices | tojson | safe}});
-var data_prices = parseData.parseFlaskJSON().parsePrices({{ google_prices | tojson | safe}});
-// var data_tweets = parseData.parseFlaskJSON().parseTweets({{ documents | tojson | safe}});
+var data_prices = functions.parsing().parsePrices({{ google_prices | tojson | safe}});
 var tweet_urls = ["{{ url_for('static', filename = 'img/twitter-retweet.svg') }}", "{{ url_for('static', filename = 'img/twitter-like.svg') }}", "{{ url_for('static', filename = 'img/twitter-reply.png') }}","{{ url_for('static', filename = 'img/twitter-promoted.png') }}"];
 </script>
 <script src="{{ url_for('static', filename = 'js/scoop-streaming.js') }}"></script>  

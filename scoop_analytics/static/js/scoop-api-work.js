@@ -60,37 +60,26 @@ var twitterapi = {
 			}
 		}
 
-		function getTwitterRanges(range){
-			var result=[];
-			for(var i=0; i<data_prices.length; i++) {
-				if(i==data_prices.length-1) break;
-				if(getPercentageChange(data_prices[i].close, data_prices[i+1].close)<-range || getPercentageChange(data_prices[i].close, data_prices[i+1].close)>range) {
-				  	result.push([data_prices[i].timestamp, data_prices[i+1].timestamp]);
-				}
-			}
-			return result;
-		}
+		price_changes = functions.twitterSearch().getChanges();
+
 
 		function getLiveTweets(init){
 			if(init) {
-				tweet_ranges = getTwitterRanges(tweet_fetch_pct);
+				tweet_ranges = functions.twitterSearch().getTwitterTimestamps();
 				fetchNew(tweet_ranges);
 			} else {
 				var difference=[];
-				temp_ranges = getTwitterRanges(tweet_fetch_pct);
+				temp_ranges = functions.twitterSearch().getTwitterTimestamps();
 				jQuery.grep(temp_ranges, function(el) {
 				        if (jQuery.inArray(el, tweet_ranges) == -1) difference.push(el);
 				});
 				tweet_ranges = temp_ranges;
 				fetchNew(difference);
 			}
-/*			for(var i=0; i<tweet_ranges.length; i++) {
-				console.log(timeParser(tweet_ranges[i][0]), timeParser(tweet_ranges[i][1]))
-			}*/
 
 			function fetchNew(ranges){
 				if(ranges.length!=0) {
-					var jqxhr = $.getJSON("tweet-get-new", {"data": JSON.stringify(ranges), "cashtag": cashtag})
+					var jqxhr = $.getJSON("tweet-search", {"data": JSON.stringify(ranges), "cashtag": cashtag})
 								  .done(function(data) {
 								  	if(data==429) {
 								  		console.log("Error (429): Rate Limited");
@@ -156,8 +145,8 @@ var googleapi = {
                     }
                     twitterapi.fetch([], tweet_urls[0], tweet_urls[1]).getLiveTweets(false);
                 }
-	                resetGraph();
-	                setDiscontinuities();
+	                functions.chart().resetGraph();
+	                functions.chart().setDiscontinuities();
 				    
 				    plot.call(focus, {
 						data_prices: data_prices,
