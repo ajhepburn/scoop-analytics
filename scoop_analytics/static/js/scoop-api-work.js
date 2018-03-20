@@ -121,7 +121,6 @@ var twitterapi = {
 }
 
 var googleapi = {
-
 	fetch: function() {
 		function scrapePage(market, cashtag, last_el) {
 			var jqxhr = $.getJSON("google-get", {"data": JSON.stringify([market, cashtag, last_el])})
@@ -146,7 +145,8 @@ var googleapi = {
                     twitterapi.fetch([], tweet_urls[0], tweet_urls[1]).getLiveTweets(false);
                 }
 	                functions.chart().resetGraph();
-	                functions.chart().setDiscontinuities();
+	                discontinuityList = functions.chart().collectDiscontinuities();
+	                functions.chart().setDiscontinuities(discontinuityList);
 				    
 				    plot.call(focus, {
 						data_prices: data_prices,

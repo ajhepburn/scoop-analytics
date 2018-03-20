@@ -4,6 +4,7 @@ var init_brush = null;
 var tweet_ranges=[];
 var data_tweets=[];
 var price_changes=[];
+var discontinuityList=[];
 
 // twitterapi.fetch([], tweet_urls[0], tweet_urls[1]).getLiveTweets(true);
 
@@ -134,7 +135,7 @@ var analytics = svg.append("g")
 
 var timeParser = d3.timeParse("%s");
 
-var discontinuityList = functions.chart().collectDiscontinuities();
+discontinuityList = functions.chart().collectDiscontinuities();
 
 var x = fc.scaleDiscontinuous(d3.scaleTime())
 		.domain([d3.min(data_prices, function(d){
@@ -159,7 +160,7 @@ var x = fc.scaleDiscontinuous(d3.scaleTime())
 x3.domain(x.domain());
 y3.domain([d3.min(data_prices, function(d) { return d.volume; }), d3.max(data_prices, function(d) { return d.volume; })]).nice();
 
-functions.chart().setDiscontinuities();
+functions.chart().setDiscontinuities(discontinuityList);
 
 var formatMillisecond = d3.timeFormat(".%L"),
     formatSecond = d3.timeFormat(":%S"),
@@ -747,7 +748,8 @@ function drawStatic(params){
 				  .done(function(data) {
 				  	data_prices = functions.parsing().parsePrices(data);
 	              	functions.chart().resetGraph();
-	                functions.chart().setDiscontinuities();
+	              	discontinuityList = functions.chart().collectDiscontinuities();
+	                functions.chart().setDiscontinuities(discontinuityList);
 				    
 				    plot.call(focus, {
 						data_prices: data_prices,
