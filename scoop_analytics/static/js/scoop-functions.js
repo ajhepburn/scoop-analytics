@@ -56,9 +56,9 @@ var functions = {
 
 			return disc_list;
 		}
-		function setDiscontinuities(){
-			x.discontinuityProvider(fc.discontinuityRange.apply(this,discontinuityList));
-			x2.discontinuityProvider(fc.discontinuityRange.apply(this,discontinuityList));
+		function setDiscontinuities(dList){
+			x.discontinuityProvider(fc.discontinuityRange.apply(this,dList));
+			x2.discontinuityProvider(fc.discontinuityRange.apply(this,dList));
 		}
 		function resetGraph() {
 		    d3.select(".focus").selectAll("*").remove();

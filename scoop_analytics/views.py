@@ -171,16 +171,15 @@ class WorkerThread(object):
 		while self.switch:
 			self.socketio.sleep(5)
 			self.r = api.request('user', args)
-			print(args)
+			# print(args)
 			if self.r.status_code == 420:
 				print("Error (420): Rate Limited")
 				time.sleep(60*15)
 			else:
 				for item in self.r.get_iterator():
-					print("Tweet found!", item)
+					# print("Tweet found!", item)
 					if 'text' in item:
 						json_data = {'data': item}
-						print("Here")
 						with app.test_request_context('/'):
 							self.socketio.emit('stream-response',json_data, namespace='/tweets')
 					elif 'limit' in item:
