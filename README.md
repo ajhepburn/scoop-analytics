@@ -21,7 +21,7 @@ There are a number of files outlining the base functionality of each of the func
 
 Flask is a core dependency of the application and to run the application, it must be installed on your local machine. In order to run the program, navigate to the **scoop_analytics** folder and execute the following in a terminal:
 
-*export FLASK_APP=\_\_init\_\_.py*
+*export FLASK_APP=\_\_init\_\_.py*  
 *flask run*
 
 Then navigate your browser to **http://127.0.0.1:5000**.
