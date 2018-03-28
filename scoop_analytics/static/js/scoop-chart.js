@@ -6,7 +6,7 @@ var data_tweets=[];
 var price_changes=[];
 var discontinuityList=[];
 
-// twitterapi.fetch([], tweet_urls[0], tweet_urls[1]).getLiveTweets(true);
+twitterapi.fetch([], tweet_urls[0], tweet_urls[1]).getLiveTweets(true);
 
 /*setInterval(function(){ 
 	googleapi.fetch().scrapePage(market, cashtag, data_prices[data_prices.length-1]);
@@ -351,7 +351,7 @@ function drawTweetIndicators(params){
 	});
 }
 
-function drawRects(params){
+function drawTechIndicators(params){
 	this.append("g")
 		.classed("axis y-layer-lastval", true)
 		.attr("transform", "translate(0,0)")
@@ -420,20 +420,27 @@ function drawXAxis(params){
 	xFake.append("line").attr("x1", width).attr("x2", width).attr("y2", 6).attr("stroke", "#ccc");
 }
 
-function drawBottom(params){
+function drawDashboard(params){
 	function getLastWeek() {
 		var lastWeek=[];
 		var c = 0;
 		var lastEntry = data_prices[data_prices.length-1];
 		var topOfWeek = timeParser(lastEntry.timestamp).getDay();
+		console.log(topOfWeek);
 		
 		if(topOfWeek==1) {
 			for(var i=data_prices.length-1; i>=0; --i){
 				if(timeParser(data_prices[i].timestamp).getDay()>topOfWeek) {
-					topOfWeek = timeParser(data_prices[i].timestamp).getDay();
+					topOfWeek = data_prices[i];
 					break;
 				}
 			}
+			var fromIndex = data_prices.slice(0, data_prices.indexOf(topOfWeek));
+			for (var i=fromIndex.length-1; i >= 0; --i) {
+				if(timeParser(fromIndex[i].timestamp).getDay()>=topOfWeek && timeParser(fromIndex[i].timestamp).getDate()!=timeParser(fromIndex[fromIndex.length-1].timestamp).getDate()) break;
+				else lastWeek.push(fromIndex[i]);
+			}
+			return lastWeek;
 		}
 
 		for (var i=data_prices.length-1; i >= 0; --i) {
@@ -489,15 +496,15 @@ function drawBottom(params){
 
 	var dailyCloseGroup = this.append("g")
 						.classed("daily-close-group", true)
-						.attr("transform", "translate(20,"+marginDailyClose.bottom+")");
+						.attr("transform", "translate(0,"+marginDailyClose.bottom+")");
 
 	var dailyVolGroup = this.append("g")
 						.classed("daily-vol-group", true)
-						.attr("transform", "translate(325,"+marginDailyClose.bottom+")");
+						.attr("transform", "translate(335,"+marginDailyClose.bottom+")");
 
 	var arcGroup = this.append("g")
 						.classed("arc-group", true)
-						.attr("transform", "translate(650,"+(marginDailyClose.bottom+75)+")");
+						.attr("transform", "translate(710,"+(marginDailyClose.bottom+75)+")");
 
 	dailyCloseGroup.append("text")
 					.text("Daily Close Values")
@@ -515,7 +522,7 @@ function drawBottom(params){
 
 	function drawDailyGraph(params) {
 		var x = d3.scaleBand()
-          .range([0, width/3])
+          .range([0, width/2.5])
           .padding(0.1);
 		var y = d3.scaleLinear()
           .range([heightDailyClose,0]);
@@ -529,7 +536,12 @@ function drawBottom(params){
 							.append("rect")
 							.attr("class", "bar")
 							.attr("x", function(d) { return x(Object.keys(d)[0]); })
-							.attr("width", x.bandwidth())
+							.attr("width", function(){
+								if(params.group == dailyVolGroup){
+									x.bandwidth();
+								}
+								return x.bandwidth();
+							})
 							.attr("y", function(d) { return y(Object.values(d)[0]); })
 							.style("fill", function(d,i) {
 								return color(i); 
@@ -542,13 +554,18 @@ function drawBottom(params){
 							.append("text")
 							.attr("class", "bar-text")
 							.attr("text-anchor", "middle")
-							.attr("x", function(d) { return x(Object.keys(d)[0])+22; })
+							.attr("x", function(d) { 
+								if(params.group == dailyVolGroup){
+									return x(Object.keys(d)[0])+26;
+								}
+								return x(Object.keys(d)[0])+22;
+							})
 							.attr("y", function(d) { return y(Object.values(d)[0]) + 10; })
 							.text(function(d) { 
 								if(params.group == dailyVolGroup) {
 									return String(Object.values(d)[0]).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 								}
-								return Object.values(d)[0]; 
+								return Object.values(d)[0].toFixed(2); 
 							})
 							.attr("fill", function(d,i){
 								return "#fff"
@@ -1182,8 +1199,8 @@ function plot(params){
 				.on('click', function(d) { functions.chart().rangeClip(this.textContent); });
 	}
 	drawXAxis.call(this, params);
-	drawRects.call(this, params);
-	drawBottom.call(analytics,params);
+	drawTechIndicators.call(this, params);
+	drawDashboard.call(analytics,params);
 }
 setTimeout(function(){
 	plot.call(focus, {

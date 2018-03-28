@@ -59,7 +59,7 @@ def scraper(*args):
 			if count % scrape_ticks == 0:
 				output.append(content[i])
 
-	def db_insert():
+	def insert():
 		new_points = []
 		marketExists = db.session.query(exists().where(StreamPrices.market==market)).scalar()
 		stockExists = db.session.query(exists().where(StreamPrices.symbol==cashtag)).scalar()
@@ -72,6 +72,7 @@ def scraper(*args):
 						next_pos = i+1
 						index_check = True
 					except IndexError:
+						print("ERROR: End of array")
 						index_check = False
 			if index_check:
 				for c in output[next_pos:len(output)]:
@@ -103,7 +104,7 @@ def scraper(*args):
 		if new_points!=[]:
 			return new_points
 
-	result = db_insert()
+	result = insert()
 	return jsonify({"pagedata": result})
 
 @app.route('/change-mkt-stock', methods=['GET'])
@@ -147,13 +148,8 @@ def tweet_search():
 
 @app.route("/")
 def main():
-	scraper('NASDAQ', 'HMNY')
-	# prices_result = db.engine.execute("SELECT symbol, timestamp, open, close, high, low, volume FROM share_prices WHERE (close >= 1.025 * open) AND volume <> 0 AND symbol LIKE 'HMNY';")
-	# docs_result = db.engine.execute("SELECT * FROM documents, jsonb_array_elements(data->'entities'->'symbols') where value->>'text' in ('HMNY');")
-	gprices_result = db.engine.execute("SELECT * FROM stream_prices WHERE symbol like 'HMNY' ORDER BY timestamp desc;")
-	
-	# docs = json.dumps([dict(r) for r in docs_result])
-	# prices = json.dumps([dict(r) for r in prices_result])
+	scraper('NASDAQ', 'AAPL')
+	gprices_result = db.engine.execute("SELECT * FROM stream_prices WHERE symbol like 'AAPL' ORDER BY timestamp desc;")
 	gprices = json.dumps([dict(r) for r in gprices_result])
 
 	return render_template('index.html', google_prices=gprices)
@@ -183,9 +179,9 @@ class WorkerThread(object):
 						with app.test_request_context('/'):
 							self.socketio.emit('stream-response',json_data, namespace='/tweets')
 					elif 'limit' in item:
-						print ('%d tweets missed') % item['limit'].get('track')
+						print(item['limit'].get('track'))
 					elif 'disconnect' in item:
-						print ('disconnecting because %s') % item['disconnect'].get('reason')
+						print(item['disconnect'].get('reason'))
 						break
 
 			eventlet.sleep(2)
