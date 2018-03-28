@@ -1,4 +1,32 @@
-var market = data_prices[data_prices.length-1]['market'];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: scoop-chart.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: scoop-chart.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>var market = data_prices[data_prices.length-1]['market'];
 var cashtag = data_prices[data_prices.length-1]['symbol'];
 var init_brush = null;
 var tweet_ranges=[];
@@ -174,12 +202,12 @@ var formatMillisecond = d3.timeFormat(".%L"),
     formatYear = d3.timeFormat("%Y");
 
 function multiFormat(date) {
-  return (d3.timeSecond(date) < date ? formatMillisecond
-    : d3.timeMinute(date) < date ? formatSecond
-    : d3.timeHour(date) < date ? formatMinute
-    : d3.timeDay(date) < date ? formatHour
-    : d3.timeMonth(date) < date ? (d3.timeWeek(date) < date ? formatDay : formatWeek)
-    : d3.timeYear(date) < date ? formatMonth
+  return (d3.timeSecond(date) &lt; date ? formatMillisecond
+    : d3.timeMinute(date) &lt; date ? formatSecond
+    : d3.timeHour(date) &lt; date ? formatMinute
+    : d3.timeDay(date) &lt; date ? formatHour
+    : d3.timeMonth(date) &lt; date ? (d3.timeWeek(date) &lt; date ? formatDay : formatWeek)
+    : d3.timeYear(date) &lt; date ? formatMonth
     : formatYear)(date);
 }
 
@@ -243,7 +271,7 @@ var areaCtx = d3.area()
 
 
 function colorise(key){
-	if(key<0) return "#d62728";
+	if(key&lt;0) return "#d62728";
 	else return "#2ca02c";
 }
 
@@ -266,9 +294,9 @@ function drawTweetIndicators(params){
 	tweet_ranges.forEach((val)=>{temp_arr.push(data_prices.find(x=>x.timestamp == val[1]));});
 
 	temp_arr.forEach((val)=>{
-		for(var i=0; i < tweet_times.length; i++) {
+		for(var i=0; i &lt; tweet_times.length; i++) {
 			var diff = val.timestamp - tweet_times[i];
-			if(diff<=1800 && diff>=-1800) {
+			if(diff&lt;=1800 &amp;&amp; diff>=-1800) {
 				if(!point_arr.includes(val)) point_arr.push(val);
 			}
 		}
@@ -454,6 +482,7 @@ function drawDashboard(params){
 		var c = 0;
 		var lastEntry = data_prices[data_prices.length-1];
 		var topOfWeek = timeParser(lastEntry.timestamp).getDay();
+		console.log(topOfWeek);
 		
 		if(topOfWeek==1) {
 			for(var i=data_prices.length-1; i>=0; --i){
@@ -464,14 +493,14 @@ function drawDashboard(params){
 			}
 			var fromIndex = data_prices.slice(0, data_prices.indexOf(topOfWeek));
 			for (var i=fromIndex.length-1; i >= 0; --i) {
-				if(timeParser(fromIndex[i].timestamp).getDay()>=topOfWeek && timeParser(fromIndex[i].timestamp).getDate()!=timeParser(fromIndex[fromIndex.length-1].timestamp).getDate()) break;
+				if(timeParser(fromIndex[i].timestamp).getDay()>=topOfWeek &amp;&amp; timeParser(fromIndex[i].timestamp).getDate()!=timeParser(fromIndex[fromIndex.length-1].timestamp).getDate()) break;
 				else lastWeek.push(fromIndex[i]);
 			}
 			return lastWeek;
 		}
 
 		for (var i=data_prices.length-1; i >= 0; --i) {
-			if(timeParser(data_prices[i].timestamp).getDay()>=topOfWeek && timeParser(data_prices[i].timestamp).getDate()!=timeParser(lastEntry.timestamp).getDate()) break;
+			if(timeParser(data_prices[i].timestamp).getDay()>=topOfWeek &amp;&amp; timeParser(data_prices[i].timestamp).getDate()!=timeParser(lastEntry.timestamp).getDate()) break;
 			else lastWeek.push(data_prices[i]);
 		}
 		return lastWeek;
@@ -487,7 +516,7 @@ function drawDashboard(params){
 
 	function getAverages(key){
 		var total = 0;
-		for(var i=0; i < lastWeek.length; i++) {
+		for(var i=0; i &lt; lastWeek.length; i++) {
 			total+=lastWeek[i][key]
 		}
 		return total/lastWeek.length;
@@ -645,7 +674,7 @@ function drawDashboard(params){
 			.attr("id", "arc-change")
 			.attr("transform", "translate(-30,-10)")
 			.text(function(){
-						if(params.change<0) return params.change;
+						if(params.change&lt;0) return params.change;
 						else return "+"+params.change;
 					})
 			.attr("fill", function(){
@@ -656,7 +685,7 @@ function drawDashboard(params){
 					.attr("id", "arc-change-pct")
 					.attr("transform", "translate(-39,15)")
 					.text(function(){
-						if(params.changePct<0) return params.changePct+"%";
+						if(params.changePct&lt;0) return params.changePct+"%";
 						else return "+"+params.changePct+"%";
 					})
 					.attr("fill", function(){
@@ -877,7 +906,7 @@ function drawStatic(params){
 						.attr("transform", "translate("+width/8+",75)")
 						.classed("m-data", true);
 		var dataRange = ['current','high', 'low', 'avg', 'vol'];
-		for(var i=0; i<dataRange.length; i++){
+		for(var i=0; i&lt;dataRange.length; i++){
 			var txt = dataRange[i];
 			marketData.append("text")
 						.classed("market market-"+dataRange[i],true)
@@ -890,7 +919,7 @@ function drawStatic(params){
 							.classed("m-labels", true);
 
 		var labelRange = ['C', 'H', 'L', 'A', 'V'];
-		for(var i=0; i<labelRange.length; i++){
+		for(var i=0; i&lt;labelRange.length; i++){
 			var txt = labelRange[i];
 			marketLabels.append("text")
 						.classed("market-labels market-"+labelRange[i],true)
@@ -1066,7 +1095,7 @@ function plot(params){
 						var date_format = d3.timeFormat("%d-%m")(timeParser(d.timestamp));
 						var time_format = d3.timeFormat("%H:%M")(timeParser(d.timestamp));
 
-						return date_format + " (<b>"+time_format+"</b>)<br/><b>Volume</b>: "+ d3.format(",")(d.volume);
+						return date_format + " (&lt;b>"+time_format+"&lt;/b>)&lt;br/>&lt;b>Volume&lt;/b>: "+ d3.format(",")(d.volume);
 					 })
 					.transition();
 				d3.select(this)
@@ -1249,7 +1278,7 @@ function plot(params){
 	focus.append("g").classed("daterange-group", true).attr("transform", "translate("+(width-119)+",0)");
 
 	var dateRange = ['1d','1w', '1m', '3m', '6m', '1y']
-	for (var i = 0, l = dateRange.length; i < l; i ++) {
+	for (var i = 0, l = dateRange.length; i &lt; l; i ++) {
 		var txt = dateRange[i];
 		d3.select(".daterange-group")
 				.append('text')
@@ -1375,4 +1404,26 @@ $("#bs-left-div").hover(function(){
 	d3.select("#panel-placeholder-text").text("No tweets available");
   	d3.select("#panel-change-percentage-text").text("");
   	d3.select("#panel-change-value-text").text("");
-}, function(){});
+}, function(){});</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#addStreamPanel">addStreamPanel</a></li><li><a href="global.html#arithmetic">arithmetic</a></li><li><a href="global.html#brushed">brushed</a></li><li><a href="global.html#chart">chart</a></li><li><a href="global.html#collectDiscontinuities">collectDiscontinuities</a></li><li><a href="global.html#displayTweets">displayTweets</a></li><li><a href="global.html#drawArc">drawArc</a></li><li><a href="global.html#drawDailyGraph">drawDailyGraph</a></li><li><a href="global.html#drawDashboard">drawDashboard</a></li><li><a href="global.html#drawStatic">drawStatic</a></li><li><a href="global.html#drawTechIndicators">drawTechIndicators</a></li><li><a href="global.html#drawTweetIndicators">drawTweetIndicators</a></li><li><a href="global.html#drawXAxis">drawXAxis</a></li><li><a href="global.html#fetchNew">fetchNew</a></li><li><a href="global.html#fifoQueue">fifoQueue</a></li><li><a href="global.html#getChanges">getChanges</a></li><li><a href="global.html#getLiveTweets">getLiveTweets</a></li><li><a href="global.html#getPercentageChange">getPercentageChange</a></li><li><a href="global.html#getTwitterTimestamps">getTwitterTimestamps</a></li><li><a href="global.html#googleapi">googleapi</a></li><li><a href="global.html#mousemove">mousemove</a></li><li><a href="global.html#parsePrices">parsePrices</a></li><li><a href="global.html#parsing">parsing</a></li><li><a href="global.html#plot">plot</a></li><li><a href="global.html#rangeClip">rangeClip</a></li><li><a href="global.html#removeStreamPanel">removeStreamPanel</a></li><li><a href="global.html#resetGraph">resetGraph</a></li><li><a href="global.html#scrapePage">scrapePage</a></li><li><a href="global.html#setDiscontinuities">setDiscontinuities</a></li><li><a href="global.html#twitterapi">twitterapi</a></li><li><a href="global.html#twitterSearch">twitterSearch</a></li><li><a href="global.html#zoomed">zoomed</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Mar 28 2018 14:54:10 GMT+0100 (BST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,4 +1,32 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: scoop-functions.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: scoop-functions.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * @file Containss all of the arithmetic operations, twitter Search capabilities, chart and parsing functions.
  */
 
@@ -39,7 +67,7 @@ var functions = {
 		 */
 		function getChanges(){
 			var total=[];
-			for(var i=0; i<data_prices.length; i++) {
+			for(var i=0; i&lt;data_prices.length; i++) {
 				if(i==data_prices.length-1) break;
 				total.push([functions.arithmetic().getPercentageChange(data_prices[i].close, data_prices[i+1].close), data_prices[i], data_prices[i+1]]);
 			}
@@ -49,7 +77,7 @@ var functions = {
 					});
 			return {
 				"increases": _.takeRight(_.filter(total, number => number[0] > 0),5),
-				"decreases": _.takeRight(_.filter(total, number => number[0] < 0).reverse(),5)
+				"decreases": _.takeRight(_.filter(total, number => number[0] &lt; 0).reverse(),5)
 			};
 		}
 		/**
@@ -87,7 +115,7 @@ var functions = {
 		function collectDiscontinuities(){
 			var disc_list = []
 
-			for(var i=0; i < data_prices.length; i++) {
+			for(var i=0; i &lt; data_prices.length; i++) {
 				if(!i) continue;
 				var curr_el = timeParser(data_prices[i].timestamp).getTime();
 				var prev_el = timeParser(data_prices[i-1].timestamp).getTime();
@@ -155,18 +183,18 @@ var functions = {
 		 * @description Responsible for all of the panning capabilities in the chart, known in d3 as "brushing".
 		 */
 		function brushed() {
-			if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return;
+			if (d3.event.sourceEvent &amp;&amp; d3.event.sourceEvent.type === "zoom") return;
 			var selection = d3.event.selection;
 			var ext = selection.map(x2.invert, x2);
 			init_brush = selection;
 			x.domain(selection.map(x2.invert, x2));
 			y.domain([
-		          d3.min(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.close : d3.max(data_prices.map(function(d) { return d.close; })); })),
-		          d3.max(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.close : d3.min(data_prices.map(function(d) { return d.close; })); }))
+		          d3.min(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] &amp;&amp; timeParser(d.timestamp) &lt;= ext[1]) ? d.close : d3.max(data_prices.map(function(d) { return d.close; })); })),
+		          d3.max(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] &amp;&amp; timeParser(d.timestamp) &lt;= ext[1]) ? d.close : d3.min(data_prices.map(function(d) { return d.close; })); }))
 		        ]);
 			y3.domain([
-		          d3.min(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.volume : d3.max(data_prices.map(function(d) { return d.volume; })); })),
-		          d3.max(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.volume : d3.min(data_prices.map(function(d) { return d.volume; })); }))
+		          d3.min(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] &amp;&amp; timeParser(d.timestamp) &lt;= ext[1]) ? d.volume : d3.max(data_prices.map(function(d) { return d.volume; })); })),
+		          d3.max(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] &amp;&amp; timeParser(d.timestamp) &lt;= ext[1]) ? d.volume : d3.min(data_prices.map(function(d) { return d.volume; })); }))
 		        ]);
 			d3.select(".x.axis-label")
 				.text(function(){
@@ -223,7 +251,7 @@ var functions = {
 				})
 				.attr("y", function(d) { return y3(d.volume); })
 				.attr("height", function(d) { 
-					if((height2 - y3(d.volume))<0) return height2;
+					if((height2 - y3(d.volume))&lt;0) return height2;
 					else return height2 - y3(d.volume); });
 			focus.select(".axis.x").call(xAxis);
 			focus.select(".axis.y").call(yAxis);
@@ -233,7 +261,7 @@ var functions = {
 			d3.select("#x-fake-text0").text(d3.timeFormat("%H:%M")(x.domain()[0]));
 			d3.select("#x-fake-text1").text(d3.timeFormat("%H:%M")(x.domain()[1]));
 
-			if (data_prices[data_prices.length-1].close > y.domain()[0] && data_prices[data_prices.length-1].close < y.domain()[1]) {
+			if (data_prices[data_prices.length-1].close > y.domain()[0] &amp;&amp; data_prices[data_prices.length-1].close &lt; y.domain()[1]) {
 				d3.select(".rect-group-lastval").attr("visibility", "visible");
 				d3.select("#lastval-rect").attr("y",y(data_prices[data_prices.length-1].close));
 				d3.select("#lastval-text").attr("y",y(data_prices[data_prices.length-1].close)+12);
@@ -246,17 +274,17 @@ var functions = {
 		 * @description Responsible for all of the zooming and resizing capabilities of the chart.
 		 */
 		function zoomed() {
-			if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return;
+			if (d3.event.sourceEvent &amp;&amp; d3.event.sourceEvent.type === "brush") return;
 			var t = d3.event.transform;
 			var ext = t.rescaleX(x2).domain();
 			x.domain(t.rescaleX(x2).domain());
 			y.domain([
-		          d3.min(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.close : d3.max(data_prices.map(function(d) { return d.close; })); })),
-		          d3.max(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.close : d3.min(data_prices.map(function(d) { return d.close; })); }))
+		          d3.min(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] &amp;&amp; timeParser(d.timestamp) &lt;= ext[1]) ? d.close : d3.max(data_prices.map(function(d) { return d.close; })); })),
+		          d3.max(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] &amp;&amp; timeParser(d.timestamp) &lt;= ext[1]) ? d.close : d3.min(data_prices.map(function(d) { return d.close; })); }))
 		        ]);
 			y3.domain([
-		          d3.min(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.volume : d3.max(data_prices.map(function(d) { return d.volume; })); })),
-		          d3.max(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] && timeParser(d.timestamp) <= ext[1]) ? d.volume : d3.min(data_prices.map(function(d) { return d.volume; })); }))
+		          d3.min(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] &amp;&amp; timeParser(d.timestamp) &lt;= ext[1]) ? d.volume : d3.max(data_prices.map(function(d) { return d.volume; })); })),
+		          d3.max(data_prices.map(function(d) { return (timeParser(d.timestamp) >= ext[0] &amp;&amp; timeParser(d.timestamp) &lt;= ext[1]) ? d.volume : d3.min(data_prices.map(function(d) { return d.volume; })); }))
 		        ]);
 			d3.select(".x.axis-label")
 				.text(function(){
@@ -301,7 +329,7 @@ var functions = {
 				})
 				.attr("y", function(d) { return y3(d.volume); })
 				.attr("height", function(d) { 
-					if((height2 - y3(d.volume))<0) return height2;
+					if((height2 - y3(d.volume))&lt;0) return height2;
 					else return height2 - y3(d.volume); });
 			focus.selectAll(".trendline")
 				.attr("d", function(d){
@@ -324,7 +352,7 @@ var functions = {
 			d3.select("#x-fake-text0").text(d3.timeFormat("%H:%M")(x.domain()[0]));
 			d3.select("#x-fake-text1").text(d3.timeFormat("%H:%M")(x.domain()[1]));
 			
-			if (data_prices[data_prices.length-1].close > y.domain()[0] && data_prices[data_prices.length-1].close < y.domain()[1]) {
+			if (data_prices[data_prices.length-1].close > y.domain()[0] &amp;&amp; data_prices[data_prices.length-1].close &lt; y.domain()[1]) {
 				d3.select(".rect-group-lastval").attr("visibility", "visible");
 				d3.select("#lastval-rect").attr("y",y(data_prices[data_prices.length-1].close));
 				d3.select("#lastval-text").attr("y",y(data_prices[data_prices.length-1].close)+12);
@@ -376,7 +404,7 @@ var functions = {
 
 					if(change>0) return "+"+change;
 					else if(change==0) return change;
-					else if(change<0) return change;
+					else if(change&lt;0) return change;
 				}
 			}).style("fill", function(){
 				var change = checkPrev(d)[0];
@@ -471,11 +499,11 @@ var functions = {
 			// PANEL
 			if(data_tweets.length!=0) {
 				var tweet_arr = [];
-				for(var c=0; c<data_tweets.length; c++){
+				for(var c=0; c&lt;data_tweets.length; c++){
 					var tweet_time = d3.timeParse('%a %b %d %H:%M:%S %Z %Y')(data_tweets[c]['created_at']);
 					var point_time = timeParser(d.timestamp);
 					var diff = point_time.getTime() - tweet_time.getTime();
-					if(diff<=3600000 && diff>=-3600000) {
+					if(diff&lt;=3600000 &amp;&amp; diff>=-3600000) {
 						tweet_arr.push(data_tweets[c]);
 					} else {
 						if(Date.now() - lastRemove>1000) {
@@ -521,7 +549,7 @@ var functions = {
 					var check = data_prices[i].timestamp - ts;
 					if(check>0) times_struct[i] = data_prices[i].timestamp - ts;
 				}
-				var smallest=Object.keys(times_struct).reduce(function(a, b){ return times_struct[a] < times_struct[b] ? a : b });
+				var smallest=Object.keys(times_struct).reduce(function(a, b){ return times_struct[a] &lt; times_struct[b] ? a : b });
 				return timeParser(data_prices[smallest].timestamp);
 			}
 
@@ -598,4 +626,26 @@ var functions = {
 		}
 	}
 
-}
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#addStreamPanel">addStreamPanel</a></li><li><a href="global.html#arithmetic">arithmetic</a></li><li><a href="global.html#brushed">brushed</a></li><li><a href="global.html#chart">chart</a></li><li><a href="global.html#collectDiscontinuities">collectDiscontinuities</a></li><li><a href="global.html#displayTweets">displayTweets</a></li><li><a href="global.html#drawArc">drawArc</a></li><li><a href="global.html#drawDailyGraph">drawDailyGraph</a></li><li><a href="global.html#drawDashboard">drawDashboard</a></li><li><a href="global.html#drawStatic">drawStatic</a></li><li><a href="global.html#drawTechIndicators">drawTechIndicators</a></li><li><a href="global.html#drawTweetIndicators">drawTweetIndicators</a></li><li><a href="global.html#drawXAxis">drawXAxis</a></li><li><a href="global.html#fetchNew">fetchNew</a></li><li><a href="global.html#fifoQueue">fifoQueue</a></li><li><a href="global.html#getChanges">getChanges</a></li><li><a href="global.html#getLiveTweets">getLiveTweets</a></li><li><a href="global.html#getPercentageChange">getPercentageChange</a></li><li><a href="global.html#getTwitterTimestamps">getTwitterTimestamps</a></li><li><a href="global.html#googleapi">googleapi</a></li><li><a href="global.html#mousemove">mousemove</a></li><li><a href="global.html#parsePrices">parsePrices</a></li><li><a href="global.html#parsing">parsing</a></li><li><a href="global.html#plot">plot</a></li><li><a href="global.html#rangeClip">rangeClip</a></li><li><a href="global.html#removeStreamPanel">removeStreamPanel</a></li><li><a href="global.html#resetGraph">resetGraph</a></li><li><a href="global.html#scrapePage">scrapePage</a></li><li><a href="global.html#setDiscontinuities">setDiscontinuities</a></li><li><a href="global.html#twitterapi">twitterapi</a></li><li><a href="global.html#twitterSearch">twitterSearch</a></li><li><a href="global.html#zoomed">zoomed</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Mar 28 2018 14:54:10 GMT+0100 (BST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+    "tags": {
+        "allowUnknownTags": true
+    },
+    "source": {
+        "include": ["scoop-api-work.js", "scoop-chart.js", "scoop-functions.js", "scoop-streaming.js"],
+        "exclude": ["d3.min.js", "jquery-3.2.1.min.js", "lodash.js"]
+    },
+    "opts": {
+        "template": "templates/default"
+    },
+    "plugins": [],
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": false,
+        "useLongnameInNav": true,
+        "default": {
+            "outputSourceFiles": true,
+            "useLongnameInNav": true
+        }
+    }
+}
