@@ -116,6 +116,7 @@ def changer(*args):
 	content = [c.decode() for c in page.content.splitlines()]
 	if (content[len(content)-1].startswith("DATA")):
 		result = 'INVALID'
+		return jsonify(result)
 	else:
 		scraper(data[0], data[1])
 		prices_result = db.engine.execute("SELECT * FROM stream_prices WHERE symbol like '"+data[1]+"' ORDER BY timestamp desc;")

@@ -18,10 +18,16 @@ body,html{
 .buttons{
 	margin-left:80px;
 }
-#confirm-change-text {
+#error-change-text, #confirm-change-text {
 	font-size: 75%;
+}
+#confirm-change-text {
 	color: steelblue !important;
 	text-decoration: underline;
+}
+#error-change-text {
+	color: darkred !important;
+	text-decoration: none;
 }
 #chart{
 	background-color: #FFFFFF;
